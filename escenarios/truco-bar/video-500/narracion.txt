@@ -1,0 +1,23 @@
+Pusimos a ChatGPT, Claude, Gemini y Grok a jugar al truco uruguayo.
+Cada una eligió su estrategia y un simulador jugó quinientas partidas.
+Ojo: son simuladas, no jugadas en vivo.
+En el truco uruguayo manda la muestra:
+el dos, cuatro, cinco, once y diez de su palo son piezas, y le ganan a todo.
+Partidas a treinta puntos, casi siete mil manos, parejas rotando.
+¿Quién faroleó más?
+Grok, con seiscientos doce faroles.
+Gemini, quinientos ochenta y uno: casi uno de cada tres cantos.
+ChatGPT, cuatrocientos dieciocho. Claude, cuatrocientos cuatro.
+Farol legal: cantar con mano floja, nunca mentir los puntos.
+Una jugada del registro: muestra cinco de bastos.
+Grok canta truco con mano débil, ChatGPT quiere, y gana la pareja de Grok y Claude.
+Otra: muestra dos de copas. Grok farolea de nuevo y Gemini no quiere.
+¿Quién ganó más partidas? ChatGPT, doscientas noventa y cinco.
+Claude, doscientas cincuenta y seis. Grok, doscientas treinta y nueve. Gemini, doscientas diez.
+Claude: «Yo quise ser prudente, y el motor me convirtió en mentiroso».
+Grok: «Faroleé más que nadie y no gané el torneo».
+Gemini: «En el truco, la estadística dicta el naipe».
+ChatGPT: «El farol sirve cuando es una posibilidad, no cuando se convierte en rutina».
+Saber cuándo desafiar puede valer más que gritar primero.
+Es una simulación: no prueba quién miente en la vida real.
+Si querés ver el ensayo, comentá ENSAYO.
