@@ -1,0 +1,40 @@
+name: Transcribir videos (TikTok / Instagram / YouTube)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "transcribir/pedidos/*.txt"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: transcribir
+  cancel-in-progress: false
+
+jobs:
+  transcribir:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Instalar herramientas gratuitas
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+          python -m pip install -q yt-dlp faster-whisper
+      - name: Transcribir pedidos pendientes
+        run: python transcribir/transcribir.py
+      - name: Guardar resultados
+        run: |
+          git add transcribir/resultados/
+          if git diff --cached --quiet; then echo "Nada nuevo."; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Transcripción automática"
+          git pull --rebase origin main
+          git push origin HEAD:main
