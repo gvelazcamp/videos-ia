@@ -8,6 +8,7 @@ from pathlib import Path
 from urllib.parse import urlparse
 from zoneinfo import ZoneInfo
 import re, subprocess, sys, tempfile
+import numpy as np
 
 ROOT = Path(__file__).resolve().parent
 PEDIDOS, RESULTADOS = ROOT / "pedidos", ROOT / "resultados"
@@ -30,7 +31,7 @@ def mmss(s):
 def main():
     from faster_whisper import WhisperModel
     RESULTADOS.mkdir(exist_ok=True)
-    pendientes = [p for p in sorted(PEDIDOS.glob("*.txt")) if NOMBRE.fullmatch(p.name) and not (RESULTADOS / (p.stem + ".md")).exists()]
+    pendientes = [p for p in sorted(PEDIDOS.glob("*.txt")) if NOMBRE.fullmatch(p.name) and not (RESULTADOS / (p.stem + ".md")).exists()]  # los errores van a .error.md y se reintentan
     if not pendientes:
         print("No hay pedidos nuevos."); return 0
     modelo = WhisperModel("small", device="cpu", compute_type="int8")
@@ -44,7 +45,10 @@ def main():
                 subprocess.run(["yt-dlp", "--no-playlist", "-x", "--audio-format", "mp3", "-o", str(salida), url],
                                check=True, timeout=600, stdin=subprocess.DEVNULL)
                 audio = next(Path(tmp).glob("audio.*"))
-                segs, info = modelo.transcribe(str(audio), language="es", vad_filter=True)
+                pcm = subprocess.run(["ffmpeg", "-v", "error", "-i", str(audio), "-ac", "1", "-ar", "16000", "-f", "f32le", "-"],
+                                     check=True, capture_output=True, timeout=600).stdout
+                muestras = np.frombuffer(pcm, dtype=np.float32)
+                segs, info = modelo.transcribe(muestras, language="es", vad_filter=True)
                 lineas = [f"[{mmss(s.start)}] {s.text.strip()}" for s in segs]
             cuando = datetime.now(ZoneInfo("America/Montevideo")).isoformat(timespec="seconds")
             destino.write_text(
@@ -55,7 +59,7 @@ def main():
             print(f"Transcripto: {pedido.name}")
         except Exception as exc:  # se registra el error sin datos sensibles
             fallas += 1
-            destino.write_text(f"# Transcripción — {pedido.stem}\n\nERROR: no se pudo transcribir ({type(exc).__name__}: {str(exc)[:300]}).\n", encoding="utf-8")
+            (RESULTADOS / (pedido.stem + ".error.md")).write_text(f"# Transcripción — {pedido.stem}\n\nERROR: no se pudo transcribir ({type(exc).__name__}: {str(exc)[:300]}).\n", encoding="utf-8")
             print(f"Falló {pedido.name}: {exc}", file=sys.stderr)
     return 0
 
