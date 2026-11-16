@@ -61,6 +61,9 @@ def main() -> None:
 
             download_btn = page.get_by_role("button", name=re.compile(r"^Download", re.I)).first
             download_btn.wait_for(state="visible", timeout=90000)
+            # El boton puede aparecer antes de que el procesamiento termine.
+            # En el primer run de Actions se descargo un PNG opaco demasiado pronto.
+            page.wait_for_timeout(14000)
             # El menú ofrece Preview/Free y, según la imagen, Max/HD.
             # Seleccionar EXCLUSIVAMENTE Preview evita consumir créditos.
             download_btn.click()
@@ -80,6 +83,7 @@ def main() -> None:
             rgba = output.convert("RGBA")
             alpha = rgba.getchannel("A")
             minimum, maximum = alpha.getextrema()
+            print(f"Diagnostico PNG: {output.size} modo={output.mode}, alpha_min={minimum}, alpha_max={maximum}")
             if maximum == 0 or minimum == 255:
                 raise ValueError("Resultado inválido: no contiene sujeto y transparencia.")
             rgba.save(destino, "PNG", optimize=True)
