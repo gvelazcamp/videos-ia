@@ -15,6 +15,7 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/removebg-web-sin-api.yml'
+      - 'herramientas/removebg-web/remover.py'
 
 permissions:
   contents: write
