@@ -10,3 +10,9 @@ Estilo tomado de las referencias de Gonzalo (`referencias/recibidas/01-chatgpt-h
 **Regla:** en cada video, cada IA está sobre su islita, y **la islita se ilumina cuando se nombra a esa IA o cuando habla**: `isla.userData.luz(1)`. Las demás quedan tenues: `luz(0)`.
 
 Uso: `cat base.js islas.js main.js > scene2.js`. En `main.js`: `const g = crearIsla('chatgpt', 2.3); scene.add(g); g.userData.luz(k);`.
+
+## Expresiones de los robots (expresiones.js)
+6 caras: contento, sorprendido, pensando, asustado, festejando, triste.
+`prepararCara(bot)` una vez; después `ponerExpresion(bot, 'festejando', T)` en cada cuadro y
+`iconoExpresion(bot, expr, T)` dibuja el ícono arriba de la cabeza (rayitos, !!, ?, gotitas, papelitos, lágrima).
+Demo: `cat base.js islas.js expresiones.js demo-expresiones.js > scene2.js`.
