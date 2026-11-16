@@ -1,0 +1,66 @@
+name: Remove.bg en la nube sin API (web oficial)
+
+on:
+  workflow_dispatch:
+    inputs:
+      origen:
+        description: 'Ruta de la imagen existente en GitHub'
+        required: true
+        default: 'experimentos/pikachu-surf-3ia/referencia-original.png'
+      destino:
+        description: 'Nuevo PNG transparente dentro de experimentos/ o recortes/'
+        required: true
+        default: 'experimentos/pikachu-castillo-terror/personaje-removebg-web.png'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/removebg-web-sin-api.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: removebg-web-sin-api
+  cancel-in-progress: false
+
+jobs:
+  recortar-sin-api:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      IMAGE_PATH: ${{ github.event.inputs.origen || 'experimentos/pikachu-surf-3ia/referencia-original.png' }}
+      OUTPUT_PATH: ${{ github.event.inputs.destino || 'experimentos/pikachu-castillo-terror/personaje-removebg-web.png' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Preparar navegador en la nube
+        run: |
+          python -m pip install --disable-pip-version-check pillow playwright
+          python -m playwright install --with-deps chromium
+      - name: Subir al sitio oficial y descargar SOLO Preview gratuito
+        run: python herramientas/removebg-web/remover.py
+      - name: Guardar el PNG nuevo en GitHub sin modificar proyectos existentes
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add -- "$OUTPUT_PATH"
+          if git diff --cached --quiet; then
+            echo 'Sin cambios en PNG.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'remove.bg web gratuito: PNG transparente sin API'
+          git pull --rebase origin main
+          git push origin HEAD:main
+      - name: Guardar copia descargable del PNG
+        uses: actions/upload-artifact@v4
+        with:
+          name: removebg-png-transparente
+          path: ${{ env.OUTPUT_PATH }}
+          if-no-files-found: error
+          retention-days: 7
