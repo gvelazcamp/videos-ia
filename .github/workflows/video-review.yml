@@ -28,6 +28,12 @@ jobs:
               raise SystemExit('Ruta MP4 invalida')
           print(p,p.stat().st_size)
           PY
+      - name: Instalar FFmpeg
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          ffmpeg -version
+          ffprobe -version
       - name: Extraer fotogramas y metadatos
         env:
           VIDEO_PATH: ${{ inputs.video_path }}
