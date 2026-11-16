@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0d1c35">
+<title>Pikachu haciendo surf — ChatGPT × Gemini × Grok</title>
+<style>
+:root{color-scheme:dark;--surface:#102843;--aqua:#74f8e1}
+*{box-sizing:border-box}
+body{margin:0;background:#09172d;color:#edfaff;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+main{max-width:1120px;margin:auto;padding:30px 18px 48px}
+header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:22px}
+.brand{font-size:12px;letter-spacing:.16em;font-weight:800;color:#93b5c8}
+.credit{font-size:12px;color:#9daec5}
+h1{font-size:clamp(31px,5vw,56px);letter-spacing:-.045em;line-height:1.09;margin:0 0 8px}
+h1 span{color:var(--aqua)}
+.intro{color:#c1d5e4;max-width:710px;line-height:1.65;margin:0 0 20px;font-size:14px}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 290px;gap:16px;align-items:start}
+.stage{position:relative;aspect-ratio: 800/565;min-height:340px;overflow:hidden;border-radius:23px;background:radial-gradient(ellipse at 75% 42%,#fad5a27d,transparent 32%),linear-gradient(180deg,#1b4167 0%,#337b9a 42%,#efbd94 53%,#164b7d 54%,#0b4b79 100%);box-shadow:0 25px 60px #0005;isolation:isolate}
+.skyshine{position:absolute;top:17%;right:23%;width:110px;height:110px;border-radius:50%;background:#ffe6ab;box-shadow:0 0 42px #ffe6ab99,0 0 105px #ffc07f80}
+.island{position:absolute;bottom:42%;left:-4%;width:33%;height:9%;border-radius:70% 90% 0 0;background:#0b4563;opacity:.75}
+.cloud{position:absolute;width:130px;height:22px;background:#dff5ec45;filter:blur(11px);border-radius:100px}
+.c1{top:16%;left:10%}.c2{top:31%;right:8%;width:86px}
+.wave{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+#backwave{z-index:1;fill:#2a9cb3}
+#frontwave{z-index:5;fill:#1372a5;opacity:.77}
+#foam{z-index:7;stroke:#d4f9ed;fill:none;stroke-width:3;stroke-linecap:round;opacity:.7}
+.rig{position:absolute;z-index:4;left:50%;bottom:9%;width:300px;height:395px;transform:translateX(-50%);transform-origin:50% 90%;will-change:transform}
+.character{position:absolute;top:0;left:0;width:298px;height:342px;transform-origin:50% 87%;will-change:transform;filter:drop-shadow(1px 9px 7px #0937544d)}
+.character img{display:block;width:298px;height:342px;object-fit:contain}
+#traces{position:absolute;inset:0;width:298px;height:342px;display:none;pointer-events:none;overflow:visible}
+#traces path{stroke:#ff2bdf;stroke-width:2.4;stroke-linejoin:round;fill:none;vector-effect:non-scaling-stroke;filter:drop-shadow(0 0 3px #fff)}
+.show-traces #traces{display:block}
+.board{position:absolute;z-index:2;top:325px;left:50%;width:405px;height:83px;transform-origin:50% 48%;will-change:transform}
+.board svg{width:100%;height:100%;overflow:visible;filter:drop-shadow(0px 13px 8px #043650aa)}
+#foamDots{position:absolute;inset:0;pointer-events:none;z-index:6}
+.fdot{position:absolute;display:block;background:#e7fff6d4;border-radius:100%;height:3px}
+.panel{background:#132a46;border:1px solid #2b4565;border-radius:20px;padding:20px;box-shadow:0 12px 33px #0002}
+.panel h2{font-size:18px;margin:0 0 6px}
+.panel p{font-size:13px;color:#bacbdd;line-height:1.55;margin:0 0 16px}
+button{border:1px solid #466581;background:#254360;color:#eefcff;border-radius:12px;font:inherit;padding:12px 14px;cursor:pointer;font-size:13px;font-weight:750}
+button:focus-visible,a:focus-visible{outline:3px solid #90ffe7;outline-offset:3px}
+button.primary{background:#64f5d3;border-color:#64f5d3;color:#083e43;width:100%;font-weight:850;font-size:15px;padding:15px}
+button.secondary{width:100%;margin-top:9px}
+button[aria-pressed=true]{background:#315d76;border-color:#6ed0ce}
+.stat{display:flex;justify-content:space-between;gap:10px;align-items:center;border-top:1px solid #36516b;padding:11px 0;font-size:12px;color:#c6dae6}
+.stat b{color:#94ffe6}
+.tag{font-size:11px;color:#68d6cd;letter-spacing:.08em;font-weight:800;margin-bottom:8px}
+.links{display:grid;gap:8px;margin-top:13px;font-size:12px}
+a{color:#9ee9eb;text-underline-offset:3px}
+footer{color:#a2b6c5;font-size:12px;line-height:1.65;margin-top:18px}
+footer a{color:#aff8db}
+@media(max-width:800px){main{padding:17px 10px 30px}.layout{grid-template-columns:1fr}.stage{aspect-ratio: 4/4;min-height:365px}.rig{transform:translateX(-50%) scale(.8);transform-origin:50% 100%;bottom:7%}.skyshine{width:80px;height:80px}h1{font-size:36px}}
+@media(max-width:430px){.stage{aspect-ratio:1/1.12}.rig{transform:translateX(-50%) scale(.72)}.panel{padding:17px}}
+@media(prefers-reduced-motion:reduce){.stage *{transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+<header><div class="brand">CUATRO LAB · EXPERIMENTO AISLADO</div><div class="credit">ChatGPT · Gemini · Grok · 16 nov. 2026</div></header>
+<h1>Un Pikachu. <span>Tres IA.</span><br>Y una ola.</h1>
+<p class="intro">Esta prueba anima la <strong>misma imagen que subió Gonzalo</strong>: conservamos los píxeles del personaje y utilizamos un recorte transparente para llevarlo sobre la tabla. Gemini estudió los rasgos, Grok diseñó el movimiento y ChatGPT integró la escena.</p>
+<div class="layout">
+<section class="stage" id="stage" aria-label="Animación de Pikachu haciendo surf sobre una ola">
+<div class="skyshine"></div><div class="cloud c1"></div><div class="cloud c2"></div><div class="island"></div>
+<svg class="wave" viewBox="0 0 800 565" preserveAspectRatio="none" aria-hidden="true"><path id="backwave" d="M0 355 H800 V565 H0Z"/></svg>
+<div class="rig" id="rig">
+<div class="board" id="board" aria-hidden="true">
+<svg viewBox="0 0 405 83"><ellipse cx="202" cy="45" rx="195" ry="25" fill="#07385b" opacity=".33"/><path d="M11 42 Q27 18 202 18 Q381 18 395 43 Q378 65 202 67 Q31 65 11 42Z" fill="#f7f9ea" stroke="#0c5f7e" stroke-width="5"/><path d="M28 42Q62 25 194 25Q340 25 375 43Q340 56 194 58Q64 57 28 42Z" fill="#57dcd6"/><path d="M159 25L206 59L246 25" fill="none" stroke="#f9c763" stroke-width="13" opacity=".85"/><path d="M18 45Q202 77 389 44" fill="none" stroke="#d7fffd" stroke-width="5"/></svg>
+</div>
+<div class="character" id="character"><img src="https://raw.githubusercontent.com/gvelazcamp/videos-ia/main/experimentos/pikachu-surf-3ia/recorte-personaje.webp" alt="El Pikachu original proporcionado por Gonzalo, separado del fondo para animarlo." width="298" height="342"><svg id="traces" viewBox="0 0 298 342" aria-hidden="true"><path d="M0,40 L0,141 L9,139 L49,152 L51,154 L42,172 L65,176 L68,178 L50,199 L51,203 L57,206 L52,223 L56,223 L61,227 L62,251 L73,261 L80,322 L83,333 L88,336 L88,341 L103,341 L111,339 L124,328 L129,321 L127,319 L128,318 L170,313 L205,313 L205,315 L200,316 L214,323 L229,327 L237,326 L240,329 L245,328 L246,325 L240,314 L245,300 L245,295 L242,292 L241,277 L243,255 L246,254 L248,250 L249,234 L244,233 L246,225 L242,193 L261,173 L263,173 L268,152 L253,138 L251,104 L255,98 L255,81 L265,71 L272,58 L278,57 L287,50 L288,47 L286,44 L297,32 L296,0 L279,0 L237,48 L228,46 L226,48 L215,50 L189,42 L161,42 L139,51 L136,48 L129,52 L94,1 L89,1 L88,24 L104,47 L118,60 L108,75 L108,80 L103,88 L100,100 L97,97 L97,94 L94,94 L90,88 L85,86 L75,76 L70,74 L71,69 L64,61 L54,61 L52,63 L22,48 Z"/></svg></div>
+</div>
+<svg class="wave" viewBox="0 0 800 565" preserveAspectRatio="none" aria-hidden="true"><path id="frontwave" d="M0 455 H800 V565 H0Z"/></svg>
+<svg class="wave" viewBox="0 0 800 565" preserveAspectRatio="none" aria-hidden="true"><path id="foam" d="M0 445 H800"/></svg><div id="foamDots" aria-hidden="true"></div>
+</section>
+<aside class="panel">
+<div class="tag">PRUEBA REAL · 3 IA</div><h2>Movimiento de surf</h2>
+<p>Una animación de 8 segundos que vuelve al inicio sin cortes. La cara y los trazos del personaje no se estiran.</p>
+<button class="primary" id="play" type="button">Pausar animación</button>
+<button class="secondary" id="trace" type="button" aria-pressed="false">Mostrar trazos del recorte</button>
+<button class="secondary" id="original" type="button">Ver imagen original</button>
+<div class="stat" style="margin-top:17px"><span>Imagen base</span><b>Original de Gonzalo</b></div>
+<div class="stat"><span>Rasgos y colores</span><b>Gemini</b></div>
+<div class="stat"><span>Surf en 8 s</span><b>Grok</b></div>
+<div class="stat"><span>Integración web</span><b>ChatGPT</b></div>
+<div class="links">
+<a href="https://github.com/gvelazcamp/videos-ia/tree/main/experimentos/pikachu-surf-3ia" target="_blank" rel="noopener">Ver archivos del experimento en GitHub</a>
+<a href="https://github.com/gvelazcamp/chatgpt-claude-puente/blob/main/bandeja/respuestas-gemini/pikachu-surf-trazos-20261116.md" target="_blank" rel="noopener">Aporte original de Gemini</a>
+<a href="https://github.com/gvelazcamp/chatgpt-claude-puente/blob/main/bandeja/respuestas-grok/pikachu-surf-movimiento-20261116.md" target="_blank" rel="noopener">Aporte original de Grok</a>
+</div>
+</aside>
+</div>
+<footer><strong>Cómo se conserva la semejanza:</strong> el personaje de la escena viene de la misma imagen original, no de un redibujo generativo. El recorte automático puede tener pequeñas imperfecciones en los bordes; la cola y las orejas cortadas por el marco siguen exactamente como aparecen en la referencia. La tabla, el mar y el movimiento son elementos nuevos agregados por código.</footer>
+</main>
+<script type="module">
+import {poseSurf} from './movimiento-grok.js';
+const rig=document.getElementById('rig');
+const character=document.getElementById('character');
+const board=document.getElementById('board');
+const backwave=document.getElementById('backwave');
+const frontwave=document.getElementById('frontwave');
+const foam=document.getElementById('foam');
+const play=document.getElementById('play');
+const trace=document.getElementById('trace');
+let playing=!matchMedia('(prefers-reduced-motion: reduce)').matches;
+let t=0,previous=0;
+play.textContent=playing?'Pausar animación':'Reproducir animación';
+function wavePath(phase,level,amp,close){
+ let d='';
+ for(let x=-15;x<=815;x+=12){
+  const y=level+amp*Math.sin(x*.014-phase*1.5)+9*Math.sin(x*.03+phase);
+  d+=(x===-15?'M':'L')+x.toFixed(1)+' '+y.toFixed(1)+' ';
+ }
+ return close?d+'L815 565 L-15 565Z':d;
+}
+function renderPose(time){
+ const p=poseSurf(time);
+ rig.style.translate=p.x.toFixed(2)+'px '+(-p.y).toFixed(2)+'px';
+ character.style.transform='rotate('+p.rot.toFixed(3)+'deg)';
+ board.style.transform='translateX(-50%) translateY('+(-p.boardY).toFixed(2)+'px) rotate('+p.boardRot.toFixed(3)+'deg)';
+ backwave.setAttribute('d',wavePath(p.wavePhase,371,17,true));
+ frontwave.setAttribute('d',wavePath(p.wavePhase+1.4,465,18,true));
+ foam.setAttribute('d',wavePath(p.wavePhase+1.4,465,18,false));
+}
+function tick(ms){
+ if(!previous)previous=ms;
+ const dt=Math.max(0,Math.min(.08,(ms-previous)/1000));previous=ms;
+ if(playing)t=(t+dt)%8;
+ renderPose(t);
+ requestAnimationFrame(tick);
+}
+play.addEventListener('click',()=>{playing=!playing;play.textContent=playing?'Pausar animación':'Reproducir animación';});
+trace.addEventListener('click',()=>{const on=document.getElementById('stage').classList.toggle('show-traces');trace.setAttribute('aria-pressed',String(on));trace.textContent=on?'Ocultar trazos del recorte':'Mostrar trazos del recorte';});
+document.getElementById('original').addEventListener('click',()=>window.open('https://github.com/gvelazcamp/videos-ia/blob/main/experimentos/pikachu-surf-3ia/referencia-original.png','_blank','noopener'));
+renderPose(0);requestAnimationFrame(tick);
+</script>
+</body>
+</html>
