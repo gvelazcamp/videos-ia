@@ -33,7 +33,10 @@ function crearIsla(n, R = 2.4) {
   // robot
   const bot = makeBot(c); bot.scale.setScalar(R * .72); bot.position.set(-R * .05, top, R * .22); g.add(bot);
   if (n === 'grok') bot.position.set(R * .25, top, R * .15);
-  if (n === 'github') { bot.visible = false; ped.position.set(0, top, R * .05); ped.scale.setScalar(1.5); }
+  if (n === 'github') { bot.visible = false; mastil.visible = false; ped.children[0].visible = false; ped.position.set(0, top - R * .3, R * .12); ped.scale.setScalar(1.6);
+    const cartel = new THREE.Group(); cartel.position.set(0, top, -R * .35); g.add(cartel);
+    for (const sx of [-1, 1]) mesh(new THREE.CylinderGeometry(R * .025, R * .025, R * 1.0, 12), M(0xc8ccd6, { metalness: .8, roughness: .25 }), [sx * R * .4, R * .5, 0], cartel);
+    mesh(new THREE.BoxGeometry(R * .84, R * .34, R * .03), new THREE.MeshStandardMaterial({ map: banderaTex('GitHub', '#16181d'), roughness: .6 }), [0, R * .82, 0], cartel); }
   const luzIA = new THREE.PointLight(c, 0, R * 3); luzIA.position.set(0, R * .9, R * .6); g.add(luzIA);
   g.userData = { lab, c, f, bot, aro, halo, halo2, boton, luzIA, top,
     luz(k) { k = Math.max(0, Math.min(1, k)); aroMat.color.setHex(c).multiplyScalar(.4 + .6 * k); halo.material.opacity = .12 + .88 * k; halo2.material.opacity = .05 + .55 * k; aro.scale.setScalar(1 + .015 * k); boton.material.emissiveIntensity = .5 + 1.5 * k; luzIA.intensity = 6 * k; } };
