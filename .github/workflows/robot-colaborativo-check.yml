@@ -1,0 +1,36 @@
+name: Prueba aislada robot ChatGPT + Claude
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'experimentos/robot-colaborativo/**'
+      - '.github/workflows/robot-colaborativo-check.yml'
+  pull_request:
+    paths:
+      - 'experimentos/robot-colaborativo/**'
+permissions:
+  contents: read
+jobs:
+  validar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Comprobar sintaxis de los archivos sin ejecutar IA ni alterar proyectos
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd experimentos/robot-colaborativo
+          for f in robot-base.js expresiones-chatgpt.js escena.js; do
+            node --check "$f"
+          done
+          if [ -f animacion-claude.js ]; then
+            node --check animacion-claude.js
+            grep -q 'export function aplicarCaminata' animacion-claude.js
+            echo 'Módulo de caminata presente y sintácticamente válido.'
+          else
+            echo 'ChatGPT listo. Módulo de Claude pendiente; no se simula entrega.'
+          fi
