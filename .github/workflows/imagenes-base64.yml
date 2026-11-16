@@ -38,7 +38,7 @@ jobs:
               except Exception as e: print("Base64 inválido en", nombre, e); continue
               esperado = re.sub(r"[^0-9a-f]", "", hf.read_text().lower())[:64]
               if hashlib.sha256(raw).hexdigest() != esperado: print("Hash no coincide, falta o sobra algo:", nombre); continue
-              ext = "png" if raw[:4] == b"\x89PNG" else "jpg"
+              ext = "png" if raw[:4] == b"\x89PNG" else ("webp" if raw[:4] == b"RIFF" and raw[8:12] == b"WEBP" else "jpg")
               out = pathlib.Path("referencias/recibidas") / (nombre + "." + ext)
               out.parent.mkdir(parents=True, exist_ok=True)
               if out.exists(): print("Ya existe:", out); continue
