@@ -64,7 +64,7 @@ const sizeObserver=new ResizeObserver(()=>{
 try{
  const mod=await import('./animacion-claude.js');
  if(typeof mod.aplicarCaminata!=='function')throw Error('Falta aplicarCaminata exportada');
- walkModule=mod;walkButton.disabled=false;led.classList.add('ok');
+ walkModule=mod;walkButton.disabled=false;walkButton.textContent='Iniciar caminata';led.classList.add('ok');
  claudeStatus.textContent='Módulo de caminata recibido y listo';
 }catch(_){
  walkButton.disabled=true;
@@ -80,7 +80,8 @@ function animate(){
    walkModule.aplicarCaminata(robot,t,1);
  }else if(!walking){
    // Reset de caminar al volver al reposo, sin modificar la lógica de Claude.
-   for(const foot of robot.userData.feet){foot.rotation.set(0,0,0);foot.position.y=.125;}
+   for(const [i,foot] of robot.userData.feet.entries()){foot.rotation.set(0,0,0);foot.position.set((i===0?-1:1)*.14,.125,.035);}
+   robot.userData.body.rotation.set(0,0,0);
    robot.position.x=0;robot.position.y=.11;
  }
  robot.rotation.y=angle+(dragging?0:(reducedMotion?0:Math.sin(t*.5)*.08));
