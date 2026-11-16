@@ -1,0 +1,40 @@
+name: Descargar video de referencia (TikTok / Instagram / YouTube)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "descargar/pedidos/*.txt"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: descargar
+  cancel-in-progress: false
+
+jobs:
+  descargar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Instalar yt-dlp
+        run: python -m pip install -q yt-dlp
+      - name: Bajar videos pedidos
+        run: |
+          for f in descargar/pedidos/*.txt; do
+            n=$(basename "$f" .txt); [ -f "referencias/$n.mp4" ] && continue
+            url=$(grep -Eo 'https://[^ ]+' "$f" | head -1)
+            case "$url" in https://*tiktok.com/*|https://*instagram.com/*|https://*youtube.com/*|https://youtu.be/*) ;; *) echo "URL no permitida: $url"; continue;; esac
+            yt-dlp --no-playlist -f "mp4/best" -o "referencias/$n.%(ext)s" "$url" || echo "Falló $url" > "referencias/$n.error.txt"
+          done
+      - name: Guardar
+        run: |
+          git add referencias/
+          if git diff --cached --quiet; then echo "Nada nuevo."; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Video de referencia descargado"
+          git pull --rebase origin main
+          git push origin HEAD:main
