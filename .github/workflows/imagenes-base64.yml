@@ -1,0 +1,54 @@
+name: Recibir imágenes enviadas como texto (base64)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "entrada-imagenes/*.txt"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: imagenes-base64
+  cancel-in-progress: false
+
+jobs:
+  convertir:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Convertir texto base64 en imagen
+        run: |
+          python3 - <<'PY'
+          import base64, re, pathlib
+          ok = []
+          for f in sorted(pathlib.Path("entrada-imagenes").glob("*.txt")):
+              txt = f.read_text(encoding="utf-8", errors="ignore")
+              m = re.search(r"data:image/(png|jpe?g|webp);base64,([A-Za-z0-9+/=\s]+)", txt)
+              ext, data = (m.group(1), m.group(2)) if m else (None, txt)
+              data = re.sub(r"[^A-Za-z0-9+/=]", "", data)
+              try:
+                  raw = base64.b64decode(data, validate=True)
+              except Exception as e:
+                  print("No es base64 válido:", f, e); continue
+              if raw[:8] == b"\x89PNG\r\n\x1a\n": ext = "png"
+              elif raw[:3] == b"\xff\xd8\xff": ext = "jpg"
+              elif raw[:4] == b"RIFF" and raw[8:12] == b"WEBP": ext = "webp"
+              else:
+                  print("No parece una imagen:", f); continue
+              out = pathlib.Path("referencias/recibidas") / (f.stem.replace(".b64", "") + "." + ext.replace("jpeg", "jpg"))
+              out.parent.mkdir(parents=True, exist_ok=True)
+              if out.exists(): print("Ya existe, no se sobrescribe:", out); continue
+              out.write_bytes(raw); f.unlink(); ok.append(str(out)); print("OK", out, len(raw), "bytes")
+          PY
+      - name: Guardar
+        run: |
+          git add -A referencias/recibidas entrada-imagenes
+          if git diff --cached --quiet; then echo "Nada nuevo."; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Imagen recibida (convertida de base64)"
+          git pull --rebase origin main
+          git push origin HEAD:main
