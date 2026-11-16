@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="es-UY">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#080d1c">
+<meta name="description" content="Una escena interactiva de fantasía oscura con el personaje original de Gonzalo, bruma, magia, luna y castillo."><title>Pikachu y el castillo encantado — Laboratorio CUATRO</title>
+<style>
+:root{color-scheme:dark;--cream:#edeaf7;--muted:#a6adc7;--blue:#6ab7ef;--gold:#efc68c;--edge:#2b3754}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#080d1c;color:var(--cream);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;min-width:0}button,a{font:inherit}button{cursor:pointer}a{color:#9fd9ff;text-underline-offset:4px}a:focus-visible,button:focus-visible{outline:3px solid #fff2a3;outline-offset:3px}
+.page{max-width:1240px;padding:24px clamp(12px,3vw,28px) 38px;margin:0 auto}.top{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin:0 0 16px}.eyebrow{display:flex;align-items:center;gap:9px;font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:#bcc5df;font-weight:800}.mark{display:grid;place-items:center;width:29px;height:29px;border-radius:9px;background:linear-gradient(145deg,#586cb7,#8e5dab);font-size:16px}.top .type{color:#7f8caf;font-size:11px;letter-spacing:.08em}h1{font-family:Georgia,serif;font-weight:500;letter-spacing:-.025em;font-size:clamp(37px,5.5vw,68px);line-height:1.04;margin:0 0 9px}h1 em{font-style:italic;color:#e9bc83}.intro{font-size:14px;line-height:1.62;color:#b7c1d4;max-width:800px;margin:0 0 20px}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 286px;gap:16px;align-items:start}.stage{position:relative;width:100%;aspect-ratio:16/10;min-height:430px;overflow:hidden;isolation:isolate;border-radius:22px;background:#0c182b;border:1px solid #30415b;box-shadow:0 26px 66px #0009;touch-action:pan-y;--sx:0px;--sy:0px}.stage>img.bg{position:absolute;width:100%;height:100%;object-fit:cover;object-position:50% 53%;inset:0;filter:contrast(1.04) brightness(.83) saturate(.92);transform:scale(1.04);animation:drift-bg 18s ease-in-out infinite alternate;z-index:0}.shade{position:absolute;inset:0;background:linear-gradient(180deg,#060b1800 35%,#06081733 68%,#02040e8a 100%),radial-gradient(ellipse at 38% 64%,#17395322,transparent 57%);z-index:1;pointer-events:none}.flash{position:absolute;inset:0;z-index:9;background:#a6c5ff;opacity:0;pointer-events:none;mix-blend-mode:screen}.stage.flash-on .flash{animation:lightning .65s ease-out 1}.castle-title{position:absolute;left:5%;top:5%;z-index:6;color:#e9d8c2cc;font-family:Georgia,serif;font-size:clamp(12px,1.4vw,17px);letter-spacing:.17em;text-shadow:0 2px 6px #0009;pointer-events:none}.castle-title small{display:block;font:700 9px Inter,system-ui,sans-serif;letter-spacing:.24em;margin-top:6px;color:#b2bbc9}
+#fx{position:absolute;inset:0;width:100%;height:100%;z-index:5;pointer-events:none}.mist{position:absolute;left:-30%;width:160%;height:33%;background:radial-gradient(ellipse at 40% 56%,#e1ecff32 0%,#c3dafb0e 43%,transparent 70%);filter:blur(20px);z-index:3;bottom:0;animation:mist 12s ease-in-out infinite alternate;pointer-events:none}.mist.two{height:18%;z-index:6;opacity:.68;animation-duration:17s;animation-direction:alternate-reverse}
+.traveler{position:absolute;z-index:4;left:51%;bottom:6.2%;height:49%;aspect-ratio:298/342;transform:translate3d(calc(-50% + var(--sx)),var(--sy),0) rotate(var(--lean,0deg));transform-origin:50% 90%;will-change:transform;pointer-events:none}.traveler img{width:100%;height:100%;object-fit:contain;display:block;image-rendering:auto;filter:drop-shadow(0px 7px 7px #000e) drop-shadow(0 0 6px #c5ab744b)}.traveler.pixel img{image-rendering:pixelated;filter:drop-shadow(0 6px 0px #000e)}.glow{position:absolute;left:50%;bottom:3.6%;width:22%;height:7%;border-radius:50%;background:radial-gradient(ellipse,#f9cb7f44,#53a89a19 55%,transparent 71%);transform:translateX(calc(-50% + var(--sx)));filter:blur(5px);z-index:3;pointer-events:none}.portal{position:absolute;z-index:2;bottom:-25%;right:-12%;width:34%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,#49f3b032,transparent 70%);filter:blur(25px);pointer-events:none}.ghost{position:absolute;z-index:2;right:9%;top:14%;width:6.6%;height:13%;opacity:.32;filter:blur(4px);transform-origin:center;animation:ghost-drift 9s ease-in-out infinite alternate;pointer-events:none}.ghost svg{width:100%;height:100%}
+.hud{position:absolute;z-index:7;bottom:12px;left:14px;right:14px;display:flex;align-items:center;justify-content:space-between;gap:9px;pointer-events:none}.stamp{background:#050b20a6;border:1px solid #c5bed246;backdrop-filter:blur(8px);font-size:9px;letter-spacing:.09em;padding:8px 11px;border-radius:99px;color:#e8dcbf;text-transform:uppercase}.spirit{font-size:10px;color:#bddbd0;text-shadow:0 1px 3px #000}
+.panel{background:linear-gradient(157deg,#182136,#10182b);border:1px solid #34415e;border-radius:21px;padding:20px;box-shadow:0 15px 40px #0004}.panel .tag{font-size:10px;font-weight:900;letter-spacing:.14em;color:#f4c793;text-transform:uppercase;margin-bottom:12px}.panel h2{font-family:Georgia,serif;font-size:26px;line-height:1.17;margin:0 0 8px;font-weight:500}.panel p{font-size:12px;line-height:1.65;color:#b0bad0;margin:0 0 18px}.control{display:flex;align-items:center;gap:9px;width:100%;margin-top:9px;min-height:46px;border-radius:13px;border:1px solid #475574;background:#23314e;color:#edf4ff;text-align:left;padding:11px 13px;font-size:13px;font-weight:750;transition:background .2s,transform .2s}.control:hover{background:#30405e}.control.main{background:#d5b081;color:#14162c;border-color:#e5c49a;font-weight:900;justify-content:center}.control.main:hover{background:#f3ce9e}.control[aria-pressed="true"]{border-color:#acd3ff;background:#36516d}.control span{font-size:16px}.stats{border-top:1px solid #34405a;margin-top:18px;padding-top:15px;display:grid;gap:10px}.stats div{display:flex;gap:9px;justify-content:space-between;font-size:11px;color:#9ba9c1}.stats strong{color:#d6e6f0;font-size:11px}.links{border-top:1px solid #34405a;margin-top:18px;padding-top:15px;display:grid;gap:9px;font-size:12px}.foot{font-size:11px;line-height:1.7;color:#8896b3;margin:15px 5px 0;max-width:860px}.foot b{color:#b6c9dc}body.no-mist .mist{opacity:0!important}body.no-mist #fx{opacity:.48}body:not(.active) .stage img.bg,body:not(.active) .mist,body:not(.active) .ghost{animation-play-state:paused!important}
+@keyframes drift-bg{0%{transform:scale(1.035) translateX(-.35%)}100%{transform:scale(1.075) translateX(.5%)}}@keyframes mist{from{transform:translateX(-7%)}to{transform:translateX(9%)}}@keyframes ghost-drift{from{transform:translate(-25%,0) rotate(-6deg)}to{transform:translate(35%,12%) rotate(10deg)}}@keyframes lightning{0%{opacity:0}6%{opacity:.26}12%{opacity:0}20%{opacity:.13}28%{opacity:0}100%{opacity:0}}
+@media(max-width:900px){.layout{grid-template-columns:1fr}.panel{display:grid;grid-template-columns:1fr 1fr;gap:5px 12px}.panel .tag,.panel h2,.panel p,.panel .stats,.panel .links{grid-column:1/-1}.panel p{margin-bottom:4px}.control{margin-top:3px}}
+@media(max-width:560px){.page{padding:13px 9px 24px}.top{margin-bottom:12px}.top .type{display:none}h1{font-size:40px}.intro{font-size:12px;margin-bottom:14px}.stage{aspect-ratio:3/4;min-height:0;border-radius:16px}.stage>img.bg{object-position:55% 50%}.castle-title{top:3%;left:4%;font-size:12px}.traveler{left:49%;height:40%;bottom:7%}.glow{width:34%}.hud{bottom:9px;left:9px;right:9px}.stamp{font-size:8px;padding:6px 8px}.spirit{font-size:9px}.panel{padding:15px;grid-template-columns:1fr 1fr}.panel h2{font-size:22px}.control{font-size:11px;padding:9px;min-height:44px}.control span{font-size:14px}}
+@media(prefers-reduced-motion:reduce){.stage img.bg,.mist,.ghost{animation:none!important}}
+</style>
+</head>
+<body class="active">
+<main class="page">
+<header class="top"><div class="eyebrow"><span class="mark">✦</span> CUATRO · LABORATORIO VISUAL</div><span class="type">EXPERIMENTO 02 / ANIMACIÓN EN LA NUBE</span></header>
+<h1>La noche del <em>castillo encantado.</em></h1>
+<p class="intro">El mismo personaje de tu foto, esta vez explorando un castillo de fantasía oscura. Niebla, relámpagos, magia verde y una caminata entre las sombras.</p>
+<div class="layout">
+<section id="stage" class="stage" aria-label="Pikachu explora un castillo de terror en una animación de fantasía">
+<img class="bg" alt="" src="https://raw.githubusercontent.com/gvelazcamp/videos-ia/main/experimentos/pikachu-castillo-terror/escenario-castillo.webp" width="1672" height="941">
+<div class="shade"></div><div class="portal"></div><div class="castle-title">CASTILLO ENCANTADO<small>MEDIANOCHE · EXPERIENCIA VISUAL</small></div>
+<div class="ghost" aria-hidden="true"><svg viewBox="0 0 80 100"><path d="M10 85 V35 A30 30 0 0 1 70 35 V85 L58 73 L46 85 L34 73 L22 85Z" fill="#c4f4f0"/><ellipse cx="30" cy="43" rx="5" ry="9" fill="#0d2231"/><ellipse cx="51" cy="43" rx="5" ry="9" fill="#0d2231"/></svg></div>
+<div class="flash"></div><div class="mist"></div><div class="mist two"></div><div class="glow" id="shadow"></div>
+<div class="traveler" id="traveler"><img id="sprite" alt="Pikachu de la foto original de Gonzalo, sin redibujar la cara ni cambiar sus rasgos" src="https://raw.githubusercontent.com/gvelazcamp/videos-ia/main/experimentos/pikachu-surf-3ia/recorte-personaje.webp" width="298" height="342"></div>
+<canvas id="fx" aria-hidden="true"></canvas>
+<div class="hud"><span class="stamp">ESCENA EN VIVO · 12 SEGUNDOS</span><span class="spirit">✦ Movete entre las sombras</span></div>
+</section>
+<aside class="panel">
+<div class="tag">FANTASÍA OSCURA · PRUEBA INTERACTIVA</div><h2>Una imagen.<br>Otra aventura.</h2><p>Camina, se detiene, se asusta y encuentra magia junto a un castillo misterioso. Su apariencia se conserva a partir de tu archivo original.</p>
+<button class="control main" id="play" type="button" aria-pressed="true"><span>❚❚</span> Pausar animación</button>
+<button class="control" id="pixel" type="button" aria-pressed="false"><span>▦</span> Cambiar a pixel art</button>
+<button class="control" id="fog" type="button" aria-pressed="true"><span>☁</span> Ocultar niebla</button>
+<button class="control" id="flashButton" type="button"><span>⚡</span> Invocar relámpago</button>
+<div class="stats"><div><span>Personaje</span><strong>Imagen original</strong></div><div><span>Escenario</span><strong>Arte de ChatGPT</strong></div><div><span>Animación</span><strong>Código web</strong></div><div><span>Duración</span><strong>12 s · bucle</strong></div></div>
+<div class="links"><a target="_blank" rel="noopener" href="https://github.com/gvelazcamp/videos-ia/tree/main/experimentos/pikachu-castillo-terror">Ver archivos de la escena</a><a target="_blank" rel="noopener" href="https://github.com/gvelazcamp/videos-ia/blob/main/experimentos/pikachu-surf-3ia/referencia-original.png">Ver foto original</a></div>
+</aside>
+</div>
+<p class="foot"><b>Cómo se hizo:</b> se usa el personaje recortado de la primera prueba, superpuesto sobre el escenario de fantasía creado para esta escena. El personaje no se vuelve a dibujar; el movimiento y los efectos se producen con CSS y JavaScript. Se mantiene como una pieza completa: caminar no significa que los pies estén articulados individualmente. Esta es una nueva carpeta independiente, sin tocar el juego ni la biblioteca.</p>
+</main>
+<script>
+(()=>{'use strict';
+const stage=document.querySelector('#stage'),sprite=document.querySelector('#sprite'),traveler=document.querySelector('#traveler'),canvas=document.querySelector('#fx');
+const ctx=canvas.getContext('2d'),play=document.querySelector('#play'),pixel=document.querySelector('#pixel'),fog=document.querySelector('#fog');
+const PFX='https://raw.githubusercontent.com/gvelazcamp/videos-ia/main/experimentos/pikachu-castillo-terror/';
+let playing=!matchMedia('(prefers-reduced-motion: reduce)').matches, t=0,last=0,px=false,lightAt=-50;
+const particles=Array.from({length:76},(_,i)=>({seed:i*12.9898,r:(i*19%97)/97,a:.2+(i*7%11)/18,s:.05+(i*13%17)/120}));
+const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));const rnd=x=>{const a=Math.sin(x*127.1+5.98)*43758.5;return a-Math.floor(a)};
+let w=0,h=0,dpr=1;
+function resize(){const r=stage.getBoundingClientRect();w=r.width;h=r.height;dpr=Math.min(devicePixelRatio||1,2);canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);ctx.setTransform(dpr,0,0,dpr,0,0)}
+new ResizeObserver(resize).observe(stage);resize();
+function walk(T){const ph=T%12;let v=0;
+// Caminata pausada frente a la magia: segmento A, pausa, segmento B, susto, regreso
+if(ph<3.9)v=-.76+ph*.4;else if(ph<5.2)v=.8;else if(ph<8.6)v=.8-(ph-5.2)*.46;else if(ph<9.4)v=-.76;else v=-.76;
+const moving=ph<3.9||(ph>=5.2&&ph<8.6);const beat=moving?Math.sin(ph*12)*3.3:Math.sin(ph*2.3)*.8;
+const turn=ph>=5.2&&ph<8.6?-1:1;
+const xpos=v*(w<550?w*.15:w*.18);
+traveler.style.setProperty('--sx',xpos.toFixed(2)+'px');stage.style.setProperty('--sx',xpos.toFixed(2)+'px');
+traveler.style.setProperty('--sy',(-beat).toFixed(2)+'px');traveler.style.setProperty('--lean',(moving?Math.sin(ph*6)*3.2:(ph>=8.7&&ph<9.7?9:0)).toFixed(2)+'deg');
+sprite.style.transform='scaleX('+turn+')';
+return {x:w*.51+xpos,y:h*.82,magic:ph>=4.4&&ph<7.2};}
+function effects(T,pose){ctx.clearRect(0,0,w,h);if(document.body.classList.contains('no-mist'))return;
+ctx.save();
+// polvo mágico luminoso, tenue para no tapar la escena
+particles.forEach((p,i)=>{const a=rnd(i+2),b=rnd(i+94);const x=((a*w+T*(8+i%7))%(w+40))-20;const y=h*(.12+b*.82)+Math.sin(T*(p.s*3)+i)*9;const radius=1+(i%4)*.5;const intensity=(.38+.45*Math.sin(T*1.8+i));ctx.globalAlpha=clamp(intensity,0,.5);ctx.fillStyle=i%5===0?'#c7f0ff':i%3===0?'#d4eeb0':'#f4c889';ctx.beginPath();ctx.arc(x,y,radius,0,Math.PI*2);ctx.fill()});
+if(pose.magic){const pulse=(.6+.4*Math.sin(T*3));const x=w*.76,y=h*.77;ctx.globalAlpha=.5*pulse;const g=ctx.createRadialGradient(x,y,2,x,y,w*.15);g.addColorStop(0,'#a9ffad');g.addColorStop(.23,'#42eca7a9');g.addColorStop(1,'#42eca700');ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,w*.15,0,Math.PI*2);ctx.fill()}
+ctx.restore();}
+function render(T){const pose=walk(T);effects(T,pose);if(T>0.1&&((T+.12)%12)<.15&&lightAt!==Math.floor(T/12)){stage.classList.remove('flash-on');void stage.offsetWidth;stage.classList.add('flash-on');lightAt=Math.floor(T/12)}}
+function frame(ms){if(!last)last=ms;let dt=Math.min(.05,(ms-last)/1000);last=ms;if(playing)t=(t+dt)%1200;render(t);requestAnimationFrame(frame)}
+function togglePlay(){playing=!playing;document.body.classList.toggle('active',playing);play.setAttribute('aria-pressed',String(playing));play.innerHTML=playing?'<span>❚❚</span> Pausar animación':'<span>▶</span> Reproducir animación'}
+play.addEventListener('click',togglePlay);
+pixel.addEventListener('click',()=>{px=!px;traveler.classList.toggle('pixel',px);pixel.setAttribute('aria-pressed',String(px));sprite.src=px?PFX+'personaje-pixel.webp':'https://raw.githubusercontent.com/gvelazcamp/videos-ia/main/experimentos/pikachu-surf-3ia/recorte-personaje.webp';pixel.innerHTML=px?'<span>▦</span> Volver al original':'<span>▦</span> Cambiar a pixel art'});
+fog.addEventListener('click',()=>{const off=document.body.classList.toggle('no-mist');fog.setAttribute('aria-pressed',String(!off));fog.innerHTML=off?'<span>☁</span> Activar niebla':'<span>☁</span> Ocultar niebla'});
+document.querySelector('#flashButton').addEventListener('click',()=>{stage.classList.remove('flash-on');void stage.offsetWidth;stage.classList.add('flash-on')});
+if(!playing){document.body.classList.remove('active');play.setAttribute('aria-pressed','false');play.innerHTML='<span>▶</span> Reproducir animación'}
+render(0);requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
