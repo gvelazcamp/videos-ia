@@ -1,0 +1,49 @@
+name: Exportar video para revision
+on:
+  workflow_dispatch:
+    inputs:
+      video_path:
+        description: Ruta del MP4 dentro del repositorio
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  preparar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Validar MP4
+        env:
+          VIDEO_PATH: ${{ inputs.video_path }}
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          p=Path(os.environ['VIDEO_PATH'])
+          if p.is_absolute() or '..' in p.parts or p.suffix.lower()!='.mp4' or not p.is_file() or p.is_symlink():
+              raise SystemExit('Ruta MP4 invalida')
+          print(p,p.stat().st_size)
+          PY
+      - name: Extraer fotogramas y metadatos
+        env:
+          VIDEO_PATH: ${{ inputs.video_path }}
+        run: |
+          mkdir -p paquete/fotogramas
+          ffprobe -v error -show_format -show_streams -of json "$VIDEO_PATH" > paquete/metadatos.json
+          sha256sum "$VIDEO_PATH" > paquete/sha256.txt
+          DURATION=$(ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 "$VIDEO_PATH")
+          for n in 1 2 3 4 5 6; do
+            SECOND=$(awk -v d="$DURATION" -v n="$n" 'BEGIN {printf "%.3f", d*n/7}')
+            ffmpeg -nostdin -hide_banner -loglevel error -ss "$SECOND" -i "$VIDEO_PATH" -frames:v 1 -vf scale=480:-2 "paquete/fotogramas/escena-$n.jpg"
+          done
+          cp "$VIDEO_PATH" paquete/video-original.mp4
+      - uses: actions/upload-artifact@v4
+        with:
+          name: video-revision-${{ github.run_id }}
+          path: paquete/
+          retention-days: 7
+          if-no-files-found: error
