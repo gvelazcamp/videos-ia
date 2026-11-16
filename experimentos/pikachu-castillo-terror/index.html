@@ -29,7 +29,7 @@
 <div class="shade"></div><div class="portal"></div><div class="castle-title">CASTILLO ENCANTADO<small>MEDIANOCHE · EXPERIENCIA VISUAL</small></div>
 <div class="ghost" aria-hidden="true"><svg viewBox="0 0 80 100"><path d="M10 85 V35 A30 30 0 0 1 70 35 V85 L58 73 L46 85 L34 73 L22 85Z" fill="#c4f4f0"/><ellipse cx="30" cy="43" rx="5" ry="9" fill="#0d2231"/><ellipse cx="51" cy="43" rx="5" ry="9" fill="#0d2231"/></svg></div>
 <div class="flash"></div><div class="mist"></div><div class="mist two"></div><div class="glow" id="shadow"></div>
-<div class="traveler" id="traveler"><img id="sprite" alt="Pikachu de la foto original de Gonzalo, sin redibujar la cara ni cambiar sus rasgos" src="https://raw.githubusercontent.com/gvelazcamp/videos-ia/main/experimentos/pikachu-castillo-terror/personaje-original-transparente.png" width="298" height="342"></div>
+<div class="traveler" id="traveler"><img id="sprite" alt="Pikachu de la foto original de Gonzalo, sin redibujar la cara ni cambiar sus rasgos" src="https://raw.githubusercontent.com/gvelazcamp/videos-ia/main/experimentos/pikachu-castillo-terror/personaje-removebg-web.png" width="298" height="342"></div>
 <canvas id="fx" aria-hidden="true"></canvas>
 <div class="hud"><span class="stamp">ESCENA EN VIVO · 12 SEGUNDOS</span><span class="spirit">✦ Movete entre las sombras</span></div>
 </section>
@@ -76,7 +76,7 @@ function render(T){const pose=walk(T);effects(T,pose);if(T>0.1&&((T+.12)%12)<.15
 function frame(ms){if(!last)last=ms;let dt=Math.min(.05,(ms-last)/1000);last=ms;if(playing)t=(t+dt)%1200;render(t);requestAnimationFrame(frame)}
 function togglePlay(){playing=!playing;document.body.classList.toggle('active',playing);play.setAttribute('aria-pressed',String(playing));play.innerHTML=playing?'<span>❚❚</span> Pausar animación':'<span>▶</span> Reproducir animación'}
 play.addEventListener('click',togglePlay);
-pixel.addEventListener('click',()=>{px=!px;traveler.classList.toggle('pixel',px);pixel.setAttribute('aria-pressed',String(px));sprite.src=px?PFX+'personaje-pixel.webp':'https://raw.githubusercontent.com/gvelazcamp/videos-ia/main/experimentos/pikachu-castillo-terror/personaje-original-transparente.png';pixel.innerHTML=px?'<span>▦</span> Volver al original':'<span>▦</span> Cambiar a pixel art'});
+pixel.addEventListener('click',()=>{px=!px;traveler.classList.toggle('pixel',px);pixel.setAttribute('aria-pressed',String(px));sprite.src=px?PFX+'personaje-pixel.webp':'https://raw.githubusercontent.com/gvelazcamp/videos-ia/main/experimentos/pikachu-castillo-terror/personaje-removebg-web.png';pixel.innerHTML=px?'<span>▦</span> Volver al original':'<span>▦</span> Cambiar a pixel art'});
 fog.addEventListener('click',()=>{const off=document.body.classList.toggle('no-mist');fog.setAttribute('aria-pressed',String(!off));fog.innerHTML=off?'<span>☁</span> Activar niebla':'<span>☁</span> Ocultar niebla'});
 document.querySelector('#flashButton').addEventListener('click',()=>{stage.classList.remove('flash-on');void stage.offsetWidth;stage.classList.add('flash-on')});
 if(!playing){document.body.classList.remove('active');play.setAttribute('aria-pressed','false');play.innerHTML='<span>▶</span> Reproducir animación'}
