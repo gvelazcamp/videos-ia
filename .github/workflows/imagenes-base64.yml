@@ -23,8 +23,28 @@ jobs:
         run: |
           python3 - <<'PY'
           import base64, re, pathlib
+          import hashlib, collections
           ok = []
+          # Envío en partes: nombre.parteNN.b64.txt + nombre.sha256.txt (hash del JPG/PNG final)
+          grupos = collections.defaultdict(list)
+          for f in pathlib.Path("entrada-imagenes").glob("*.parte*.b64.txt"):
+              grupos[f.name.split(".parte")[0]].append(f)
+          for nombre, partes in grupos.items():
+              hf = pathlib.Path("entrada-imagenes") / (nombre + ".sha256.txt")
+              if not hf.exists(): print("Falta", hf); continue
+              partes.sort(key=lambda f: int(re.search(r"parte(\d+)", f.name).group(1)))
+              data = re.sub(r"[^A-Za-z0-9+/=]", "", "".join(f.read_text(encoding="utf-8", errors="ignore") for f in partes))
+              try: raw = base64.b64decode(data, validate=True)
+              except Exception as e: print("Base64 inválido en", nombre, e); continue
+              esperado = re.sub(r"[^0-9a-f]", "", hf.read_text().lower())[:64]
+              if hashlib.sha256(raw).hexdigest() != esperado: print("Hash no coincide, falta o sobra algo:", nombre); continue
+              ext = "png" if raw[:4] == b"\x89PNG" else "jpg"
+              out = pathlib.Path("referencias/recibidas") / (nombre + "." + ext)
+              out.parent.mkdir(parents=True, exist_ok=True)
+              if out.exists(): print("Ya existe:", out); continue
+              out.write_bytes(raw); [f.unlink() for f in partes]; hf.unlink(); print("OK por partes", out, len(raw))
           for f in sorted(pathlib.Path("entrada-imagenes").glob("*.txt")):
+              if ".parte" in f.name or f.name.endswith(".sha256.txt"): continue
               txt = f.read_text(encoding="utf-8", errors="ignore")
               m = re.search(r"data:image/(png|jpe?g|webp);base64,([A-Za-z0-9+/=\s]+)", txt)
               ext, data = (m.group(1), m.group(2)) if m else (None, txt)
