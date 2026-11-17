@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/voltito-3d-alta-calidad-20261117.yml'
+      - 'experimentos/voltito-3d-alta-calidad-20261117/index.html'
   workflow_dispatch:
 
 permissions:
