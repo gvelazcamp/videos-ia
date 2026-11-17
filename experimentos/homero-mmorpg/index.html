@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0d1828">
+<title>Homero caminando — Springfield MMORPG</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#233753,#09111d 76%);color:#eaf6ff;font-family:system-ui,-apple-system,Arial,sans-serif}
+main{max-width:1120px;margin:0 auto;padding:13px}header{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 12px;flex-wrap:wrap}
+h1{margin:0;font-size:clamp(19px,4vw,29px);letter-spacing:.5px}h1 em{font-style:normal;color:#ffdd52}.tag{font-size:12px;border:1px solid #52718b;background:#1e3349;padding:7px 12px;border-radius:18px}
+small{color:#a3bbd0}.screen{position:relative;overflow:hidden;aspect-ratio:16/9;width:100%;background:#7cb763;border:3px solid #738ca6;border-radius:18px;box-shadow:0 15px 35px #0008;touch-action:none}
+#world{width:100%;height:100%;display:block;touch-action:none}
+#avatar{position:absolute;width:8.6%;min-width:37px;max-width:92px;pointer-events:none;transform:translate(-50%,-97%);filter:drop-shadow(0 4px 2px #142a2c80)}
+#avatar svg{display:block;width:100%;overflow:visible}#avatar .leg-left,#avatar .leg-right,#avatar .arm-left,#avatar .arm-right{transform-box:fill-box}
+#avatar.walk .leg-left{animation:stride .32s ease-in-out infinite alternate;transform-origin:50% 0}
+#avatar.walk .leg-right{animation:stride .32s ease-in-out infinite alternate-reverse;transform-origin:50% 0}
+#avatar.walk .arm-left{animation:stride .32s ease-in-out infinite alternate-reverse;transform-origin:50% 0}
+#avatar.walk .arm-right{animation:stride .32s ease-in-out infinite alternate;transform-origin:50% 0}
+#avatar.walk{animation:bop .28s ease-in-out infinite alternate}
+@keyframes stride{from{transform:rotate(-23deg)}to{transform:rotate(23deg)}}@keyframes bop{from{margin-top:0}to{margin-top:-4px}}
+.hud{position:absolute;top:11px;left:11px;background:#15283be8;border:1px solid #b1c9d1a0;border-radius:10px;padding:9px 12px;pointer-events:none;font-size:13px;box-shadow:0 2px 12px #1118}
+.hud b{color:#ffda60}.hp{width:140px;max-width:31vw;height:6px;border-radius:5px;background:#32475c;margin:5px 0;overflow:hidden}.hp:before{content:"";display:block;height:100%;background:#4fe56b}
+#toast{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);max-width:88%;text-align:center;border-radius:10px;background:#102338eb;border:1px solid #e1b75f;padding:10px 14px;font-size:13px;opacity:0;transition:opacity .15s;pointer-events:none}
+#toast.show{opacity:1}
+.controls{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:13px}
+.help{line-height:1.65;font-size:13px;color:#b7ccdd;font-weight:500}.help b{color:#ffe18b}
+.pad{display:grid;grid-template-columns:repeat(3,55px);grid-template-rows:repeat(2,50px);gap:4px;touch-action:none}
+button{touch-action:none;-webkit-user-select:none;user-select:none;cursor:pointer;border-radius:12px;border:1px solid #7488ac;color:#fff;font-size:20px;font-weight:900;background:linear-gradient(#405776,#233953);box-shadow:0 3px #091526}
+button:active,button.pressed{background:#558db2;transform:translateY(2px);box-shadow:none}
+.up{grid-column:2;grid-row:1}.left{grid-column:1;grid-row:2}.down{grid-column:2;grid-row:2}.right{grid-column:3;grid-row:2}
+.actions{display:flex;gap:8px;flex-wrap:wrap}.actions button{font-size:13px;min-height:43px;padding:0 15px}.actions button.active{background:#865e22;border-color:#e6b65b}
+footer{font-size:11px;color:#7f97ad;text-align:center;margin:14px}
+@media(max-width:650px){main{padding:7px}header{padding:5px}h1{font-size:20px}.tag{font-size:10px}.screen{border:2px solid #7085a0;border-radius:12px}
+.hud{top:5px;left:5px;padding:4px 6px;font-size:9px}.hp{height:4px;margin:3px 0}#toast{bottom:3px;font-size:10px;padding:5px 8px}.help{display:none}.pad{grid-template-columns:repeat(3,52px);grid-template-rows:repeat(2,48px)}.actions button{padding:0 9px;font-size:12px}}
+</style>
+</head>
+<body>
+<main>
+<header><h1>HOMERO <em>· MINI MMORPG</em></h1><div class="tag">Springfield 2D · Prototipo jugable</div></header>
+<div class="screen" id="screen">
+<canvas id="world" width="960" height="540" aria-label="Mapa de Springfield"></canvas>
+<div id="avatar" aria-label="Homero caminando">
+<svg viewBox="0 0 110 163" xmlns="http://www.w3.org/2000/svg">
+<ellipse cx="55" cy="157" rx="30" ry="6" fill="#1b3e3766"/>
+<g class="leg-left"><path d="M36 119h19l-3 31H37Z" fill="#497bd5" stroke="#39352b" stroke-width="3"/><path d="M30 145h27v11H26q-5-5 4-11Z" fill="#33363b" stroke="#27252b" stroke-width="3"/></g>
+<g class="leg-right"><path d="M56 119h19l1 31H59Z" fill="#3767be" stroke="#39352b" stroke-width="3"/><path d="M57 145h27q12 6 3 11H57Z" fill="#33363b" stroke="#27252b" stroke-width="3"/></g>
+<path d="M29 88q-3 0-5 9l1 30h59l-2-30q-2-10-13-11Z" fill="#fafaf5" stroke="#38322d" stroke-width="3"/>
+<path d="M26 120h58v9H26Z" fill="#eeeeeb"/>
+<g class="arm-left"><path d="M26 93q-11-4-14 10l-3 22q5 10 13 4l11-28Z" fill="#fafaf5" stroke="#37332d" stroke-width="3"/><ellipse cx="15" cy="133" rx="10" ry="12" fill="#ffd644" stroke="#37332d" stroke-width="3"/></g>
+<g class="arm-right"><path d="M82 93q10-3 15 9l3 23q-4 11-13 4L76 102Z" fill="#fafaf5" stroke="#37332d" stroke-width="3"/><ellipse cx="92" cy="133" rx="10" ry="12" fill="#ffd644" stroke="#37332d" stroke-width="3"/></g>
+<path d="M48 80h15v14H48Z" fill="#ffda45"/>
+<path d="M38 14q-15 11-14 43 0 23 13 32 15 9 34 0 11-14 11-34 0-44-26-49Q45 6 38 14Z" fill="#ffda45" stroke="#3d3330" stroke-width="3.2"/>
+<path d="M43 9Q27-4 24 16M52 7Q45-9 36 5" fill="none" stroke="#34312e" stroke-width="3" stroke-linecap="round"/>
+<ellipse cx="78" cy="60" rx="7" ry="11" fill="#ffda45" stroke="#39332e" stroke-width="2.3"/>
+<path d="M36 71q19-9 36 2 12 10 0 18-26 12-39-4Z" fill="#bca076" stroke="#3d332e" stroke-width="2.8"/>
+<ellipse cx="42" cy="48" rx="15" ry="18" fill="white" stroke="#34312b" stroke-width="2.5"/>
+<ellipse cx="62" cy="47" rx="14" ry="18" fill="white" stroke="#34312b" stroke-width="2.5"/>
+<circle cx="47" cy="52" r="3.7" fill="#242424"/><circle cx="67" cy="50" r="3.7" fill="#242424"/>
+<path d="M49 63q-6 6 0 11 13 5 23-4 4-6-4-10" fill="#ffda45" stroke="#3c332b" stroke-width="2.3"/>
+<path d="M47 82q13 7 23-2" fill="none" stroke="#54422e" stroke-width="2.6" stroke-linecap="round"/>
+</svg>
+</div>
+<div class="hud"><strong>HOMERO · <b>NIVEL 1</b></strong><div class="hp"></div><div id="score">🍩 Donas: 0 / 8</div></div>
+<div id="toast" role="status" aria-live="polite"></div>
+</div>
+<div class="controls">
+<div class="help"><b>PC:</b> Flechas o WASD · Shift para correr<br><b>Celular:</b> Flechas táctiles · Botón CORRER<br><b>Objetivo:</b> Explorá Springfield y juntá 8 donas.</div>
+<div class="pad" aria-label="Controles táctiles">
+<button data-dir="up" class="up" aria-label="Caminar arriba">▲</button><button data-dir="left" class="left" aria-label="Caminar a la izquierda">◀</button>
+<button data-dir="down" class="down" aria-label="Caminar abajo">▼</button><button data-dir="right" class="right" aria-label="Caminar a la derecha">▶</button>
+</div>
+<div class="actions"><button id="run" type="button">CORRER</button><button id="talk" type="button">HABLAR</button></div>
+</div>
+<footer>Demo independiente de un jugador, inspirada en RPG/MMORPG. No es multijugador ni modifica juegos existentes.</footer>
+</main>
+<script>
+(function(){
+"use strict";
+var cv=document.getElementById("world"),ctx=cv.getContext("2d"),avatar=document.getElementById("avatar");
+var toast=document.getElementById("toast"),score=document.getElementById("score");
+var W=960,H=540,MW=2520,MH=1840,camX=0,camY=0,px=1275,py=975,anim=0,last=0,notice=0;
+var key={up:false,down:false,left:false,right:false},shift=false,run=false,target=null,dir="down";
+var homes=[{x:550,y:385,w:385,h:280,roof:"#dd7d55",title:"CASA SIMPSON"},
+{x:1680,y:335,w:385,h:275,roof:"#8866b8",title:"ESCUELA"},
+{x:1640,y:1130,w:385,h:275,roof:"#e45c65",title:"KWIK-E-MART"},
+{x:420,y:1180,w:370,h:260,roof:"#9b6d42",title:"TABERNA MOE"}];
+var donuts=[{x:1065,y:1030},{x:1370,y:1005},{x:1230,y:715},{x:1010,y:835},{x:1720,y:900},
+{x:2050,y:1050},{x:695,y:940},{x:970,y:1410}],got=donuts.map(function(){return false}),count=0;
+function hash(i){var k=Math.sin(i*128.27+9.94)*45785.24;return k-Math.floor(k)}
+var trees=[];for(var i=0;i<145;i++){
+var x=120+hash(i*7)*2280,y=120+hash(i*11+3)*1600;
+var road=(y>740&&y<985)||(x>1190&&x<1350);
+var house=homes.some(function(h){return x>h.x-90&&x<h.x+h.w+90&&y>h.y-90&&y<h.y+h.h+60});
+if(!road&&!house&&Math.hypot(x-1275,y-975)>155&&Math.hypot(x-390,y-225)>300)trees.push({x:x,y:y,r:31+hash(i+47)*14});
+}
+function box(x,y,w,h,color){ctx.fillStyle=color;ctx.fillRect(x,y,w,h)}
+function oval(x,y,rx,ry,color,stroke,width){ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=width||3;ctx.stroke()}}
+function words(s,x,y,size,color){ctx.font="900 "+size+"px system-ui";ctx.textAlign="center";ctx.lineJoin="round";ctx.lineWidth=4;ctx.strokeStyle="#42382c";ctx.strokeText(s,x,y);ctx.fillStyle=color;ctx.fillText(s,x,y)}
+function ground(){
+box(0,0,MW,MH,"#7bb368");
+for(var x=Math.max(0,Math.floor(camX/60)*60);x<Math.min(MW,camX+W+80);x+=60)
+for(var y=Math.max(0,Math.floor(camY/60)*60);y<Math.min(MH,camY+H+80);y+=60){
+var n=hash((x/60)*331+(y/60)*79);box(x,y,60,60,n>.62?"#80ba69":n>.25?"#78b264":"#72a85f");
+if(n>.85){box(x+14,y+18,4,3,"#c8cf79");box(x+23,y+41,3,3,"#eed48a")}
+if(n<.08){box(x+27,y+26,5,5,"#f9d5d6");box(x+30,y+28,4,4,"#ffd557")}
+}
+box(0,740,MW,245,"#94774e");box(0,758,MW,207,"#d8b77e");
+box(1190,0,160,MH,"#90744a");box(1207,0,126,MH,"#d4b57a");
+for(var j=0;j<MW;j+=80)box(j+12,746,43,4,"#ead19a");
+for(var k=0;k<MH;k+=80)box(1199,k+15,4,42,"#e6c990");
+oval(1270,856,132,115,"#e1c38d","#997e55",5);oval(1270,856,97,83,"#dbc896","#ae935f",4);
+}
+function house(h){
+oval(h.x+h.w/2,h.y+h.h+4,h.w*.49,24,"#4b7547");
+box(h.x+21,h.y+80,h.w-42,h.h-82,"#f0d59d");
+box(h.x+30,h.y+91,h.w-60,h.h-112,"#ffe3b0");
+ctx.beginPath();ctx.moveTo(h.x-12,h.y+93);ctx.lineTo(h.x+h.w/2,h.y-59);
+ctx.lineTo(h.x+h.w+12,h.y+93);ctx.closePath();ctx.fillStyle=h.roof;ctx.fill();ctx.strokeStyle="#67484a";ctx.lineWidth=8;ctx.stroke();
+for(var j=0;j<2;j++){var wx=h.x+(j? h.w-126:66);box(wx,h.y+124,68,75,"#594b40");
+box(wx+7,h.y+6+124,54,62,"#8bd2dc");box(wx+31,h.y+130,5,62,"#faf9d8");box(wx+7,h.y+157,54,5,"#faf9d8")}
+box(h.x+h.w/2-34,h.y+165,68,h.h-167,"#77513a");
+box(h.x+h.w/2-28,h.y+171,56,h.h-179,"#aa7e4d");
+oval(h.x+h.w/2+18,h.y+h.h-48,4,5,"#f8d458");
+words(h.title,h.x+h.w/2,h.y+113,17,"#fff2ca");
+}
+function tree(t){
+oval(t.x,t.y+4,t.r*.8,12,"#4b7b49");box(t.x-9,t.y-61,18,66,"#7b583b");box(t.x+3,t.y-61,6,58,"#9d794c");
+oval(t.x,t.y-88,t.r*1.15,t.r*1.08,"#2c653e");
+oval(t.x-22,t.y-98,t.r*.85,t.r*.78,"#347e42");
+oval(t.x+23,t.y-103,t.r*.77,t.r*.91,"#3e8c49");
+oval(t.x,t.y-130,t.r,t.r*.87,"#54a75a");
+oval(t.x-16,t.y-138,t.r*.42,t.r*.27,"#73c372");
+}
+function pond(){
+oval(395,223,272,176,"#55975d");oval(395,220,242,151,"#428fa7","#367d82",8);
+oval(395,219,213,121,"#61bdcf");
+for(var j=0;j<10;j++){var sx=220+j*36,sy=199+j%3*25;box(sx,sy+Math.sin(anim*2+j)*3,23,3,"#b5f1ee")}
+}
+function plaza(){oval(1270,853,76,34,"#8f9f98","#5c7c78",6);oval(1270,847,65,27,"#62bed2");
+box(1260,785,20,54,"#a0b7af");oval(1270,787,20,11,"#dce8de");
+for(var j=0;j<6;j++)oval(1270+Math.sin(anim*2+j)*47,825+Math.cos(anim*2+j)*15,3.5,4,"#dcffff")}
+function donut(p,j){
+var bob=Math.sin(anim*3+j)*5;oval(p.x,p.y+7,21,7,"#54794a");oval(p.x,p.y-6+bob,18,17,"#a96b36","#6f4832",3);
+oval(p.x,p.y-10+bob,16,12,"#f58da9");oval(p.x,p.y-6+bob,6,6,"#a76a39");
+for(var k=0;k<6;k++){var a=k*6.28/6;box(p.x+Math.sin(a)*11,p.y-9+bob+Math.cos(a)*9,4,2,["#fff2a4","#fdfdf5","#54bcdb"][k%3])}
+}
+function npc(x,y,name,color){
+oval(x,y+3,20,7,"#557a4b");box(x-15,y-59,30,42,color);box(x-12,y-18,10,21,"#405fa5");box(x+3,y-18,10,21,"#405fa5");
+oval(x,y-76,17,20,"#f7c66e","#4c3d30",2);oval(x-6,y-78,5,6,"#fff");oval(x+6,y-78,5,6,"#fff");oval(x-5,y-76,2,2,"#111");oval(x+7,y-76,2,2,"#111");
+words(name,x,y-113,14,"#f6fff0")}
+function blocked(x,y){
+if(x<30||y<30||x>MW-30||y>MH-30)return true;
+if(Math.hypot(x-395,y-223)<235)return true;
+for(var i=0;i<homes.length;i++){var h=homes[i];if(x>h.x+15&&x<h.x+h.w-15&&y>h.y+76&&y<h.y+h.h-4)return true}
+return false}
+function show(s,sec){toast.textContent=s;toast.classList.add("show");notice=anim+(sec||3)}
+function talk(){
+if(Math.hypot(px-1830,py-1450)<270){show("Apu: ¡Hoy tenemos donas fresquitas!",4);return}
+if(Math.hypot(px-740,py-680)<270){show("¡D'oh! Llegué a casa.",3);return}
+show("Acercate a la tienda o a la casa para hablar.",3)}
+function update(dt){
+var dx=(key.right?1:0)-(key.left?1:0),dy=(key.down?1:0)-(key.up?1:0);
+if(dx||dy)target=null;
+if(!dx&&!dy&&target){dx=target.x-px;dy=target.y-py;if(Math.hypot(dx,dy)<13){target=null;dx=dy=0}}
+var mag=Math.hypot(dx,dy),walking=mag>0.001;avatar.classList.toggle("walk",walking);
+if(walking){dx/=mag;dy/=mag;var speed=(shift||run?355:205)*dt;if(!blocked(px+dx*speed,py))px+=dx*speed;
+if(!blocked(px,py+dy*speed))py+=dy*speed;
+var d=Math.abs(dx)>Math.abs(dy)?(dx>0?"right":"left"):(dy>0?"down":"up");
+if(d!==dir){dir=d;avatar.style.filter=(dir==="left"?"drop-shadow(0 4px 2px #142a2c80)":"drop-shadow(0 4px 2px #142a2c80)")}
+}
+for(var j=0;j<donuts.length;j++)if(!got[j]&&Math.hypot(px-donuts[j].x,py-donuts[j].y)<40){
+got[j]=true;count++;score.textContent="🍩 Donas: "+count+" / 8";
+show(count===8?"¡Completaste las 8 donas de Springfield!":"¡Dona conseguida! "+count+" / 8",3)}
+camX+=(Math.max(0,Math.min(MW-W,px-W*.5))-camX)*Math.min(1,dt*7);
+camY+=(Math.max(0,Math.min(MH-H,py-H*.55))-camY)*Math.min(1,dt*7);
+if(notice>0&&anim>notice){toast.classList.remove("show");notice=0}
+}
+function render(){
+ctx.clearRect(0,0,W,H);ctx.save();ctx.translate(-Math.round(camX),-Math.round(camY));
+ground();pond();for(var i=0;i<homes.length;i++)house(homes[i]);for(var j=0;j<trees.length;j++)tree(trees[j]);plaza();
+for(var k=0;k<donuts.length;k++)if(!got[k])donut(donuts[k],k);
+npc(1610,930,"NED","#86a66b");npc(945,945,"LISA","#d56b63");npc(795,1110,"MOE","#557fa8");
+ctx.restore();
+avatar.style.left=(px-camX)/W*100+"%";avatar.style.top=(py-camY)/H*100+"%";
+}
+function tick(ms){var dt=Math.min(.045,(ms-last)/1000||.016);last=ms;anim+=dt;update(dt);render();requestAnimationFrame(tick)}
+var mapping={ArrowUp:"up",ArrowDown:"down",ArrowLeft:"left",ArrowRight:"right",KeyW:"up",KeyS:"down",KeyA:"left",KeyD:"right"};
+window.addEventListener("keydown",function(e){if(mapping[e.code]){key[mapping[e.code]]=true;e.preventDefault()}if(e.code==="ShiftLeft"||e.code==="ShiftRight")shift=true;if(e.code==="KeyE")talk()});
+window.addEventListener("keyup",function(e){if(mapping[e.code]){key[mapping[e.code]]=false;e.preventDefault()}if(e.code==="ShiftLeft"||e.code==="ShiftRight")shift=false});
+window.addEventListener("blur",function(){Object.keys(key).forEach(function(k){key[k]=false});shift=false});
+document.querySelectorAll("[data-dir]").forEach(function(b){
+var d=b.dataset.dir;
+b.addEventListener("pointerdown",function(e){e.preventDefault();key[d]=true;target=null;b.classList.add("pressed");b.setPointerCapture(e.pointerId)});
+["pointerup","pointercancel","lostpointercapture"].forEach(function(event){b.addEventListener(event,function(){key[d]=false;b.classList.remove("pressed")})})});
+document.getElementById("run").addEventListener("click",function(){run=!run;this.classList.toggle("active",run);this.textContent=run?"CORRIENDO":"CORRER"});
+document.getElementById("talk").addEventListener("click",talk);
+cv.addEventListener("pointerdown",function(e){var r=cv.getBoundingClientRect();target={x:(e.clientX-r.left)/r.width*W+camX,y:(e.clientY-r.top)/r.height*H+camY}});
+camX=px-W/2;camY=py-H*.55;show("Mové a Homero por Springfield y juntá 8 donas.",5);requestAnimationFrame(tick);
+})();
+</script>
+</body></html>
