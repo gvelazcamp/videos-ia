@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 900" width="1400" height="900">
+<defs>
+ <linearGradient id="sky" x2="0" y2="1"><stop stop-color="#8095d0"/><stop offset=".48" stop-color="#d5b9df"/><stop offset=".82" stop-color="#f7cfb4"/><stop offset="1" stop-color="#f9e1bb"/></linearGradient>
+ <linearGradient id="water" x2="0" y2="1"><stop stop-color="#8eafa8"/><stop offset="1" stop-color="#568ca2"/></linearGradient>
+ <linearGradient id="street" x2="0" y2="1"><stop stop-color="#efcbb0"/><stop offset="1" stop-color="#bd98ac"/></linearGradient>
+ <linearGradient id="tower" x2="0" y2="1"><stop stop-color="#895c70"/><stop offset=".6" stop-color="#594960"/><stop offset="1" stop-color="#3f4459"/></linearGradient>
+ <linearGradient id="bloom"><stop stop-color="#ee91bb"/><stop offset="1" stop-color="#f9bed3"/></linearGradient>
+ <filter id="soft"><feGaussianBlur stdDeviation="6"/></filter>
+ <pattern id="brick" width="54" height="29" patternUnits="userSpaceOnUse"><path d="M0 28H54M27 0V14M0 14H54M0 15V28" stroke="#ac879a" opacity=".28" fill="none"/></pattern>
+</defs>
+<rect width="1400" height="900" fill="url(#sky)"/>
+<circle cx="1090" cy="151" r="96" fill="#fff3d8" opacity=".52" filter="url(#soft)"/>
+<circle cx="1090" cy="151" r="71" fill="#ffe9cb"/>
+<g fill="#fff9f4" opacity=".65">
+ <path d="M115 185Q139 142 184 166Q215 120 262 165Q313 154 331 183Q361 186 355 207H100Q86 193 115 185Z"/>
+ <path d="M634 103Q660 75 692 100Q728 57 770 100Q814 88 830 122H623Q606 109 634 103Z"/>
+ <path d="M1154 300Q1171 266 1206 280Q1232 248 1269 275Q1300 271 1322 299Z"/>
+</g>
+<!-- Distant Paris rooftops -->
+<g stroke="#7e718c" stroke-width="3">
+ <path d="M0 570V430L50 390L99 430V570ZM80 570V459H166V408L221 369L272 408V570ZM275 570V445H365V416L407 391L453 416V570ZM467 570V424L523 371L584 424V570Z" fill="#b8a2bc"/>
+ <path d="M1145 575V451H1210V413L1256 380L1308 413V575ZM1262 575V432L1332 377L1400 432V575Z" fill="#ad9fba"/>
+</g>
+<g fill="#eee3db" opacity=".93">
+ <path d="M30 456h22v35H30zm0 56h22v35H30zm100-29h20v26h-20zm55 0h20v26h-20zm57-57h22v29h-22zm69 34h23v29h-23zm49-4h24v30h-24zm50 0h24v30h-24zm99-25h22v36h-22zm54-12h20v31h-20zm598 70h18v25h-18zm53-15h18v25h-18zm60-16h22v27h-22zm59 22h21v27h-21z"/>
+</g>
+<!-- Seine and arched bridge -->
+<path d="M0 578Q340 559 760 582T1400 576V756H0Z" fill="url(#water)"/>
+<g fill="#fbe5c7" opacity=".6"><path d="M100 625q150-18 290 1M470 649q170-14 325 0M930 617q140-8 285 3M320 707q180-4 285 6" stroke="#fff7e2" stroke-width="4" fill="none" stroke-linecap="round"/></g>
+<path d="M0 588H1400V631H0Z" fill="#d4b1a0" stroke="#846f86" stroke-width="7"/>
+<path d="M-30 631H1430V710H-30Z" fill="#b695a0"/>
+<g fill="#6094a8" stroke="#a0808f" stroke-width="8">
+ <path d="M50 717V686A90 90 0 0 1 230 686V717ZM312 717V686A90 90 0 0 1 492 686V717ZM566 717V686A90 90 0 0 1 746 686V717ZM821 717V686A90 90 0 0 1 1001 686V717ZM1073 717V686A90 90 0 0 1 1253 686V717Z"/>
+</g>
+<path d="M-20 625H1420" stroke="#6d6479" stroke-width="9" stroke-dasharray="18 10"/>
+<!-- Eiffel Tower main structural geometry -->
+<g stroke="#3b3a53" stroke-linejoin="round" stroke-linecap="round">
+ <path d="M917 170L897 238L849 406L777 615L744 659H1090L1058 615L985 406L938 238Z" fill="url(#tower)" stroke-width="12"/>
+ <path d="M862 447H970L1020 603Q917 500 813 603Z" fill="#d9b5ce" stroke-width="10"/>
+ <path d="M810 604H1024L1080 655H754Z" fill="#4b455c" stroke-width="11"/>
+ <path d="M897 238H938M853 399H981M810 499H1020M785 561H1050" stroke="#ecc48d" stroke-width="10"/>
+ <path d="M899 236H937M856 379H979M835 444H1001M801 529H1033" stroke="#3f3e59" stroke-width="16"/>
+ <g stroke="#ccb08f" stroke-width="4">
+ <path d="M899 239L977 390M937 239L855 390M857 398L999 491M980 398L829 494M837 496L1054 586M1008 500L777 588"/>
+ <path d="M873 335L965 335M858 370L977 370M843 421L987 421M826 472L1009 472M806 548L1029 548"/>
+ </g>
+ <path d="M913 157V106M897 171H933M910 144H925" stroke="#4a4059" stroke-width="9"/>
+ <path d="M916 92v-27" stroke="#4a4059" stroke-width="5"/>
+ <path d="M867 260H964M862 276H972" stroke="#e6b67d" stroke-width="10"/>
+ <path d="M783 613Q915 496 1044 613" fill="none" stroke="#f5d29c" stroke-width="11"/>
+ <path d="M764 653H1073" stroke="#e6b67d" stroke-width="12"/>
+</g>
+<g fill="#ffe8ae"><circle cx="851" cy="402" r="5"/><circle cx="978" cy="402" r="5"/><circle cx="830" cy="500" r="6"/><circle cx="1008" cy="500" r="6"/><circle cx="913" cy="237" r="7"/></g>
+<!-- Ground / street -->
+<path d="M0 743Q360 720 700 735Q1060 758 1400 725V900H0Z" fill="url(#street)"/>
+<path d="M0 747Q480 724 900 751Q1180 769 1400 730" stroke="#fff4e3" stroke-width="15" fill="none" opacity=".7"/>
+<g stroke="#986f86" stroke-width="2" opacity=".28">
+ <path d="M0 805Q700 770 1400 799M0 866Q700 813 1400 859M170 740L80 900M392 745L345 900M650 739L666 900M900 751L1000 900M1140 750L1360 900" fill="none"/>
+</g>
+<!-- Parisian cafe left -->
+<g transform="translate(0 400)">
+ <path d="M-35 174V-40L104 -83L243-40V174Z" fill="#c8a9c7" stroke="#715f7e" stroke-width="7"/>
+ <path d="M8 46V-29H203V46Z" fill="#496d87" stroke="#fce8ce" stroke-width="10"/>
+ <path d="M-28 30H248L226 77H-5Z" fill="#c74e72" stroke="#7f4768" stroke-width="5"/>
+ <path d="M-12 53H230" stroke="#ffe9cf" stroke-width="9" stroke-dasharray="35 25"/>
+ <path d="M16 85V170H116V85Z" fill="#f6dbca" stroke="#765c81" stroke-width="6"/>
+ <path d="M127 85V170H210V85Z" fill="#4e8294" stroke="#f1dbc7" stroke-width="6"/>
+ <text x="51" y="18" font-family="Georgia,serif" fill="#fff2d7" font-size="33" font-weight="bold">CAFÉ</text>
+ <path d="M10 173H227" stroke="#826985" stroke-width="11"/>
+</g>
+<!-- street lamps -->
+<g stroke="#4e4c69" stroke-width="10" fill="#fce1a0">
+ <path d="M310 744V474M278 476H340L328 414H290Z"/>
+ <path d="M1141 756V483M1110 484H1172L1159 418H1124Z"/>
+</g>
+<g fill="#fff1bd" opacity=".7" filter="url(#soft)"><ellipse cx="310" cy="473" rx="35" ry="53"/><ellipse cx="1141" cy="479" rx="35" ry="53"/></g>
+<!-- flowering trees and pink leaves -->
+<g>
+ <path d="M1260 774Q1252 569 1321 487M1285 620Q1338 557 1382 544" stroke="#756678" stroke-width="29" fill="none"/>
+ <g fill="url(#bloom)" stroke="#e284b2" stroke-width="4">
+ <circle cx="1307" cy="460" r="64"/><circle cx="1247" cy="509" r="56"/><circle cx="1355" cy="516" r="63"/><circle cx="1284" cy="555" r="58"/><circle cx="1390" cy="446" r="42"/>
+ </g>
+ <g fill="#f9d8e2"><circle cx="1279" cy="455" r="13"/><circle cx="1326" cy="497" r="12"/><circle cx="1360" cy="545" r="10"/><circle cx="1229" cy="542" r="10"/></g>
+</g>
+<g fill="#fff1e5" opacity=".85">
+ <path d="M375 341l20-10-11 19zM505 247l18-6-5 18zM1060 315l18-10-8 19zM699 668l18-9-9 18z"/>
+</g>
+<rect width="1400" height="900" fill="none" stroke="#f9d6ce" stroke-opacity=".1" stroke-width="12"/>
+</svg>
