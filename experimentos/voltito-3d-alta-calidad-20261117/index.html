@@ -139,9 +139,7 @@ for(const sign of [-1,1]){
 // Big head, integrated snout and cheek volume
 ellipsoid('head',headMat,0,2.30,.02,1.08,.99,.84,64);
 ellipsoid('muzzle',headMat,0,1.92,.63,.46,.28,.29,36);
-// Back fur tuft and markings
-for(const sign of [-1,1])ellipsoid('back mark',brownMat,sign*.36,1.15,-.59,.23,.17,.065,24);
-ellipsoid('back teal symbol',darkTeal,0,2.54,-.806,.24,.17,.032,26);
+// Dorso de pelaje dorado limpio, tal como en la referencia aprobada.
 
 // Wide three-dimensional leaf ears: tapered geometry with frontal/side thickness
 function leaf(sign,inner=false){
@@ -223,8 +221,8 @@ for(const a of forks)for(let i=0;i<a.length-1;i++)segment(a[i],a[i+1],.079,tealM
 
 // Short strands of fur as real 3D instanced meshes, with tiny colored variation.
 let seed=927413;function rand(){seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;}
-const hairGeo=new THREE.ConeGeometry(.011,.080,3);
-hairGeo.translate(0,.035,0);
+const hairGeo=new THREE.ConeGeometry(.0045,.029,3);
+hairGeo.translate(0,.014,0);
 const dummy=new THREE.Object3D();
 function addFur(count,cx,cy,cz,rx,ry,rz,baseHue=42){
  const mesh=new THREE.InstancedMesh(hairGeo,new THREE.MeshStandardMaterial({color:0xffffff,roughness:1,side:THREE.DoubleSide}),count);
@@ -236,7 +234,7 @@ function addFur(count,cx,cy,cz,rx,ry,rz,baseHue=42){
   const point=new THREE.Vector3(cx+nx*rx,cy+ny*ry,cz+nz*rz);
   const normal=new THREE.Vector3(nx/rx,ny/ry,nz/rz).normalize();
   dummy.position.copy(point);dummy.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),normal);
-  const scale=.55+rand()*.8;dummy.scale.set(scale,scale,scale);dummy.updateMatrix();
+  const scale=.46+rand()*.55;dummy.scale.set(scale,scale,scale);dummy.updateMatrix();
   mesh.setMatrixAt(i,dummy.matrix);
   const color=gold.clone().lerp(rand()>.5?light:dark,rand()*.38);
   mesh.setColorAt(i,color);
@@ -244,10 +242,10 @@ function addFur(count,cx,cy,cz,rx,ry,rz,baseHue=42){
  mesh.instanceMatrix.needsUpdate=true;
  mesh.castShadow=false;mesh.frustumCulled=false;body.add(mesh);
 }
-addFur(1900,0,2.30,.02,1.084,.993,.845);
-addFur(900,0,.91,.0,.784,.883,.595);
+addFur(3300,0,2.30,.02,1.084,.993,.845);
+addFur(1600,0,.91,.0,.784,.883,.595);
 for(const s of [-1,1]){
- addFur(250,s*.52,.23,.35,.422,.213,.493);
+ addFur(330,s*.52,.23,.35,.422,.213,.493);
 }
 
 // Podium and contact shadow
