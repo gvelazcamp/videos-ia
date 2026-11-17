@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="es-UY">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#191b38">
+<title>París Pixel Quest — Pikachu en París</title>
+<meta name="description" content="Minijuego pixel art: paseá por París, juntá croissants y llegá a la Torre Eiffel. Para celular o teclado.">
+<style>
+:root{color-scheme:dark;--ink:#fff4df;--pink:#ff9ec4;--edge:#584d7d;--deep:#17172d}
+*{box-sizing:border-box}html,body{min-height:100%;margin:0;overflow-x:hidden}
+body{background:radial-gradient(ellipse at 45% -12%,#4e426f 0,transparent 52%),#141426;color:var(--ink);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+button{font:inherit;cursor:pointer;touch-action:none;user-select:none;-webkit-user-select:none}
+button:focus-visible,a:focus-visible{outline:3px solid #fff7b9;outline-offset:3px}
+a{color:#ffcbd8;text-underline-offset:3px}
+.shell{max-width:980px;margin:auto;padding:16px clamp(9px,2.5vw,25px) 34px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:8px 3px 17px}
+.brand{font-size:11px;font-weight:900;letter-spacing:.12em;color:#eecbdf}.brand .star{display:inline-grid;place-items:center;width:28px;height:28px;margin-right:7px;background:#d85991;border:3px solid #f1b7d1;box-shadow:3px 3px 0 #45294f;font-size:14px}
+.tag{font-size:10px;color:#c4b7d5;letter-spacing:.08em}
+h1{font-size:clamp(25px,5vw,47px);margin:0 0 5px;line-height:1.18;font-weight:1000;letter-spacing:-.06em;text-shadow:3px 3px 0 #583d6c}
+h1 span{color:#ffb2d1}
+.lead{font-size:12px;line-height:1.7;color:#c9c1da;margin:0 0 15px}
+.frame{position:relative;overflow:hidden;border:4px solid #a5769c;border-radius:13px;background:#7f91bd;box-shadow:0 0 0 4px #312947,0 19px 55px #0008}
+.hud{position:absolute;z-index:2;left:0;right:0;top:0;display:flex;align-items:center;justify-content:space-between;gap:6px;padding:9px;background:linear-gradient(180deg,#1f254de8,#22234a80 76%,transparent);pointer-events:none;font-size:clamp(9px,1.7vw,13px);font-weight:bold;text-shadow:2px 2px #2f2146}
+.hud div{display:flex;align-items:center;gap:6px}.hud b{color:#ffe5a9}.hearts{color:#ff769e;letter-spacing:1px}
+#game{display:block;width:100%;aspect-ratio:400/256;image-rendering:pixelated;image-rendering:crisp-edges;background:#8797bd}
+.overlay{position:absolute;inset:0;background:#10142dc9;z-index:5;display:grid;place-items:center;padding:12px;text-align:center}
+.overlay[hidden]{display:none!important}
+.modal{max-width:410px;width:100%;background:#2b294e;border:4px solid #e5a2c3;padding:21px 16px 18px;box-shadow:8px 8px 0 #101322}
+.modal .pixelicon{font-size:30px;display:block;padding-bottom:6px}
+.modal h2{font-size:clamp(21px,4vw,28px);text-shadow:3px 3px #66435c;letter-spacing:-.07em;margin:5px 0 10px;color:#ffe3af}
+.modal p{font-size:12px;color:#f4d5df;line-height:1.7;margin:0 0 16px}
+.action{background:#ffe1a5;color:#322344;border:3px solid #fff3cc;padding:12px 25px;font-weight:1000;letter-spacing:.06em;box-shadow:4px 4px 0 #141226;text-transform:uppercase}
+.action:active{transform:translate(3px,3px);box-shadow:1px 1px 0 #141226}
+.bottom{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding-top:14px}
+.dpad{display:flex;gap:12px;align-items:center}
+.control{border:3px solid #c1a0c6;border-radius:12px;min-width:76px;min-height:69px;background:linear-gradient(180deg,#4c4268,#382f55);color:#fff5eb;font-weight:1000;font-size:27px;box-shadow:0 5px 0 #211b35;display:grid;place-items:center}
+.control:active,.control.held{background:#70517b;transform:translateY(4px);box-shadow:0 1px 0 #211b35}
+.jump{background:linear-gradient(180deg,#e892a6,#bc527b);border-color:#ffb2c1;color:#271c3d;min-width:145px;font-size:15px;letter-spacing:.03em}
+.status{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-top:14px;padding:13px 15px;background:#28243e;border:2px solid #584d6e;font-size:11px;line-height:1.6;color:#ded0e4}
+.status strong{color:#fff0be}
+.footer{margin-top:14px;display:flex;align-items:center;flex-wrap:wrap;justify-content:space-between;gap:8px;color:#afa4c6;font-size:10px;line-height:1.6}
+.footer button{padding:7px 11px;color:#f6dde9;border:1px solid #68587b;background:#28243d;border-radius:8px}
+@media(max-width:540px){.shell{padding:10px 7px 25px}.top{padding-bottom:12px}.brand{font-size:10px}.tag{font-size:8px}h1{font-size:28px}.lead{font-size:10px;margin-bottom:11px}.frame{border-width:3px}.hud{font-size:9px;padding:6px}.control{min-width:67px;min-height:64px}.dpad{gap:9px}.jump{min-width:124px}.status{margin-top:11px;padding:10px;font-size:10px}.footer{font-size:9px}}
+@media(prefers-reduced-motion:reduce){.action,.control{transition:none}}
+</style>
+</head>
+<body>
+<main class="shell">
+<div class="top"><div class="brand"><span class="star">✦</span> CUATRO · ARCADE</div><div class="tag">NIVEL 01 · PARÍS · PIXEL ART</div></div>
+<h1>PARÍS <span>PIXEL QUEST</span></h1>
+<p class="lead">Mové a Pikachu, saltá los charcos, juntá al menos 6 croissants y llegá al final del paseo. En el celular o con las flechas del teclado.</p>
+<section class="frame" aria-label="Minijuego de plataformas pixel art en París">
+ <div class="hud"><div>🥐 <b id="score">0/6</b></div><div>VIDAS <span id="hearts" class="hearts">♥ ♥ ♥</span></div><div>PARÍS <b id="progress">0%</b></div></div>
+ <canvas id="game" width="400" height="256" aria-label="Pikachu con boina y vestido pasea por un videojuego pixel art de París"></canvas>
+ <div class="overlay" id="overlay"><div class="modal">
+ <span class="pixelicon">🥐 ✦ 🗼</span><h2 id="modalTitle">BONJOUR, PIKACHU!</h2>
+ <p id="modalBody">¡Bienvenida a París! Recolectá 6 croissants, evitá los charcos y encontrá la Torre Eiffel. Usá las flechas para caminar y SALTAR para brincar.</p>
+ <button id="begin" type="button" class="action">▶ EMPEZAR</button>
+ </div></div>
+</section>
+<div class="bottom">
+ <div class="dpad"><button class="control" id="left" aria-label="Mover izquierda" type="button">◀</button><button class="control" id="right" aria-label="Mover derecha" type="button">▶</button></div>
+ <button class="control jump" id="jump" type="button">▲ SALTAR</button>
+</div>
+<div class="status" aria-live="polite"><div id="message"><strong>OBJETIVO:</strong> 6 croissants + llegar a la Torre Eiffel.</div><div id="distance">0 m</div></div>
+<div class="footer">
+ <span>TECLADO: ← → / A D para caminar · ESPACIO / ↑ para saltar</span>
+ <button id="reset" type="button">↻ Reiniciar nivel</button>
+ <a href="https://github.com/gvelazcamp/videos-ia/tree/main/experimentos/pikachu-paris-videojuego" target="_blank" rel="noopener">Código en GitHub</a>
+</div>
+</main>
+<script>
+(()=>{
+"use strict";
+const canvas=document.querySelector('#game'),ctx=canvas.getContext('2d',{alpha:false});
+const W=400,H=256,GROUND=216,WORLD=1380;
+ctx.imageSmoothingEnabled=false;
+const qs=id=>document.getElementById(id);
+const ui={score:qs('score'),hearts:qs('hearts'),progress:qs('progress'),message:qs('message'),distance:qs('distance'),overlay:qs('overlay'),title:qs('modalTitle'),body:qs('modalBody'),begin:qs('begin')};
+const base="https://raw.githubusercontent.com/gvelazcamp/videos-ia/main/experimentos/";
+const sources=[
+base+"pikachu-castillo-terror/personaje-removebg-web.png",
+base+"pikachu-paris/accesorios-paris.svg"
+];
+const sprite=document.createElement('canvas');sprite.width=57;sprite.height=66;
+const sp=sprite.getContext('2d');sp.imageSmoothingEnabled=true;
+const fallback=document.createElement('canvas');fallback.width=57;fallback.height=66;
+const fb=fallback.getContext('2d');fb.imageSmoothingEnabled=false;
+let spriteReady=false;
+function rect(context,x,y,w,h,col){context.fillStyle=col;context.fillRect(Math.round(x),Math.round(y),Math.ceil(w),Math.ceil(h));}
+function fallbackSprite(){
+ const c=fb;rect(c,4,15,48,14,"#e6cc57");rect(c,18,1,8,24,"#f2d74f");rect(c,38,3,8,20,"#f2d74f");rect(c,18,1,8,5,"#34303a");rect(c,40,3,6,5,"#34303a");
+ rect(c,10,19,37,35,"#f1db57");rect(c,16,49,26,10,"#f1db57");rect(c,12,52,7,10,"#f1db57");rect(c,37,52,7,10,"#f1db57");rect(c,19,25,5,7,"#282432");rect(c,35,25,5,7,"#282432");rect(c,17,32,7,7,"#d75167");rect(c,37,33,7,7,"#d75167");
+ rect(c,15,15,31,9,"#262637");rect(c,18,8,26,10,"#262637");rect(c,12,41,34,15,"#2a2738");rect(c,15,39,30,5,"#f5e2c3");rect(c,12,53,34,4,"#dd527b");}
+fallbackSprite();
+let loaded=0;
+sources.forEach((src,i)=>{
+ const img=new Image();img.crossOrigin='anonymous';
+ img.onload=()=>{
+   if(i===0){sp.clearRect(0,0,57,66);sp.drawImage(img,0,0,57,66)}
+   loaded++;
+   if(loaded===2){
+     // Personaje original y vestuario se rasterizan juntos en baja resolución.
+     sp.clearRect(0,0,57,66);sp.drawImage(assetImages[0],0,0,57,66);sp.drawImage(assetImages[1],0,0,57,66);
+     spriteReady=true;
+   }
+ };
+ img.onerror=()=>{loaded++;console.warn("Asset no disponible; se usará sprite local",src)};
+ assetImages.push(img);img.src=src;
+});
+const assetImages=[];
+const coinsX=[165,307,448,570,714,870,1025,1172];
+const hazards=[340,661,985,1104];
+const keys={left:false,right:false,jump:false};
+const petals=Array.from({length:39},(_,i)=>({x:(i*107)%WORLD,y:16+(i*41)%153,phase:i*.71,speed:6+(i%7)*2}));
+let collected=[],player,mode="ready",camera=0,clock=0,previous=0,invulnerable=0;
+const rnd=(i)=>{const v=Math.sin(i*52.1+5.34)*34758.44;return v-Math.floor(v)};
+function newGame(){
+ player={x:48,y:GROUND-69,vx:0,vy:0,w:54,h:69,onGround:true,face:1,hearts:3};
+ collected=coinsX.map(()=>false);camera=0;clock=0;invulnerable=0;
+ Object.keys(keys).forEach(k=>keys[k]=false);
+ updateHud();
+}
+function updateHud(){
+ const n=collected.filter(Boolean).length;
+ ui.score.textContent=n+"/6";
+ ui.hearts.textContent=("♥ ".repeat(player.hearts)).trim()||"—";
+ ui.progress.textContent=Math.round(Math.min(100,player.x/(WORLD-125)*100))+"%";
+ ui.distance.textContent=Math.floor(player.x)+" m";
+}
+function notice(s){ui.message.innerHTML=s;}
+function showModal(title,body,label){
+ mode=title.startsWith('VICTORIA')?'won':'lost';
+ ui.title.textContent=title;ui.body.textContent=body;ui.begin.textContent=label;ui.overlay.hidden=false;updateHud();
+}
+function start(){
+ newGame();mode="playing";ui.overlay.hidden=true;
+ notice("<strong>MISIÓN:</strong> buscá 6 croissants y la Torre Eiffel.");
+}
+ui.begin.addEventListener('click',start);qs('reset').addEventListener('click',start);
+function down(action){
+ if(mode!=="playing")return;
+ keys[action]=true;
+}
+function up(action){keys[action]=false}
+function bindButton(id,action){
+ const b=qs(id);b.addEventListener('pointerdown',e=>{e.preventDefault();b.setPointerCapture(e.pointerId);down(action);b.classList.add('held')});
+ for(const event of ['pointerup','pointercancel','lostpointercapture'])b.addEventListener(event,()=>{up(action);b.classList.remove('held')});
+}
+bindButton('left','left');bindButton('right','right');bindButton('jump','jump');
+const map={ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right',ArrowUp:'jump',KeyW:'jump',Space:'jump'};
+window.addEventListener('keydown',e=>{
+ const action=map[e.code];if(!action)return;
+ e.preventDefault();
+ if(e.repeat && action==='jump')return;
+ down(action);
+});
+window.addEventListener('keyup',e=>{const action=map[e.code];if(action){e.preventDefault();up(action)}});
+window.addEventListener('blur',()=>{Object.keys(keys).forEach(k=>keys[k]=false)});
+function update(dt){
+ if(mode!=="playing")return;
+ clock+=dt/60;
+ if(invulnerable>0)invulnerable=Math.max(0,invulnerable-dt);
+ const direction=(keys.right?1:0)-(keys.left?1:0);
+ const desired=direction*2.65;
+ player.vx+=(desired-player.vx)*Math.min(1,dt*.24);
+ if(direction)player.face=direction;
+ if(keys.jump&&player.onGround){player.vy=-7.15;player.onGround=false;keys.jump=false}
+ player.vy=Math.min(8,player.vy+.34*dt);
+ player.x=Math.max(17,Math.min(WORLD-48,player.x+player.vx*dt));
+ player.y+=player.vy*dt;
+ if(player.y+player.h>=GROUND){player.y=GROUND-player.h;player.vy=0;player.onGround=true}
+ for(let i=0;i<coinsX.length;i++){
+  if(collected[i])continue;
+  const x=coinsX[i],y=GROUND-49+Math.sin(clock*3+i)*5;
+  if(Math.abs(player.x+player.w*.5-x)<31&&Math.abs(player.y+player.h*.42-y)<39){
+   collected[i]=true;
+   const n=collected.filter(Boolean).length;
+   notice("<strong>¡CROISSANT!</strong> "+n+" recolectados.");
+  }
+ }
+ for(const hx of hazards){
+  if(invulnerable>0||player.y+player.h<GROUND-16)continue;
+  if(player.x+player.w*.68>hx-19&&player.x+player.w*.32<hx+19){
+    player.hearts--;invulnerable=75;player.vy=-5.8;player.onGround=false;player.x=Math.max(17,player.x-28);
+    notice("<strong>¡CUIDADO!</strong> Saltá los charcos.");
+    if(player.hearts<=0){showModal("FIN DEL PASEO","Te quedaste sin vidas. ¡Probá de nuevo y saltá los charcos!","↻ REINTENTAR");return}
+    break;
+  }
+ }
+ if(player.x>WORLD-120){
+  if(collected.filter(Boolean).length>=6){
+    showModal("VICTORIA EN PARÍS!","¡Magnifique! Reuniste los croissants y llegaste a la Torre Eiffel. Terminaste el primer nivel.","▶ JUGAR OTRA VEZ");return;
+  }else{
+    player.x=WORLD-121;player.vx=0;
+    notice("<strong>TE FALTAN CROISSANTS:</strong> juntá al menos 6 para terminar.");
+  }
+ }
+ camera=Math.max(0,Math.min(WORLD-W,player.x-W*.41));
+ updateHud();
+}
+function line(x1,y1,x2,y2,color,width=2){
+ ctx.beginPath();ctx.strokeStyle=color;ctx.lineWidth=width;ctx.moveTo(Math.round(x1),Math.round(y1));ctx.lineTo(Math.round(x2),Math.round(y2));ctx.stroke();
+}
+function bldg(x,w,h,n){
+ const y=159-h;rect(ctx,x,y,w,h,"#8d7a9b");rect(ctx,x-3,y-7,w+6,8,"#746783");
+ rect(ctx,x+5,y-17,w-10,10,"#837391");
+ for(let iy=0;iy<Math.max(1,Math.floor(h/22));iy++)for(let ix=0;ix<Math.floor((w-8)/17);ix++){
+  const xx=x+8+ix*17,yy=y+12+iy*22;
+  rect(ctx,xx,yy,7,11,((ix+iy+n)%4===0)?"#ffe6a3":"#c0b3c2");
+ }
+}
+function tower(x){
+ // Pixel-art Eiffel: patas, plataformas y rejilla
+ rect(ctx,x-7,26,14,5,"#3b394d");rect(ctx,x-2,14,4,15,"#42394d");rect(ctx,x-7,9,14,4,"#42394d");
+ const levels=[[27,9],[43,17],[64,24],[91,37],[121,48],[149,61],[181,78]];
+ ctx.fillStyle="#544251";
+ ctx.beginPath();ctx.moveTo(x-8,29);ctx.lineTo(x-80,191);ctx.lineTo(x-47,191);ctx.lineTo(x-22,136);ctx.lineTo(x+22,136);ctx.lineTo(x+47,191);ctx.lineTo(x+80,191);ctx.lineTo(x+8,29);ctx.fill();
+ ctx.fillStyle="#aaa0ba";ctx.fillRect(x-21,132,42,22);
+ for(const [y,half] of levels){
+   rect(ctx,x-half-4,y,half*2+8,5,"#bd9a74");
+   rect(ctx,x-half-1,y+7,4,8,"#382f44");
+ }
+ for(let i=0;i<6;i++){
+   const [y,a]=levels[i], [ny,b]=levels[i+1];
+   line(x-a,y+5,x+b,ny,"#e1b77c",2);
+   line(x+a,y+5,x-b,ny,"#e1b77c",2);
+ }
+ // arco en la base
+ ctx.fillStyle="#e7b5c2";ctx.beginPath();ctx.moveTo(x-34,191);ctx.lineTo(x-29,167);ctx.lineTo(x-22,152);ctx.lineTo(x,145);ctx.lineTo(x+22,152);ctx.lineTo(x+29,167);ctx.lineTo(x+34,191);ctx.fill();
+ rect(ctx,x-92,185,184,7,"#3d374b");
+ for(let i=-75;i<80;i+=18)rect(ctx,x+i,190,6,5,"#dcb47a");
+}
+function cafe(){
+ rect(ctx,117,86,230,79,"#c49db6");rect(ctx,113,84,238,9,"#7c6484");
+ rect(ctx,125,109,214,57,"#665778");rect(ctx,146,114,55,48,"#e4b6c6");rect(ctx,268,114,54,48,"#b0a5c1");
+ rect(ctx,104,105,254,18,"#a94577");
+ for(let x=105;x<355;x+=24)rect(ctx,x,105,12,18,"#ffe7d2");
+ rect(ctx,164,91,136,14,"#6d526f");
+ ctx.fillStyle="#fff0c5";ctx.font="bold 12px monospace";ctx.fillText("CAFÉ PARIS",173,102);
+ rect(ctx,198,136,55,30,"#645a78");
+}
+function tree(x){
+ rect(ctx,x-7,123,14,84,"#76536d");rect(ctx,x-16,158,12,6,"#76536d");rect(ctx,x+4,148,14,6,"#76536d");
+ for(let i=0;i<9;i++){const xx=x+Math.sin(i*13)*32,yy=104+Math.cos(i*11)*22;rect(ctx,xx-16,yy-15,32,30,i%2?"#eaa0c5":"#f6b8d5")}
+ for(let i=0;i<5;i++){const xx=x+Math.sin(i*5)*23,yy=103+Math.cos(i*8)*17;rect(ctx,xx,yy,7,7,"#ffe7d6")}
+}
+function lamp(x){
+ rect(ctx,x-2,128,5,79,"#483f58");rect(ctx,x-7,130,15,5,"#4f435d");rect(ctx,x-10,121,21,14,"#f9da9c");rect(ctx,x-11,118,23,5,"#51485c");rect(ctx,x-6,111,13,6,"#51485c");
+}
+function drawWorld(){
+ // Sky: true pixel art drawn at the canvas's low internal resolution.
+ rect(ctx,0,0,WORLD,H,"#8696bd");rect(ctx,0,0,WORLD,54,"#8797c2");
+ rect(ctx,0,54,WORLD,65,"#b8a9c6");rect(ctx,0,119,WORLD,38,"#e5b3c7");
+ rect(ctx,0,157,WORLD,35,"#cf9fb2");rect(ctx,0,188,WORLD,68,"#b891aa");
+ // chunky clouds
+ for(let i=0;i<16;i++){const x=(i*103+17), y=32+(i*11)%58;rect(ctx,x,y,37,8,"#eed5de");rect(ctx,x+7,y-5,22,6,"#f4e1e6")}
+ // neighborhoods
+ for(let i=0;i<26;i++){const x=i*55-20;const h=29+Math.floor(rnd(i+5)*47);bldg(x,49,h,i)}
+ // River Seine
+ rect(ctx,0,168,WORLD,31,"#70a3b0");
+ for(let i=0;i<115;i++){const x=i*13+7;rect(ctx,x,175+(i%3)*8,10,2,i%2?"#bed3c9":"#b6c6ce")}
+ // bridge railings and arches
+ rect(ctx,0,162,WORLD,7,"#a1789c");rect(ctx,0,167,WORLD,5,"#6e657e");
+ for(let x=0;x<WORLD;x+=76){rect(ctx,x,165,12,37,"#a98598");rect(ctx,x-1,193,77,5,"#a98598")}
+ cafe();tower(1080);tree(78);tree(470);tree(1302);lamp(58);lamp(580);lamp(1198);
+ // Walkable pavement
+ rect(ctx,0,205,WORLD,H-205,"#d5a9a9");rect(ctx,0,204,WORLD,6,"#f3d5be");
+ for(let i=0;i<75;i++){
+  const x=i*23;rect(ctx,x,230,1,26,"#b889a0");
+  if(i%3===0)rect(ctx,x,223,14,2,"#e3bac1");
+ }
+ rect(ctx,0,248,WORLD,8,"#a8859a");
+}
+function croissant(x,y,t){
+ const hop=Math.sin(t*4+x*.02)*3;
+ ctx.save();ctx.translate(Math.round(x),Math.round(y+hop));
+ rect(ctx,-11,-3,22,10,"#98502f");
+ rect(ctx,-10,-5,20,10,"#e7a04a");rect(ctx,-7,-7,14,3,"#ffd58a");rect(ctx,-5,-3,3,5,"#fff2ba");rect(ctx,2,-3,3,5,"#fff2ba");
+ rect(ctx,-14,0,5,5,"#b96737");rect(ctx,9,0,5,5,"#b96737");
+ ctx.restore();
+}
+function drawEffects(){
+ // parallax pink petals
+ for(const p of petals){const xx=p.x+(clock*p.speed)%WORLD, yy=p.y+Math.sin(clock*1.4+p.phase)*6;rect(ctx,xx%WORLD,yy,4,3,"#ffe1d9")}
+}
+function drawHazard(x){
+ rect(ctx,x-23,GROUND-4,46,7,"#6487aa");rect(ctx,x-17,GROUND-6,34,4,"#98bad2");
+ rect(ctx,x-6,GROUND-6,10,2,"#e3eff5");
+}
+function drawPlayer(){
+ if(invulnerable>0&&Math.floor(invulnerable/5)%2)return;
+ const x=Math.floor(player.x),y=Math.floor(player.y);
+ const walking=Math.abs(player.vx)>.5&&player.onGround;
+ const bob=walking?Math.round(Math.sin(clock*19)*2):0;
+ rect(ctx,x+11,GROUND-2,player.w-19,3,"#69596b");
+ const art=spriteReady?sprite:fallback;
+ ctx.save();ctx.translate(x+player.w/2,y+bob);ctx.scale(player.face,1);
+ ctx.drawImage(art,-player.w/2,0,player.w,player.h);
+ ctx.restore();
+}
+function draw(){
+ ctx.clearRect(0,0,W,H);ctx.save();ctx.translate(-Math.round(camera),0);
+ drawWorld();drawEffects();
+ hazards.forEach(drawHazard);
+ coinsX.forEach((cx,i)=>{if(!collected[i])croissant(cx,GROUND-44,clock+i*.4)});
+ // Victory goal flags at the end of the level
+ rect(ctx,WORLD-83,119,6,86,"#463d5e");rect(ctx,WORLD-77,119,39,24,"#e9abc6");
+ rect(ctx,WORLD-72,126,27,4,"#fff0cf");rect(ctx,WORLD-72,135,18,3,"#fff0cf");
+ drawPlayer();
+ ctx.restore();
+}
+function animate(now){
+ if(!previous)previous=now;
+ const dt=Math.min(2.4,(now-previous)/(1000/60));previous=now;
+ update(dt);draw();requestAnimationFrame(animate);
+}
+newGame();requestAnimationFrame(animate);
+})();
+</script>
+</body>
+</html>
