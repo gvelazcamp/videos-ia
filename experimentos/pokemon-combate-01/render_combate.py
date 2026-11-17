@@ -196,9 +196,9 @@ def menu(d,move,mode):
             d.polygon([(xx+220,yy+15),(xx+229,yy+23),(xx+220,yy+31)],fill="#aa3f5b")
 def dialogue(d,headline,detail="",color="#ffd5a6"):
     # Sits above permanent move bar, like attack feedback
-    box(d,20,701,500,87,fill="#242844",stroke="#e8b3ba",radius=12)
-    text(d,(36,716),headline,21,color)
-    if detail:text(d,(38,750),detail,13,"#f8efde",False)
+    box(d,20,308,500,88,fill="#242844",stroke="#e8b3ba",radius=12)
+    text(d,(35,326),headline,19,color)
+    if detail:text(d,(38,361),detail,13,"#f8efde",False)
 def lightning(d,x1,y1,x2,y2,t,rng):
     points=[(x1,y1)]
     for j in range(1,9):
@@ -260,15 +260,15 @@ def battle_events(duration):
     # Narration is 106 Spanish words; beat map normalizes if TTS duration differs.
     # start,end,label,character(action),pikachuhp,cubonehp,attack,detail
     return [
-      (.00,.10,"¡PIKACHU VS CUBONE!","intro",51,54,"","La batalla empieza bajo la luna"),
-      (.10,.21,"¡PIKACHU USÓ RAYO!","zap",51,54,"RAYO","¡NO TIENE EFECTO! CUBONE ES TIERRA."),
-      (.21,.31,"¡CUBONE USÓ HUESO PALO!","boneclub",29,54,"","¡GOLPE DIRECTO!"),
-      (.31,.42,"¡PIKACHU USÓ ATAQUE RÁPIDO!","quick",29,38,"ATAQUE RÁPIDO","¡CUBONE RECIBE DAÑO!"),
-      (.42,.52,"¡CUBONE USÓ CABEZAZO!","headbutt",17,38,"","AMBOS RESISTEN"),
-      (.52,.65,"¡PIKACHU USÓ COLA FÉRREA!","irontail",17,18,"COLA FÉRREA","¡QUÉ IMPACTO!"),
-      (.65,.77,"¡CUBONE USÓ HUESOMERANG!","bonemerang",17,18,"","¡FALLÓ POR POCO!"),
-      (.77,.90,"¡ATAQUE RÁPIDO FINAL!","final",17,0,"ATAQUE RÁPIDO","¡CUBONE NO PUEDE CONTINUAR!"),
-      (.90,1.01,"¡PIKACHU GANA!","victory",17,0,"","UNA BATALLA CON RESPETO"),
+      (.000,.147,"¡PIKACHU VS CUBONE!","intro",51,54,"","La batalla empieza bajo la luna"),
+      (.147,.279,"¡PIKACHU USÓ RAYO!","zap",51,54,"RAYO","¡NO TIENE EFECTO! CUBONE ES TIERRA."),
+      (.279,.361,"¡CUBONE USÓ HUESO PALO!","boneclub",29,54,"","¡GOLPE DIRECTO!"),
+      (.361,.443,"¡PIKACHU USÓ ATAQUE RÁPIDO!","quick",29,38,"ATAQUE RÁPIDO","¡CUBONE RECIBE DAÑO!"),
+      (.443,.525,"¡CUBONE USÓ CABEZAZO!","headbutt",17,38,"","AMBOS RESISTEN"),
+      (.525,.639,"¡PIKACHU USÓ COLA FÉRREA!","irontail",17,18,"COLA FÉRREA","¡QUÉ IMPACTO!"),
+      (.639,.738,"¡CUBONE USÓ HUESOMERANG!","bonemerang",17,18,"","¡FALLÓ POR POCO!"),
+      (.738,.886,"¡ATAQUE RÁPIDO FINAL!","final",17,0,"ATAQUE RÁPIDO","¡CUBONE NO PUEDE CONTINUAR!"),
+      (.886,1.01,"¡PIKACHU GANA!","victory",17,0,"","UNA BATALLA CON RESPETO"),
     ]
 def getbeat(u):
     for start,end,*rest in battle_events(1):
@@ -310,7 +310,9 @@ def draw(t,duration,base,pika,cubo,bone,frameidx):
         rightx-=90*k;rightrot=18*k
     if action=="victory":
         leftbottom-=22*abs(math.sin(t*4.2))
-        rightscale=.98
+        rightrot=-16*ease(between(prog,.02,.40))
+        rightscale=1-.13*ease(between(prog,.02,.40))
+        rightbottom+=13*ease(between(prog,.02,.40))
     img_at(img,cubo,rightx,rightbottom,rightrot,rightscale,opacity=1 if action!="victory" else .8)
     img_at(img,pika,leftx,leftbottom,leftrot,leftscale)
     d=ImageDraw.Draw(img)
@@ -324,7 +326,7 @@ def draw(t,duration,base,pika,cubo,bone,frameidx):
     health_card(d,"CUBONE",18,54,cub_new,284,55,w=245,enemy=True)
     health_card(d,"PIKACHU",20,51,pik_new,12,700,w=258)
     # Turn number HUD
-    turn=1 if u<.31 else 2 if u<.52 else 3 if u<.77 else 4
+    turn=1 if u<.361 else 2 if u<.525 else 3 if u<.738 else 4
     if action=="intro":
         box(d,183,170,175,50,fill="#282743",stroke="#edc38e",radius=14)
         middle(d,178,"ROUND 01",23,"#ffe0a7")
@@ -376,12 +378,12 @@ def draw(t,duration,base,pika,cubo,bone,frameidx):
             col=("#ffe5a1","#f3a4c9","#ace9ff")[k%3]
             d.polygon([(x,y),(x+4,y+6),(x,y+13),(x-4,y+6)],fill=col)
         box(d,80,307,380,113,fill="#332b54",stroke="#ffe2a1",radius=16)
-        middle(d,321,"¡VICTORIA!",43,"#ffdc8a")
-        middle(d,377,"PIKACHU GANA EL COMBATE",15,"#fff6df")
+        middle(d,321,"¿QUIÉN SIGUE?" if prog>.62 else "¡VICTORIA!",34 if prog>.62 else 43,"#ffdc8a")
+        middle(d,377,"PIKACHU GANA EL COMBATE" if prog<=.62 else "DEJÁ TU PRÓXIMO RIVAL",15,"#fff6df")
     # Keep game interface legible over the whole fight.
     mode="intro" if action=="intro" else "command" if action in ("zap","quick","irontail","final") else "battle"
     menu(d,sel,mode)
-    if action!="intro" and action!="victory":
+    if action!="intro" and action!="victory" and not (action=="zap" and prog>.60):
         dialogue(d,label,detail,color="#ffdcaa" if action in ("zap","irontail","final") else "#ffe0e7")
     # Cinematic local flash only near hits, so no text is lost.
     return img.convert("RGB")
