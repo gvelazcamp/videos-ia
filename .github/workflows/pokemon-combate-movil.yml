@@ -1,0 +1,62 @@
+name: Combate Pokemon - version movil compatible
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/pokemon-combate-movil.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pokemon-combate-movil
+  cancel-in-progress: false
+
+jobs:
+  comprimir:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Instalar FFmpeg
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+      - name: Crear version movil, sin modificar el MP4 original
+        run: |
+          ffmpeg -hide_banner -nostdin -y -loglevel error \
+            -i experimentos/pokemon-combate-01/pokemon-pikachu-vs-cubone.mp4 \
+            -vf "scale=480:854:flags=lanczos,format=yuv420p" \
+            -c:v libx264 -preset veryfast -crf 29 \
+            -profile:v baseline -level 3.0 -r 24 \
+            -c:a aac -ac 2 -b:a 96k -movflags +faststart \
+            experimentos/pokemon-combate-01/pokemon-pikachu-vs-cubone-movil.mp4
+      - name: Comprobar audio, video, duracion y peso
+        run: |
+          python3 - <<'PY'
+          import json,subprocess
+          from pathlib import Path
+          p=Path("experimentos/pokemon-combate-01/pokemon-pikachu-vs-cubone-movil.mp4")
+          d=json.loads(subprocess.check_output(["ffprobe","-v","error","-show_format","-show_streams","-of","json",str(p)]))
+          assert 60.0 < float(d["format"]["duration"]) < 62.0
+          assert any(s.get("codec_type")=="video" and s.get("codec_name")=="h264" and s.get("width")==480 and s.get("height")==854 for s in d["streams"])
+          assert any(s.get("codec_type")=="audio" and s.get("codec_name")=="aac" for s in d["streams"])
+          assert 1000000 < p.stat().st_size < 9000000
+          print("Compatible para celular:",p.stat().st_size,"bytes")
+          PY
+      - name: Guardar unicamente la version liviana en GitHub
+        run: |
+          git add -- experimentos/pokemon-combate-01/pokemon-pikachu-vs-cubone-movil.mp4
+          if git diff --cached --quiet; then
+            echo "No hay cambios."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Agregar MP4 movil ligero del combate Pikachu vs Cubone"
+          git pull --rebase origin main
+          git push origin HEAD:main
