@@ -1,0 +1,83 @@
+name: Harry y Pikachu Impactrueno en Coliseo (Remove.bg + Pillow)
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/harry-pikachu-coliseo-20261117.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: harry-pikachu-coliseo-20261117
+  cancel-in-progress: false
+
+jobs:
+  imagen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Instalar herramientas gratuitas del puente
+        run: |
+          python -m pip install --disable-pip-version-check pillow playwright
+          python -m playwright install --with-deps chromium
+      - name: Descargar referencias de Harry Potter, Pikachu y Coliseo
+        run: python experimentos/harry-pikachu-coliseo-20261117/escena.py preparar
+      - name: Recortar Harry Potter con Remove.bg web sin API
+        env:
+          IMAGE_PATH: experimentos/harry-pikachu-coliseo-20261117/harry-referencia.png
+          OUTPUT_PATH: experimentos/harry-pikachu-coliseo-20261117/harry-transparente.png
+        run: python herramientas/removebg-web/remover.py
+      - name: Recortar Pikachu con Remove.bg web sin API
+        env:
+          IMAGE_PATH: experimentos/harry-pikachu-coliseo-20261117/pikachu-referencia.png
+          OUTPUT_PATH: experimentos/harry-pikachu-coliseo-20261117/pikachu-transparente.png
+        run: python herramientas/removebg-web/remover.py
+      - name: Crear magia y electricidad; montar el Coliseo
+        run: python experimentos/harry-pikachu-coliseo-20261117/escena.py componer
+      - name: Validar resultados PNG y recortes
+        run: |
+          python - <<'PY'
+          from PIL import Image
+          from pathlib import Path
+          base=Path("experimentos/harry-pikachu-coliseo-20261117")
+          for name in ("harry-transparente.png", "pikachu-transparente.png"):
+              with Image.open(base/name) as im:
+                  im.load()
+                  lo,hi=im.convert("RGBA").getchannel("A").getextrema()
+                  assert im.format == "PNG" and lo < 255 and hi > 200, f"Recorte no válido: {name}"
+                  print(f"Recorte RGBA OK: {name}, {im.size}, alpha={lo}..{hi}")
+          with Image.open(base/"harry-potter-pikachu-impactrueno-coliseo.png") as im:
+              im.load()
+              assert im.format == "PNG" and im.size == (1600,900), "Montaje inválido"
+              print("Escena final validada:", im.size)
+          PY
+      - name: Guardar solamente archivos nuevos en carpeta del experimento
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add -- experimentos/harry-pikachu-coliseo-20261117/*.png
+          git add -- experimentos/harry-pikachu-coliseo-20261117/fuentes.json
+          if git diff --cached --quiet; then
+            echo "Los archivos ya existen y no cambiaron."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Guardar Harry y Pikachu Impactrueno en Coliseo - PNG"
+          git pull --rebase origin main
+          git push origin HEAD:main
+      - name: Adjuntar imagen final descargable
+        uses: actions/upload-artifact@v4
+        with:
+          name: harry-pikachu-impactrueno-coliseo
+          path: experimentos/harry-pikachu-coliseo-20261117/harry-potter-pikachu-impactrueno-coliseo.png
+          if-no-files-found: error
+          retention-days: 7
