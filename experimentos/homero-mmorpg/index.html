@@ -10,16 +10,30 @@ main{max-width:1120px;margin:0 auto;padding:13px}header{display:flex;align-items
 h1{margin:0;font-size:clamp(19px,4vw,29px);letter-spacing:.5px}h1 em{font-style:normal;color:#ffdd52}.tag{font-size:12px;border:1px solid #52718b;background:#1e3349;padding:7px 12px;border-radius:18px}
 small{color:#a3bbd0}.screen{position:relative;overflow:hidden;aspect-ratio:16/9;width:100%;background:#7cb763;border:3px solid #738ca6;border-radius:18px;box-shadow:0 15px 35px #0008;touch-action:none}
 #world{width:100%;height:100%;display:block;touch-action:none}
-#avatar{position:absolute;width:8%;min-width:37px;max-width:84px;pointer-events:none;transform:translate(-50%,-97%);filter:drop-shadow(0 4px 2px #142a2c80)}
+#avatar{position:absolute;width:4.6%;min-width:25px;max-width:54px;pointer-events:none;transform:translate(-50%,-97%);filter:drop-shadow(0 4px 2px #142a2c80)}
 #avatar svg{display:none;width:100%;overflow:visible}
 #avatar .photo-avatar{display:block;width:100%;height:auto;overflow:visible}
-#avatar .photo-avatar .png-leg-left,#avatar .photo-avatar .png-leg-right{transform-box:view-box}
+#avatar .photo-avatar g{transform-box:view-box}
+#avatar .photo-avatar{transform-origin:50% 50%}
+#avatar.facing-left .photo-avatar{transform:scaleX(-1)}
+#avatar .photo-avatar .png-leg-left{transform-origin:63px 307px}
+#avatar .photo-avatar .png-leg-right{transform-origin:113px 307px}
+#avatar .photo-avatar .png-arm-left{transform-origin:52px 183px}
+#avatar .photo-avatar .png-arm-right{transform-origin:142px 183px}
 #avatar.fallback .photo-avatar{display:none}
 #avatar.fallback svg:not(.photo-avatar){display:block}
-#avatar.walk .photo-avatar .png-leg-left{transform-origin:125px 335px;animation:original-left-step .36s ease-in-out infinite alternate}
-#avatar.walk .photo-avatar .png-leg-right{transform-origin:207px 335px;animation:original-right-step .36s ease-in-out infinite alternate-reverse}
-@keyframes original-left-step{from{transform:rotate(-8deg)}to{transform:rotate(8deg)}}
-@keyframes original-right-step{from{transform:rotate(-8deg)}to{transform:rotate(8deg)}}#avatar .leg-left,#avatar .leg-right,#avatar .arm-left,#avatar .arm-right{transform-box:fill-box}
+#avatar.walk .png-leg-left{animation:homero-leg-walk .28s ease-in-out infinite alternate}
+#avatar.walk .png-leg-right{animation:homero-leg-walk .28s ease-in-out infinite alternate-reverse}
+#avatar.walk .png-arm-left{animation:homero-arm-walk .28s ease-in-out infinite alternate-reverse}
+#avatar.walk .png-arm-right{animation:homero-arm-walk .28s ease-in-out infinite alternate}
+#avatar.walk.running .png-leg-left,#avatar.walk.running .png-leg-right{animation-name:homero-leg-run;animation-duration:.17s}
+#avatar.walk.running .png-arm-left,#avatar.walk.running .png-arm-right{animation-name:homero-arm-run;animation-duration:.17s}
+#avatar.walk.running{animation-duration:.17s}
+@keyframes homero-leg-walk{from{transform:rotate(-8deg)}to{transform:rotate(8deg)}}
+@keyframes homero-leg-run{from{transform:rotate(-15deg)}to{transform:rotate(15deg)}}
+@keyframes homero-arm-walk{from{transform:rotate(-7deg)}to{transform:rotate(7deg)}}
+@keyframes homero-arm-run{from{transform:rotate(-13deg)}to{transform:rotate(13deg)}}
+#avatar .leg-left,#avatar .leg-right,#avatar .arm-left,#avatar .arm-right{transform-box:fill-box}
 #avatar.walk .leg-left{animation:stride .32s ease-in-out infinite alternate;transform-origin:50% 0}
 #avatar.walk .leg-right{animation:stride .32s ease-in-out infinite alternate-reverse;transform-origin:50% 0}
 #avatar.walk .arm-left{animation:stride .32s ease-in-out infinite alternate-reverse;transform-origin:50% 0}
@@ -48,16 +62,20 @@ footer{font-size:11px;color:#7f97ad;text-align:center;margin:14px}
 <div class="screen" id="screen">
 <canvas id="world" width="960" height="540" aria-label="Mapa de Springfield"></canvas>
 <div id="avatar" aria-label="Homero caminando">
-<svg class="photo-avatar" viewBox="0 0 300 500" xmlns="http://www.w3.org/2000/svg" aria-label="Homero original caminando">
+<svg class="photo-avatar" viewBox="0 0 167 474" xmlns="http://www.w3.org/2000/svg" aria-label="Homero original articulado">
 <defs>
-<clipPath id="original-leg-left"><path d="M0 326 H175 V500 H0Z"/></clipPath>
-<clipPath id="original-leg-right"><path d="M175 326 H300 V500 H175Z"/></clipPath>
-<clipPath id="original-upper"><path d="M0 0 H300 V359 H0Z"/></clipPath>
+  <clipPath id="homero-leg-left"><path d="M53 295 L101 295 L101 474 L16 474 L16 355 L48 352 Z"/></clipPath>
+  <clipPath id="homero-leg-right"><path d="M99 293 L143 293 L143 345 L167 345 L167 474 L94 474 Z"/></clipPath>
+  <clipPath id="homero-arm-left"><path d="M3 169 C25 155 48 168 60 187 L64 232 L53 302 L51 333 C43 359 27 357 9 356 L0 331 L0 210 Z"/></clipPath>
+  <clipPath id="homero-arm-right"><path d="M126 171 L157 183 L163 222 L154 269 L164 303 L157 335 L143 344 L139 323 L137 276 L134 221 Z"/></clipPath>
+  <clipPath id="homero-body"><path d="M0 0 H167 V175 L144 175 L135 198 L144 235 L163 263 L167 284 L159 305 L41 305 L48 260 L50 232 L60 207 L60 179 L0 169 Z"/></clipPath>
 </defs>
-<!-- El PNG es el original: se recorta por máscaras SVG para animar las piernas sin redibujarlo. -->
-<g class="png-leg-left"><image href="./homero-original-mmorpg.png" width="300" height="500" clip-path="url(#original-leg-left)"/></g>
-<g class="png-leg-right"><image href="./homero-original-mmorpg.png" width="300" height="500" clip-path="url(#original-leg-right)"/></g>
-<image href="./homero-original-mmorpg.png" width="300" height="500" clip-path="url(#original-upper)"/>
+<!-- Cada máscara usa el MISMO PNG original; brazos y piernas giran de forma independiente. -->
+<g class="png-leg-right"><image href="./homero-original-parado.png" width="167" height="474" clip-path="url(#homero-leg-right)"/></g>
+<g class="png-leg-left"><image href="./homero-original-parado.png" width="167" height="474" clip-path="url(#homero-leg-left)"/></g>
+<g class="png-arm-right"><image href="./homero-original-parado.png" width="167" height="474" clip-path="url(#homero-arm-right)"/></g>
+<image href="./homero-original-parado.png" width="167" height="474" clip-path="url(#homero-body)"/>
+<g class="png-arm-left"><image href="./homero-original-parado.png" width="167" height="474" clip-path="url(#homero-arm-left)"/></g>
 </svg>
 <svg viewBox="0 0 110 163" xmlns="http://www.w3.org/2000/svg">
 <ellipse cx="55" cy="157" rx="30" ry="6" fill="#1b3e3766"/>
@@ -98,7 +116,7 @@ footer{font-size:11px;color:#7f97ad;text-align:center;margin:14px}
 var cv=document.getElementById("world"),ctx=cv.getContext("2d"),avatar=document.getElementById("avatar");
 var toast=document.getElementById("toast"),score=document.getElementById("score");
 var enterButton=document.getElementById("enter-house"),placeName=document.getElementById("place-name");
-var portraitCheck=new Image();portraitCheck.onerror=function(){avatar.classList.add("fallback")};portraitCheck.src="./homero-original-mmorpg.png";
+var portraitCheck=new Image();portraitCheck.onerror=function(){avatar.classList.add("fallback")};portraitCheck.src="./homero-original-parado.png";
 var W=960,H=540,MW=2520,MH=1840,camX=0,camY=0,px=1275,py=975,anim=0,last=0,notice=0;
 var key={up:false,down:false,left:false,right:false},shift=false,run=false,target=null,dir="down";
 // Escena interior independiente; se conserva la posicion exterior para regresar al mismo lugar.
@@ -229,11 +247,11 @@ function update(dt){
 var dx=(key.right?1:0)-(key.left?1:0),dy=(key.down?1:0)-(key.up?1:0);
 if(dx||dy)target=null;
 if(!dx&&!dy&&target){dx=target.x-px;dy=target.y-py;if(Math.hypot(dx,dy)<13){target=null;dx=dy=0}}
-var mag=Math.hypot(dx,dy),walking=mag>0.001;avatar.classList.toggle("walk",walking);
+var mag=Math.hypot(dx,dy),walking=mag>0.001;avatar.classList.toggle("walk",walking);avatar.classList.toggle("running",walking&&(shift||run));
 if(walking){dx/=mag;dy/=mag;var speed=(shift||run?355:205)*dt;if(!(indoors?indoorBlocked(px+dx*speed,py):blocked(px+dx*speed,py)))px+=dx*speed;
 if(!(indoors?indoorBlocked(px,py+dy*speed):blocked(px,py+dy*speed)))py+=dy*speed;
 var d=Math.abs(dx)>Math.abs(dy)?(dx>0?"right":"left"):(dy>0?"down":"up");
-if(d!==dir){dir=d;avatar.style.filter=(dir==="left"?"drop-shadow(0 4px 2px #142a2c80)":"drop-shadow(0 4px 2px #142a2c80)")}
+if(d!==dir){dir=d;avatar.classList.toggle("facing-left",dir==="left");avatar.style.filter=(dir==="left"?"drop-shadow(0 4px 2px #142a2c80)":"drop-shadow(0 4px 2px #142a2c80)")}
 }
 for(var j=0;j<donuts.length;j++)if(!indoors&&!got[j]&&Math.hypot(px-donuts[j].x,py-donuts[j].y)<40){
 got[j]=true;count++;score.textContent="🍩 Donas: "+count+" / 8";

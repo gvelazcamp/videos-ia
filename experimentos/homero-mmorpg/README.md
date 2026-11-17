@@ -21,3 +21,11 @@ https://raw.githack.com/gvelazcamp/videos-ia/main/experimentos/homero-mmorpg/ind
 - Homero puede caminar por el living con los controles existentes y usar **SALIR DE CASA** o **F** para regresar a la posición de Springfield donde estaba antes de entrar.
 - Los seis objetos son archivos PNG independientes con transparencia en `assets/sofa.png`, `assets/mesa.png`, `assets/lampara.png`, `assets/cuadro.png`, `assets/alfombra.png` y `assets/televisor.png`.
 - Son versiones optimizadas para el juego (hasta 256 px por eje). El exterior, las 8 donas, la tecla E para hablar y los controles actuales se conservan.
+
+## Avatar articulado — Homero original de cuerpo entero
+
+- Se usa `homero-original-parado.png`, copia exacta del PNG transparente aprobado en el puente `gvelazcamp/chatgpt-claude-puente/assets/homero-original-20261117/homero_transparente_para_juego.png`.
+- Las extremidades se recortan con máscaras SVG **sin redibujar** la imagen: brazo izquierdo, brazo derecho y ambas piernas, con pivotes independientes para caminar y correr.
+- El mismo avatar se usa afuera y dentro de la casa. Flechas/WASD, toque corto, mantener pulsado, CORRER/Shift, recolección de donas, HABLAR y ENTRAR/SALIR se conservan.
+- El personaje se refleja al caminar a la izquierda. Si el PNG nuevo no carga, se mantiene el avatar de respaldo previo.
+- Referencia de la imagen preexistente: https://www.instructables.com/Life-Sized-Homer-Simpson/; no se afirma ninguna licencia para explotación comercial.
