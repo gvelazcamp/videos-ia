@@ -1,0 +1,55 @@
+name: "Remera real Goku y Snorlax - mockup fotografico"
+on:
+  push:
+    branches: [main]
+    paths:
+      - "remeras/goku-snorlax/fuente-original.webp"
+      - "remeras/goku-snorlax/crear_remera.py"
+      - ".github/workflows/remera-goku-snorlax.yml"
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: remera-fotografica-goku-snorlax
+  cancel-in-progress: false
+jobs:
+  renderizar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Instalar herramientas gratuitas de imagen
+        run: python -m pip install --disable-pip-version-check -q "Pillow>=10,<13" "numpy>=1.26,<3"
+      - name: Verificar sintaxis y fuente real
+        run: |
+          python -m py_compile remeras/goku-snorlax/crear_remera.py
+          test -s remeras/goku-snorlax/fuente-original.webp
+      - name: Aplicar la ilustracion original sobre la remera de foto real
+        run: python remeras/goku-snorlax/crear_remera.py
+      - name: Validar PNG resultantes
+        run: |
+          python - <<'PY'
+          from PIL import Image
+          from pathlib import Path
+          shirt=Path("remeras/goku-snorlax/remera-goku-snorlax-real.png")
+          print_=Path("remeras/goku-snorlax/estampado-goku-snorlax-transparente.png")
+          with Image.open(shirt) as im:
+              assert im.size==(1600,1067) and im.format=="PNG"
+          with Image.open(print_) as im:
+              assert im.format=="PNG" and im.getchannel("A").getextrema()==(0,255)
+          print("VERIFICADO: mockup fotográfico y estampa transparente")
+          PY
+      - name: Publicar exclusivamente los dos PNG nuevos
+        run: |
+          git add -- remeras/goku-snorlax/remera-goku-snorlax-real.png remeras/goku-snorlax/estampado-goku-snorlax-transparente.png
+          if git diff --cached --quiet; then echo "PNG ya existentes."; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Publicar foto de remera Goku y Snorlax y PNG para estampado"
+          git pull --rebase origin main
+          git push origin HEAD:main
