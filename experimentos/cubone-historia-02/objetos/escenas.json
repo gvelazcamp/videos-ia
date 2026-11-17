@@ -1,0 +1,37 @@
+{
+  "version": "02",
+  "duracion_original": 61.754,
+  "elementos": [
+    {
+      "asset": "01-pokedex.png",
+      "inicio": 1.3,
+      "fin": 6.55,
+      "descripcion": "Pokédex roja, Cubone #0104 tipo Tierra"
+    },
+    {
+      "asset": "02-craneo.png",
+      "inicio": 7.1,
+      "fin": 14.1,
+      "descripcion": "Cráneo materno, ficha #01"
+    },
+    {
+      "asset": "03-hueso.png",
+      "inicio": 18.3,
+      "fin": 27.0,
+      "descripcion": "Hueso para combatir, ficha #02"
+    },
+    {
+      "asset": "04-encuentro.png",
+      "inicio": 35.15,
+      "fin": 40.5,
+      "descripcion": "Ficha Eevee #0133 con Poké Ball de interfaz"
+    },
+    {
+      "asset": "05-final.png",
+      "inicio": 59.65,
+      "fin": 61.55,
+      "descripcion": "Pokédex actualizada, cierre"
+    }
+  ],
+  "nota": "La Poké Ball es un elemento de interfaz; la historia no incluye captura"
+}
