@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/voltito-png-original-20261117.yml'
+      - 'experimentos/voltito-png-original-20261117/recortar.py'
   workflow_dispatch:
 
 permissions:
@@ -32,6 +33,7 @@ jobs:
       - name: Recortar la imagen grande del mismo Voltito, sin redibujarla
         run: python experimentos/voltito-png-original-20261117/recortar.py preparar
       - name: Obtener transparencia con Remove.bg del puente existente
+        if: ${{ hashFiles('experimentos/voltito-png-original-20261117/voltito-removebg-preview.png') == '' }}
         env:
           IMAGE_PATH: experimentos/voltito-png-original-20261117/voltito-referencia-limpia.png
           OUTPUT_PATH: experimentos/voltito-png-original-20261117/voltito-removebg-preview.png
