@@ -1,88 +1,82 @@
-<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Voltito · 3D 360°</title>
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"><meta name="theme-color" content="#0b1c27"><title>Voltito 360° — visor interactivo</title>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#0b1821;font:15px system-ui,-apple-system,Segoe UI,sans-serif;color:#f8fafc}.wrap{position:relative;max-width:900px;min-height:550px;margin:auto;overflow:hidden;border-radius:18px;background:radial-gradient(ellipse at 50% 45%,#234f5d 0%,#0c2735 57%,#071823 100%)}
-.wrap:before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 30% 10%,#fff2 0%,transparent 40%)}canvas{display:block;width:100%;height:510px;touch-action:none;cursor:grab}canvas:active{cursor:grabbing}
-.head{position:absolute;z-index:2;top:18px;left:20px;pointer-events:none}.name{font-size:27px;font-weight:850;letter-spacing:.08em;color:#fff2ba}.subtitle{font-size:12px;letter-spacing:.09em;color:#9bc0c9;text-transform:uppercase;margin-top:4px}.pill{display:inline-block;margin-top:8px;border:1px solid #87d8d055;color:#b7f9ee;border-radius:30px;padding:5px 10px;font-size:11px;background:#164b4a88}
-.controls{position:relative;z-index:2;background:#0c1c26e8;padding:14px 20px 18px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;border-top:1px solid #eaffff17}.controls label{color:#aecbd1;font-size:12px;white-space:nowrap}.controls input{flex:1;min-width:120px;accent-color:#57ddcb;cursor:pointer}.deg{color:#f8f1bc;font-weight:750;font-variant-numeric:tabular-nums;min-width:42px;text-align:right}button{border:1px solid #46958f;background:#173943;color:#e6ffff;border-radius:9px;padding:9px 13px;cursor:pointer;font-weight:700}button:hover{background:#23565c}.hint{position:absolute;z-index:1;right:18px;top:18px;color:#c9e0e2a8;font-size:12px;pointer-events:none;text-align:right}
-@media(max-width:600px){canvas{height:420px}.wrap{min-height:490px}.head{top:12px;left:14px}.name{font-size:23px}.subtitle{font-size:10px}.pill{font-size:10px}.hint{font-size:10px}.controls{padding:12px;gap:9px}.controls label{display:none}}
-</style></head><body><div class="wrap"><div class="head"><div class="name">VOLTITO</div><div class="subtitle">Modelo 3D interactivo · 360°</div><div class="pill">↔ Arrastrá para girar</div></div><div class="hint">Girá con el dedo<br>o mové la barra</div><canvas id="stage" aria-label="Modelo tridimensional interactivo de Voltito"></canvas><div class="controls"><label for="angle">ROTACIÓN</label><input id="angle" aria-label="Ángulo de rotación" type="range" min="0" max="360" value="0" step="1"><span class="deg" id="degree">0°</span><button id="auto" type="button">▶ Girar</button><button id="reset" type="button">Frente</button></div></div>
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:system-ui,-apple-system,Segoe UI,sans-serif;background:#0b1822;color:#eaf8f6}
+.stage{width:100%;max-width:880px;margin:0 auto;background:radial-gradient(ellipse at 52% 45%,#234d5b,#0b2835 60%,#07151f);border:1px solid #376474;border-radius:16px;overflow:hidden;box-shadow:0 10px 30px #0002}
+.header{display:flex;justify-content:space-between;gap:12px;padding:17px 20px 0;align-items:flex-start}
+.brand{font-weight:850;font-size:26px;letter-spacing:.09em;color:#fff3c5;line-height:1}.subtitle{font-size:12px;letter-spacing:.06em;color:#a0c9cf;margin-top:7px}.tag{font-size:11px;border:1px solid #5faea0;color:#caffee;border-radius:20px;padding:7px 11px;background:#15505a55}
+.viewer{position:relative;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none} .viewer.dragging{cursor:grabbing}
+canvas{display:block;width:100%;height:min(64vh,520px);min-height:310px;touch-action:none}.help{font-size:12px;text-align:center;margin:-4px 0 14px;color:#b6d3d4}
+.controls{border-top:1px solid #315560;background:#0e2632;display:flex;gap:13px;align-items:center;padding:14px 16px 18px;flex-wrap:wrap}
+.controls input[type=range]{flex:1;min-width:130px;accent-color:#4bdcca;cursor:pointer;height:32px}.degree{font-variant-numeric:tabular-nums;min-width:42px;color:#fff1bb;font-weight:800;text-align:right}button{font:600 13px system-ui,sans-serif;border:1px solid #4a9995;border-radius:9px;color:#e3fffb;background:#194650;padding:10px 13px;cursor:pointer;touch-action:manipulation}
+button:focus-visible{outline:2px solid #bfffee;outline-offset:2px}.foot{font-size:11px;text-align:center;color:#7099a4;padding:10px 0 16px}
+@media(max-width:500px){.header{padding:14px 15px 0}.brand{font-size:23px}.tag{font-size:10px}.controls{gap:10px;padding:10px 11px}.controls input[type=range]{min-width:100px}button{padding:9px 11px}.help{font-size:11px}}
+</style></head><body>
+<main class="stage"><header class="header"><div><div class="brand">VOLTITO</div><div class="subtitle">Personaje original · Vista 3D interactiva</div></div><div class="tag">360° · Sin Remove.bg</div></header>
+<div id="viewer" class="viewer"><canvas id="voltito" aria-label="Voltito giratorio: arrastrá horizontalmente con el dedo"></canvas><div class="help">Deslizá el dedo sobre Voltito para girarlo</div></div>
+<div class="controls"><input aria-label="Girarlo a un ángulo" id="angle" type="range" min="0" max="360" step="1" value="0"><output class="degree" id="deg">0°</output><button id="spin" type="button">▶ Girar</button><button id="home" type="button">Frente</button></div><div class="foot">Modelo volumétrico aproximado a partir de las cuatro vistas originales. Funciona sin WebGL ni imágenes externas.</div></main>
 <script>
-(()=>{
-const canvas=document.getElementById('stage'),input=document.getElementById('angle'),deg=document.getElementById('degree'),auto=document.getElementById('auto');
-const gl=canvas.getContext('webgl',{antialias:true,alpha:true,premultipliedAlpha:true});
-if(!gl){
- const src='https://raw.githubusercontent.com/gvelazcamp/videos-ia/main/experimentos/voltito-4-vistas-20261117/';
- const items=['voltito-frente.png','voltito-izquierda.png','voltito-espalda.png','voltito-derecha.png'];
- const wrap=document.createElement('div');wrap.style.cssText='display:flex;justify-content:center;align-items:center;height:510px;touch-action:none;cursor:grab;user-select:none';
- const img=document.createElement('img');img.alt='Voltito girando con cuatro vistas transparentes';img.style.cssText='display:block;max-height:95%;height:95%;max-width:95%;object-fit:contain;pointer-events:none;filter:drop-shadow(0 24px 20px #0005)';wrap.append(img);canvas.replaceWith(wrap);
- const subtitle=document.querySelector('.subtitle');subtitle.textContent='Visor giratorio · 4 vistas PNG';
- let angle=0,autoplay=false,dragging=false,lastX=0,lastTime=0,shown=-1;
- function setAngle(a){angle=(a%360+360)%360;let frame=Math.round(angle/90)%4;if(frame!==shown){shown=frame;img.src=src+items[frame];}input.value=Math.round(angle);deg.textContent=Math.round(angle)+'°';}
- wrap.addEventListener('pointerdown',e=>{dragging=true;autoplay=false;auto.textContent='▶ Girar';lastX=e.clientX;wrap.setPointerCapture(e.pointerId)});
- wrap.addEventListener('pointermove',e=>{if(dragging){setAngle(angle+(e.clientX-lastX)*.6);lastX=e.clientX;}});
- wrap.addEventListener('pointerup',()=>dragging=false);wrap.addEventListener('pointercancel',()=>dragging=false);
- input.addEventListener('input',()=>{autoplay=false;auto.textContent='▶ Girar';setAngle(+input.value)});
- auto.addEventListener('click',()=>{autoplay=!autoplay;auto.textContent=autoplay?'Ⅱ Pausar':'▶ Girar'});
- document.getElementById('reset').addEventListener('click',()=>{autoplay=false;auto.textContent='▶ Girar';setAngle(0)});
- function tick(t){if(autoplay){setAngle(angle+((t-lastTime)||0)*.04)}lastTime=t;requestAnimationFrame(tick)}setAngle(0);requestAnimationFrame(tick);
- return;
- }
-const vs=`attribute vec3 aPosition;attribute vec3 aNormal;attribute vec3 aColor;uniform float uYaw;uniform float uPitch;uniform float uAspect;uniform float uOutline;varying vec3 vNormal;varying vec3 vColor;varying vec3 vWorld;void main(){float c=cos(uYaw),s=sin(uYaw);vec3 p=aPosition+aNormal*uOutline;vec3 n=aNormal;vec3 q=vec3(c*p.x+s*p.z,p.y,-s*p.x+c*p.z);n=vec3(c*n.x+s*n.z,n.y,-s*n.x+c*n.z);float cp=cos(uPitch),sp=sin(uPitch);q=vec3(q.x,cp*q.y-sp*q.z,sp*q.y+cp*q.z);n=vec3(n.x,cp*n.y-sp*n.z,sp*n.y+cp*n.z);q.y-=0.62;float z=q.z-9.0;float f=2.16;gl_Position=vec4(q.x*f/uAspect,q.y*f,(-1.001*z-0.2001),-z);vNormal=n;vColor=aColor;vWorld=q;}`;
-const fs=`precision mediump float;varying vec3 vNormal;varying vec3 vColor;varying vec3 vWorld;uniform float uOutline;void main(){if(uOutline>0.0){gl_FragColor=vec4(.105,.175,.213,1.);return;}vec3 n=normalize(vNormal);vec3 light=normalize(vec3(-.63,.95,1.15));float diff=max(0.,dot(n,light));float rim=pow(1.-max(0.,dot(n,normalize(vec3(-vWorld.x*.08,-vWorld.y*.07,1.)))),2.5);float intensity=.52+.54*diff;vec3 color=vColor*intensity + vec3(.035,.055,.06)*rim;vec3 h=normalize(light+vec3(0.,0.,1.));float spec=pow(max(dot(n,h),0.),24.)*.13;gl_FragColor=vec4(color+vec3(spec),1.);}`;
-function shader(type,src){const s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw Error(gl.getShaderInfoLog(s));return s;}
-const program=gl.createProgram();gl.attachShader(program,shader(gl.VERTEX_SHADER,vs));gl.attachShader(program,shader(gl.FRAGMENT_SHADER,fs));gl.linkProgram(program);if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw Error(gl.getProgramInfoLog(program));gl.useProgram(program);
-const loc={pos:gl.getAttribLocation(program,'aPosition'),normal:gl.getAttribLocation(program,'aNormal'),color:gl.getAttribLocation(program,'aColor'),yaw:gl.getUniformLocation(program,'uYaw'),pitch:gl.getUniformLocation(program,'uPitch'),aspect:gl.getUniformLocation(program,'uAspect'),outline:gl.getUniformLocation(program,'uOutline')};
-const vertices=[];const C={gold:[1,.72,.19],head:[1,.81,.35],ear:[1,.76,.28],teal:[.12,.87,.80],darkTeal:[.07,.57,.62],cream:[1,.96,.78],navy:[.10,.20,.32],white:[1,1,1],nose:[.38,.24,.24],stripe:[.73,.37,.18],shadow:[.84,.48,.19]};
-const normalize=v=>{const l=Math.hypot(...v)||1;return v.map(x=>x/l)};
-function pushVertex(p,n,col){vertices.push(...p,...normalize(n),...col)}
-function tri(p1,n1,c1,p2,n2,c2,p3,n3,c3){pushVertex(p1,n1,c1);pushVertex(p2,n2,c2);pushVertex(p3,n3,c3)}
-function sphere(cx,cy,cz,rx,ry,rz,color,rows=24,cols=32,turn=0){
-const pt=(t,p)=>[cx+rx*Math.cos(t)*Math.cos(p),cy+ry*Math.sin(t),cz+rz*Math.cos(t)*Math.sin(p)];
-const nn=(t,p)=>[Math.cos(t)*Math.cos(p)/rx,Math.sin(t)/ry,Math.cos(t)*Math.sin(p)/rz];
-for(let i=0;i<rows;i++){let t0=-Math.PI/2+i*Math.PI/rows,t1=-Math.PI/2+(i+1)*Math.PI/rows;for(let j=0;j<cols;j++){
-let p0=j*2*Math.PI/cols,p1=(j+1)*2*Math.PI/cols;
-const a=pt(t0,p0),b=pt(t0,p1),c=pt(t1,p1),d=pt(t1,p0);const na=nn(t0,p0),nb=nn(t0,p1),nc=nn(t1,p1),nd=nn(t1,p0);
-tri(a,na,color,b,nb,color,c,nc,color);tri(a,na,color,c,nc,color,d,nd,color);
-}}}
-function ribbon(points,r,color,segments=9){for(let k=0;k<points.length-1;k++){const a=points[k],b=points[k+1],d=normalize(b.map((v,i)=>v-a[i]));let axis=normalize(Math.abs(d[1])>.9?[1,0,0]:[0,1,0]);let u=normalize([d[1]*axis[2]-d[2]*axis[1],d[2]*axis[0]-d[0]*axis[2],d[0]*axis[1]-d[1]*axis[0]]);let v=normalize([d[1]*u[2]-d[2]*u[1],d[2]*u[0]-d[0]*u[2],d[0]*u[1]-d[1]*u[0]]);for(let j=0;j<segments;j++){let an0=2*Math.PI*j/segments,an1=2*Math.PI*(j+1)/segments;const n0=u.map((w,i)=>w*Math.cos(an0)+v[i]*Math.sin(an0)),n1=u.map((w,i)=>w*Math.cos(an1)+v[i]*Math.sin(an1));const point=(base,n)=>base.map((val,i)=>val+n[i]*r);const p0=point(a,n0),p1=point(b,n0),p2=point(b,n1),p3=point(a,n1);tri(p0,n0,color,p1,n0,color,p2,n1,color);tri(p0,n0,color,p2,n1,color,p3,n1,color);}}}
-function leaf(sign){const rings=22,seg=16;const center=t=>[sign*(.67+.78*t+.14*Math.sin(t*Math.PI)),2.03+1.56*t,-.05+.02*Math.sin(t*Math.PI)];const w=t=>(.21+.16*Math.sin(Math.PI*t))*(1-.98*Math.pow(t,8));const point=(t,theta)=>{const b=center(t);return[b[0]+w(t)*Math.cos(theta),b[1],b[2]+w(t)*.58*Math.sin(theta)]};for(let i=0;i<rings;i++){const t0=i/rings,t1=(i+1)/rings;for(let j=0;j<seg;j++){const a=2*Math.PI*j/seg,b=2*Math.PI*(j+1)/seg;const p0=point(t0,a),p1=point(t0,b),p2=point(t1,b),p3=point(t1,a);const normal0=[Math.cos(a),.20*sign,.92*Math.sin(a)],normal1=[Math.cos(b),.20*sign,.92*Math.sin(b)];const col0=t0>.76?C.teal:C.ear,col1=t1>.76?C.teal:C.ear;tri(p0,normal0,col0,p2,normal1,col1,p1,normal1,col0);tri(p0,normal0,col0,p3,normal0,col1,p2,normal1,col1);}}}
-function bolt(){// Zigzag eléctrico tridimensional detrás de Voltito; grosor visible desde los lados
-const pts=[[.68,-.57,-.62],[1.09,-.26,-.78],[.93,.05,-.8],[1.66,.52,-.86],[1.41,.08,-.86],[1.93,.05,-.86],[1.32,-.62,-.8],[.78,-.92,-.64]];ribbon(pts,.125,C.teal,10);sphere(1.66,.52,-.86,.13,.14,.11,C.teal,12,16)}
-// Orden de la malla no afecta gracias al depth buffer.
-bolt();
-for(const s of [-1,1]){leaf(s); sphere(s*.55,-1.83,.17,.38,.24,.43,C.gold,18,24);sphere(s*.83,-.43,.12,.25,.53,.24,C.gold,18,24);sphere(s*.91,-.72,.35,.18,.19,.16,C.gold,14,18)}
-sphere(0,-.48,0,.83,1.02,.64,C.gold,32,40);sphere(0,-.51,.53,.52,.72,.145,C.cream,22,30);
-// Icono del rayo en pecho, pequeña marca de cristales azules.
-ribbon([[.01,-.28,.70],[.21,-.51,.69],[-.02,-.55,.69],[.10,-.76,.67]],.055,C.darkTeal,8);
-// La cabeza cubre la unión de orejas y cuerpo.
-sphere(0,1.35,0,1.08,.96,.78,C.head,34,46);
-// Copete turquesa de tres cristales, vistas 360.
-for(const x of [-.27,0,.27]){const base=[x,2.21,.08];const top=[x*.75,2.53+(x===0?.15:0),.08];ribbon([base,top],.12,C.teal,10);sphere(...top,.10,.12,.10,C.teal,12,16)}
-// Ojos y brillos, hacia adelante +Z.
-for(const s of [-1,1]){sphere(s*.44,1.52,.706,.205,.25,.095,C.navy,20,26);sphere(s*.46-.045,1.63,.788,.065,.079,.04,C.white,12,16);sphere(s*.43+.07,1.43,.786,.033,.042,.03,C.teal,10,12);
-// Marcas eléctricas turquesas en las mejillas
-sphere(s*.83,1.05,.49,.19,.20,.065,C.teal,18,22);
-ribbon([[s*.78,1.12,.55],[s*.91,1.06,.55],[s*.79,.93,.56],[s*.94,.94,.52]],.038,C.darkTeal,7);
-// Franjas del lomo: visibles por detrás
-sphere(s*.45,-.11,-.609,.28,.15,.062,C.stripe,16,20);
+(()=>{'use strict';
+const canvas=document.getElementById('voltito'),view=document.getElementById('viewer'),ctx=canvas.getContext('2d',{alpha:false}),slider=document.getElementById('angle'),out=document.getElementById('deg'),spin=document.getElementById('spin'),home=document.getElementById('home');
+if(!ctx){view.insertAdjacentHTML('beforeend','<p style="text-align:center;padding:70px">Tu navegador no admite el visor 2D.</p>');return}
+let yaw=0,pitch=-.05,auto=false,drag=false,lastX=0,lastY=0,lastTs=0;
+const P={gold:'#FFCC61',head:'#FFD870',light:'#FFF0A6',cream:'#FFF6D0',outline:'#35444C',teal:'#29DAC8',tealDark:'#168F95',eye:'#223D58',brown:'#BD8141',nose:'#805356',white:'#FFFFFF'};
+const rad=Math.PI/180;
+function rot(p){let [x,y,z]=p;const co=Math.cos(yaw),si=Math.sin(yaw);let X=x*co+z*si,Z=-x*si+z*co;const cp=Math.cos(pitch),sp=Math.sin(pitch);return [X,y*cp-Z*sp,y*sp+Z*cp]}
+function proj(p,S,CX,CY){let [x,y,z]=rot(p);let perspective=1+z*.065;return [CX+x*S*perspective,CY-y*S*perspective,z,perspective]}
+function drawEllipse(cx,cy,rx,ry,col,stroke=3){const grad=ctx.createRadialGradient(cx-rx*.30,cy-ry*.42,ry*.05,cx,cy,Math.max(rx,ry)*1.24);grad.addColorStop(0,lighten(col,.28));grad.addColorStop(.45,col);grad.addColorStop(1,darken(col,.20));ctx.fillStyle=grad;ctx.strokeStyle=P.outline;ctx.lineWidth=stroke;ctx.beginPath();ctx.ellipse(cx,cy,Math.max(2,rx),Math.max(2,ry),0,0,Math.PI*2);ctx.fill();if(stroke)ctx.stroke()}
+function parseRGB(h){return [1,3,5].map(i=>parseInt(h.slice(i,i+2),16))}
+function colorRGB(v){return '#'+v.map(x=>Math.max(0,Math.min(255,Math.round(x))).toString(16).padStart(2,'0')).join('')}
+function lighten(c,f){return colorRGB(parseRGB(c).map(x=>x+(255-x)*f))}
+function darken(c,f){return colorRGB(parseRGB(c).map(x=>x*(1-f)))}
+function strokePath(points,width,col,outline=0,S=1,CX=0,CY=0){let xy=points.map(p=>proj(p,S,CX,CY));ctx.lineCap='round';ctx.lineJoin='round';ctx.beginPath();xy.forEach((p,i)=>{if(i===0)ctx.moveTo(p[0],p[1]);else ctx.lineTo(p[0],p[1])});if(outline){ctx.lineWidth=width+outline*2;ctx.strokeStyle=P.outline;ctx.stroke()}ctx.lineWidth=width;ctx.strokeStyle=col;ctx.stroke()}
+function polygon(points,fill,S,CX,CY,stroke=3){let p=points.map(q=>proj(q,S,CX,CY));ctx.beginPath();p.forEach((v,i)=>{if(i)ctx.lineTo(v[0],v[1]);else ctx.moveTo(v[0],v[1])});ctx.closePath();ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.lineWidth=stroke;ctx.strokeStyle=P.outline;ctx.stroke()}}
+function makeScene(w,h){ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,w,h);let grad=ctx.createLinearGradient(0,0,w,h);grad.addColorStop(0,'#204E5C');grad.addColorStop(.6,'#10313E');grad.addColorStop(1,'#0D202F');ctx.fillStyle=grad;ctx.fillRect(0,0,w,h);
+ctx.fillStyle='#59EDCD14';for(let i=0;i<8;i++){ctx.beginPath();ctx.arc(w*(.12+i*.115),h*(.17+(i%3)*.17),10+i*6,0,Math.PI*2);ctx.fill()}
+const S=Math.min(w*.24,h*.16),CX=w*.50,CY=h*.57;let flo=proj([0,-1.48,0],S,CX,CY);ctx.fillStyle='#00141F66';ctx.beginPath();ctx.ellipse(flo[0],flo[1]+S*.17,S*1.05,S*.17,0,0,Math.PI*2);ctx.fill();
+let things=[];function addSphere(pos,dim,col,name,stroke=3){let r=rot(pos);things.push({name,z:r[2],draw(){let c=proj(pos,S,CX,CY);let horizontal=Math.hypot(dim[0]*Math.cos(yaw),dim[2]*Math.sin(yaw));drawEllipse(c[0],c[1],S*horizontal*c[3],S*dim[1]*c[3],col,stroke)}})}
+function addPoly(pts,col,name,stroke=3){let z=pts.reduce((s,p)=>s+rot(p)[2],0)/pts.length;things.push({name,z,draw(){polygon(pts,col,S,CX,CY,stroke)}})}
+function addLine(pts,width,col,name,outline=2){let z=pts.reduce((s,p)=>s+rot(p)[2],0)/pts.length;things.push({name,z,draw(){strokePath(pts,width*S,col,outline,S,CX,CY)}})}
+// Cola bifurcada: segmentos con grosor, siempre detrás del torso mirando de frente.
+const tail=[[.50,-.72,-.42],[.92,-.48,-.54],[.83,-.19,-.57],[1.44,.38,-.59],[1.24,-.08,-.60],[1.72,-.10,-.59]];
+addLine(tail,.15,P.teal,'cola',2.3);addLine([[1.44,.38,-.59],[1.72,.50,-.58]],.125,P.teal,'punta',2);
+// Orejas de hoja, inclinadas y con punta turquesa.
+for(let s of [-1,1]){
+ let root=[s*.62,1.70,-.03],bend=[s*(s===-1?1.01:.98),2.33,-.07],tip=[s*(s===-1?1.25:1.42),2.92,-.10];
+ addLine([root,bend,tip],.255,P.gold,'oreja'+s,3);
+ addLine([[s*(s===-1?1.12:1.20),2.70,-.08],tip],.19,P.teal,'oreja-punta'+s,1);
 }
-// Nariz, sonrisa pequeña y cejas
-sphere(0,1.13,.766,.078,.061,.061,C.nose,14,18);
-ribbon([[-.22,.96,.723],[-.12,.89,.762],[0,.865,.78],[.12,.89,.762],[.22,.96,.723]],.026,C.nose,8);
-// Corona de marcas al dorso.
-sphere(0,1.4,-.745,.35,.22,.05,C.shadow,18,26);
-const buffer=new Float32Array(vertices);const b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,buffer,gl.STATIC_DRAW);const stride=36;
-for(const [name,off] of [['pos',0],['normal',12],['color',24]]){gl.enableVertexAttribArray(loc[name]);gl.vertexAttribPointer(loc[name],3,gl.FLOAT,false,stride,off);}
-let yaw=0,pitch=0.025,rotating=false,drag=false,lastX=0,lastY=0,lastTs=0;
-function setYaw(angle){yaw=((angle%(Math.PI*2))+(Math.PI*2))%(Math.PI*2);const d=Math.round(yaw*180/Math.PI)%360;input.value=d;deg.textContent=d+'°';}
-function draw(){const ratio=Math.min(window.devicePixelRatio||1,2);const w=Math.round(canvas.clientWidth*ratio),h=Math.round(canvas.clientHeight*ratio);if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h;gl.viewport(0,0,w,h);}gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.enable(gl.DEPTH_TEST);gl.depthFunc(gl.LESS);gl.disable(gl.CULL_FACE);gl.uniform1f(loc.yaw,yaw);gl.uniform1f(loc.pitch,pitch);gl.uniform1f(loc.aspect,w/h);gl.uniform1f(loc.outline,0);gl.drawArrays(gl.TRIANGLES,0,buffer.length/9);}
-canvas.addEventListener('pointerdown',e=>{drag=true;rotating=false;auto.textContent='▶ Girar';lastX=e.clientX;lastY=e.clientY;canvas.setPointerCapture(e.pointerId)});
-canvas.addEventListener('pointermove',e=>{if(!drag)return;const dx=e.clientX-lastX,dy=e.clientY-lastY;lastX=e.clientX;lastY=e.clientY;setYaw(yaw+dx*.012);pitch=Math.max(-.25,Math.min(.35,pitch+dy*.0035));draw();});
-canvas.addEventListener('pointerup',()=>drag=false);canvas.addEventListener('pointercancel',()=>drag=false);
-input.addEventListener('input',()=>{rotating=false;auto.textContent='▶ Girar';setYaw(+input.value*Math.PI/180);draw()});
-canvas.addEventListener('wheel',e=>{e.preventDefault();setYaw(yaw+Math.sign(e.deltaY)*.08);draw()},{passive:false});
-auto.addEventListener('click',()=>{rotating=!rotating;auto.textContent=rotating?'Ⅱ Pausar':'▶ Girar'});
-document.getElementById('reset').addEventListener('click',()=>{rotating=false;auto.textContent='▶ Girar';pitch=.025;setYaw(0);draw()});
-function tick(t){if(rotating){if(!lastTs)lastTs=t;setYaw(yaw+(t-lastTs)*.00042);draw();}lastTs=t;requestAnimationFrame(tick);}draw();requestAnimationFrame(tick);
+// Piernas, brazos, cuerpo y cabeza volumenados.
+for(let s of [-1,1]){addSphere([s*.45,-1.35,.18],[.31,.24,.36],P.gold,'pie'+s);addSphere([s*.79,-.44,.00],[.23,.43,.26],P.gold,'brazo'+s)}
+addSphere([0,-.45,0],[.75,.87,.58],P.gold,'cuerpo',4);
+addSphere([0,-.45,.525],[.49,.60,.14],P.cream,'panza',1);
+// Icono rayo frontal y franjas dorsales de marca propia.
+addLine([[.03,-.21,.65],[.17,-.43,.66],[-.02,-.48,.66],[.1,-.75,.64]],.060,P.tealDark,'logo',0);
+for(let s of [-1,1])addSphere([s*.42,-.25,-.55],[.23,.13,.05],P.brown,'raya-espalda'+s,0);
+addSphere([0,1.10,0],[1.00,.84,.71],P.head,'cabeza',4);
+for(const s of [-1,0,1]){addLine([[s*.24,1.77,.06],[s*.18,2.20+(s===0?.11:0),.06]],.10,P.teal,'copete'+s,1.7)}
+for(let s of [-1,1]){
+ addSphere([s*.42,1.20,.64],[.165,.22,.07],P.eye,'ojo'+s,1);
+ addSphere([s*.45-.04,1.29,.704],[.050,.073,.03],P.white,'brillo'+s,0);
+ addSphere([s*.76,.84,.50],[.16,.16,.09],P.teal,'mejilla'+s,1.5);
+}
+addSphere([0,.92,.703],[.070,.055,.036],P.nose,'nariz',0);
+addLine([[-.14,.76,.688],[0,.72,.713],[.14,.76,.688]],.023,P.nose,'sonrisa',0);
+// Marcas posteriores visibles al girar.
+addSphere([0,1.10,-.687],[.28,.17,.050],P.brown,'nuca',0);
+things.sort((a,b)=>a.z-b.z);for(let t of things)t.draw();
+// Brillos decorativos laterales, siempre fuera de las patas.
+ctx.fillStyle='#7BEED788';for(let i=0;i<4;i++){let x=CX+Math.sin(i*1.57+yaw)*S*1.83, y=CY-S*.1+i*24;ctx.beginPath();ctx.arc(x,y,1.8+i*.15,0,Math.PI*2);ctx.fill()}
+}
+function setYaw(deg){yaw=((deg%360)+360)%360*rad;slider.value=String(Math.round(((deg%360)+360)%360));out.textContent=slider.value+'°';render()}
+function render(){let dpr=Math.min(devicePixelRatio||1,2), rect=canvas.getBoundingClientRect();let w=Math.max(250,Math.floor(rect.width*dpr)),h=Math.max(290,Math.floor(rect.height*dpr));if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h}makeScene(w,h)}
+view.addEventListener('pointerdown',e=>{if(e.target!==canvas)return;drag=true;auto=false;spin.textContent='▶ Girar';lastX=e.clientX;lastY=e.clientY;view.classList.add('dragging');canvas.setPointerCapture(e.pointerId)});
+canvas.addEventListener('pointermove',e=>{if(!drag)return;let dx=e.clientX-lastX,dy=e.clientY-lastY;lastX=e.clientX;lastY=e.clientY;pitch=Math.max(-.20,Math.min(.22,pitch+dy*.0008));setYaw(yaw/rad+dx*.65)});
+canvas.addEventListener('pointerup',()=>{drag=false;view.classList.remove('dragging')});canvas.addEventListener('pointercancel',()=>{drag=false;view.classList.remove('dragging')});
+slider.addEventListener('input',()=>{auto=false;spin.textContent='▶ Girar';setYaw(+slider.value)});
+spin.addEventListener('click',()=>{auto=!auto;spin.textContent=auto?'Ⅱ Pausar':'▶ Girar'});
+home.addEventListener('click',()=>{auto=false;spin.textContent='▶ Girar';pitch=-.05;setYaw(0)});
+function tick(t){if(auto&&lastTs)setYaw(yaw/rad+(t-lastTs)*.035);lastTs=t;requestAnimationFrame(tick)}
+window.addEventListener('resize',render);setYaw(0);requestAnimationFrame(tick);
 })();
 </script></body></html>
