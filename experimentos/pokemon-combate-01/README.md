@@ -32,3 +32,15 @@ Los números de daño y el resultado de la batalla son **ficción para este vide
 No se editaron los proyectos del surf, castillo, París, historia de Cubone V1/V2 ni Girá y Adiviná. El combate es un proyecto nuevo y autocontenido. El guion y las animaciones son originales, tomando como referencia **el montaje y los elementos de videojuego** de un reel de Instagram (`DfFWUJJuE6o`), sin usar cuadros ni audio de ese reel.
 
 **Aviso:** los personajes Pokémon son propiedad de sus respectivos titulares. Fan animation no oficial; no afiliada a The Pokémon Company o Nintendo.
+
+
+## Reproducción en celular: sin el visor de GitHub
+
+La app GitHub puede mostrar "No se puede ver el archivo" aunque el MP4 esté correcto.
+
+- **Abrir directamente en el navegador (video/mp4)**: https://cdn.jsdelivr.net/gh/gvelazcamp/videos-ia@main/experimentos/pokemon-combate-01/pokemon-pikachu-vs-cubone-movil.mp4
+- **Versión móvil en GitHub**: [pokemon-pikachu-vs-cubone-movil.mp4](pokemon-pikachu-vs-cubone-movil.mp4)
+- **Video original de máxima calidad**: [pokemon-pikachu-vs-cubone.mp4](pokemon-pikachu-vs-cubone.mp4)
+
+El archivo para celular conserva los 61 segundos y el audio: H.264 Constrained Baseline, AAC, 480×854, ~2,5 MB y cabecera faststart para reproducir sin descargar todo. El workflow de GitHub Actions llamado "Combate Pokémon - versión móvil" lo recrea automáticamente sin cambiar el original.
+
