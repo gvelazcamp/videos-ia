@@ -12,11 +12,14 @@ small{color:#a3bbd0}.screen{position:relative;overflow:hidden;aspect-ratio:16/9;
 #world{width:100%;height:100%;display:block;touch-action:none}
 #avatar{position:absolute;width:8%;min-width:37px;max-width:84px;pointer-events:none;transform:translate(-50%,-97%);filter:drop-shadow(0 4px 2px #142a2c80)}
 #avatar svg{display:none;width:100%;overflow:visible}
-#avatar img{display:block;width:100%;height:auto;object-fit:contain}
-#avatar.fallback img{display:none}
-#avatar.fallback svg{display:block}
-#avatar.walk img{animation:homero-sway .36s ease-in-out infinite alternate}
-@keyframes homero-sway{from{transform:rotate(-2deg)}to{transform:rotate(2deg)}}#avatar .leg-left,#avatar .leg-right,#avatar .arm-left,#avatar .arm-right{transform-box:fill-box}
+#avatar .photo-avatar{display:block;width:100%;height:auto;overflow:visible}
+#avatar .photo-avatar .png-leg-left,#avatar .photo-avatar .png-leg-right{transform-box:view-box}
+#avatar.fallback .photo-avatar{display:none}
+#avatar.fallback svg:not(.photo-avatar){display:block}
+#avatar.walk .photo-avatar .png-leg-left{transform-origin:125px 335px;animation:original-left-step .36s ease-in-out infinite alternate}
+#avatar.walk .photo-avatar .png-leg-right{transform-origin:207px 335px;animation:original-right-step .36s ease-in-out infinite alternate-reverse}
+@keyframes original-left-step{from{transform:rotate(-8deg)}to{transform:rotate(8deg)}}
+@keyframes original-right-step{from{transform:rotate(-8deg)}to{transform:rotate(8deg)}}#avatar .leg-left,#avatar .leg-right,#avatar .arm-left,#avatar .arm-right{transform-box:fill-box}
 #avatar.walk .leg-left{animation:stride .32s ease-in-out infinite alternate;transform-origin:50% 0}
 #avatar.walk .leg-right{animation:stride .32s ease-in-out infinite alternate-reverse;transform-origin:50% 0}
 #avatar.walk .arm-left{animation:stride .32s ease-in-out infinite alternate-reverse;transform-origin:50% 0}
@@ -45,7 +48,17 @@ footer{font-size:11px;color:#7f97ad;text-align:center;margin:14px}
 <div class="screen" id="screen">
 <canvas id="world" width="960" height="540" aria-label="Mapa de Springfield"></canvas>
 <div id="avatar" aria-label="Homero caminando">
-<img src="./homero-original-mmorpg.png" alt="Homero Simpson de brazos cruzados" draggable="false">
+<svg class="photo-avatar" viewBox="0 0 300 500" xmlns="http://www.w3.org/2000/svg" aria-label="Homero original caminando">
+<defs>
+<clipPath id="original-leg-left"><path d="M0 326 H175 V500 H0Z"/></clipPath>
+<clipPath id="original-leg-right"><path d="M175 326 H300 V500 H175Z"/></clipPath>
+<clipPath id="original-upper"><path d="M0 0 H300 V359 H0Z"/></clipPath>
+</defs>
+<!-- El PNG es el original: se recorta por máscaras SVG para animar las piernas sin redibujarlo. -->
+<g class="png-leg-left"><image href="./homero-original-mmorpg.png" width="300" height="500" clip-path="url(#original-leg-left)"/></g>
+<g class="png-leg-right"><image href="./homero-original-mmorpg.png" width="300" height="500" clip-path="url(#original-leg-right)"/></g>
+<image href="./homero-original-mmorpg.png" width="300" height="500" clip-path="url(#original-upper)"/>
+</svg>
 <svg viewBox="0 0 110 163" xmlns="http://www.w3.org/2000/svg">
 <ellipse cx="55" cy="157" rx="30" ry="6" fill="#1b3e3766"/>
 <g class="leg-left"><path d="M36 119h19l-3 31H37Z" fill="#497bd5" stroke="#39352b" stroke-width="3"/><path d="M30 145h27v11H26q-5-5 4-11Z" fill="#33363b" stroke="#27252b" stroke-width="3"/></g>
@@ -84,7 +97,7 @@ footer{font-size:11px;color:#7f97ad;text-align:center;margin:14px}
 "use strict";
 var cv=document.getElementById("world"),ctx=cv.getContext("2d"),avatar=document.getElementById("avatar");
 var toast=document.getElementById("toast"),score=document.getElementById("score");
-var portrait=avatar.querySelector("img");if(portrait)portrait.addEventListener("error",function(){avatar.classList.add("fallback")});
+var portraitCheck=new Image();portraitCheck.onerror=function(){avatar.classList.add("fallback")};portraitCheck.src="./homero-original-mmorpg.png";
 var W=960,H=540,MW=2520,MH=1840,camX=0,camY=0,px=1275,py=975,anim=0,last=0,notice=0;
 var key={up:false,down:false,left:false,right:false},shift=false,run=false,target=null,dir="down";
 var homes=[{x:550,y:385,w:385,h:280,roof:"#dd7d55",title:"CASA SIMPSON"},
