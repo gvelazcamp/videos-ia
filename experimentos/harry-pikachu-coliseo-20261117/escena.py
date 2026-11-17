@@ -166,9 +166,9 @@ def add_effects(canvas: Image.Image, harry_bounds, pikachu_bounds):
                start=RNG.randint(0,70),end=330,fill=(224,252,255,210),width=width)
     b.ellipse((collision[0]-17,collision[1]-17,
                collision[0]+17,collision[1]+17),fill=(255,255,255,240))
-    glow_dots(b, wand,(72,230,255),150,210)
-    glow_dots(b,cheeks,(255,227,39),150,180)
-    glow_dots(b,collision,(255,255,222),130,200)
+    glow_dots(bolts, wand,(72,230,255),150,210)
+    glow_dots(bolts,cheeks,(255,227,39),150,180)
+    glow_dots(bolts,collision,(255,255,222),130,200)
     halo=bolts.filter(ImageFilter.GaussianBlur(15))
     halo.putalpha(halo.getchannel("A").point(lambda v: min(210,int(v*.8))))
     canvas.alpha_composite(halo)
