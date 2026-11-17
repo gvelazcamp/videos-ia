@@ -90,8 +90,8 @@ function hash(i){var k=Math.sin(i*128.27+9.94)*45785.24;return k-Math.floor(k)}
 var trees=[];for(var i=0;i<145;i++){
 var x=120+hash(i*7)*2280,y=120+hash(i*11+3)*1600;
 var road=(y>740&&y<985)||(x>1190&&x<1350);
-var house=homes.some(function(h){return x>h.x-90&&x<h.x+h.w+90&&y>h.y-90&&y<h.y+h.h+60});
-if(!road&&!house&&Math.hypot(x-1275,y-975)>155&&Math.hypot(x-390,y-225)>300)trees.push({x:x,y:y,r:31+hash(i+47)*14});
+var nearHouse=homes.some(function(h){return x>h.x-90&&x<h.x+h.w+90&&y>h.y-90&&y<h.y+h.h+60});
+if(!road&&!nearHouse&&Math.hypot(x-1275,y-975)>155&&Math.hypot(x-390,y-225)>300)trees.push({x:x,y:y,r:31+hash(i+47)*14});
 }
 function box(x,y,w,h,color){ctx.fillStyle=color;ctx.fillRect(x,y,w,h)}
 function oval(x,y,rx,ry,color,stroke,width){ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=width||3;ctx.stroke()}}
