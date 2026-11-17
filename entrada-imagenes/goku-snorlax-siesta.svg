@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900">
+<defs>
+ <linearGradient id="fur" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#345d69"/><stop offset=".55" stop-color="#244b57"/><stop offset="1" stop-color="#18323c"/></linearGradient>
+ <linearGradient id="tummy" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff4d7"/><stop offset="1" stop-color="#e7c89c"/></linearGradient>
+ <linearGradient id="orange" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffb33d"/><stop offset=".5" stop-color="#f77a17"/><stop offset="1" stop-color="#ce4212"/></linearGradient>
+ <linearGradient id="skin" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#ffdfb2"/><stop offset="1" stop-color="#e9ad80"/></linearGradient>
+ <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="12"/></filter>
+</defs>
+<!-- Ilustración vectorial original sobre fondo totalmente transparente -->
+<ellipse cx="624" cy="833" rx="474" ry="30" fill="#111b23" opacity=".16" filter="url(#shadow)"/>
+<!-- Snorlax: cuerpo, orejas, brazos y patas -->
+<g stroke="#162c39" stroke-width="15" stroke-linejoin="round" stroke-linecap="round">
+ <path d="M684 217 L679 91 Q692 43 741 95 L782 158 Q885 119 965 167 L1014 96 Q1050 45 1075 101 L1064 250 Z" fill="url(#fur)"/>
+ <path d="M693 316 C629 334 591 461 595 605 C595 783 712 854 883 850 C1052 848 1150 721 1127 543 C1105 375 1015 273 883 270 C783 264 722 288 693 316 Z" fill="url(#fur)"/>
+ <path d="M660 493 C593 450 551 520 572 591 C591 656 651 672 699 623 L748 555 Z" fill="url(#fur)"/>
+ <path d="M1091 450 C1154 415 1190 474 1169 557 C1155 611 1110 641 1061 600 L1027 528 Z" fill="url(#fur)"/>
+ <path d="M687 658 C642 672 603 741 650 796 C684 839 765 824 787 778 C809 732 764 647 687 658 Z" fill="#2e5560"/>
+ <path d="M1024 655 C1081 671 1104 740 1066 795 C1022 837 937 829 919 775 C903 724 949 641 1024 655 Z" fill="#2e5560"/>
+ <path d="M707 430 C746 360 840 350 899 373 C1007 392 1059 495 1043 623 C1031 749 965 805 864 814 C738 809 674 715 674 594 C674 515 681 478 707 430 Z" fill="url(#tummy)" stroke-width="12"/>
+ <path d="M738 242 C758 177 820 157 871 158 C954 149 1013 193 1027 248 C1028 336 953 394 866 393 C788 392 726 339 738 242 Z" fill="url(#fur)" stroke-width="13"/>
+ <path d="M767 279 C786 230 819 214 870 215 C925 209 975 229 996 278 C978 350 943 366 867 369 C817 367 783 348 767 279 Z" fill="#f8e7c9" stroke="none"/>
+ <path d="M791 274 Q814 251 838 270 M905 269 Q930 247 955 264" fill="none" stroke="#172b34" stroke-width="10"/>
+ <path d="M831 315 Q870 356 916 315 Q873 374 831 315 Z" fill="#864d56" stroke-width="6"/>
+ <path d="M856 338 Q875 345 892 339" fill="none" stroke="#ef9baa" stroke-width="8"/>
+ <path d="M634 557 l-25 -9 7 31 M644 590 l-28 -2 15 27 M1104 513 l25 -14 -2 35 M1094 558 l30 -4 -13 30" fill="#fff7ed" stroke-width="8"/>
+ <ellipse cx="716" cy="739" rx="62" ry="56" fill="#e9d2bc" stroke-width="9"/><ellipse cx="1009" cy="738" rx="62" ry="56" fill="#e9d2bc" stroke-width="9"/>
+ <path d="M679 681 l-14 -45 39 18 M736 675 l20 -43 20 30 M963 677 l-6 -48 33 30 M1034 679 l21 -42 22 37" fill="#fff7ed" stroke-width="8"/>
+</g>
+<!-- Goku: pantalón, torso y postura de siesta -->
+<g stroke="#312735" stroke-width="12" stroke-linejoin="round" stroke-linecap="round">
+ <path d="M214 593 C132 623 91 704 121 761 C147 813 245 812 335 783 L417 839 C481 867 543 817 519 766 L456 659 C407 590 300 567 214 593 Z" fill="url(#orange)"/>
+ <path d="M150 760 Q168 793 220 803 L206 842 Q119 872 85 838 L99 792 Z" fill="#193e90"/>
+ <path d="M389 796 Q434 812 474 788 L522 825 Q514 872 472 879 L400 853 Z" fill="#183d91"/>
+ <path d="M159 803 L124 840 90 847 74 875 Q170 900 222 854 L210 808 Z" fill="#3053a1"/>
+ <path d="M423 813 L456 841 507 822 Q543 845 530 874 Q467 900 392 869 Z" fill="#2b4f9d"/>
+ <path d="M227 461 C204 480 180 537 182 595 L211 699 C270 738 379 724 426 662 L427 551 C402 491 342 456 227 461 Z" fill="url(#orange)"/>
+ <path d="M275 473 Q325 496 382 468 L376 548 L296 567 Z" fill="#143d94" stroke-width="9"/>
+ <path d="M213 600 Q298 644 410 588 L404 630 Q303 688 224 651 Z" fill="#1a3f8b" stroke-width="7"/>
+ <path d="M400 500 C462 474 510 518 498 564 C492 610 453 631 406 606 L366 561 Z" fill="url(#orange)"/>
+ <path d="M225 493 C169 474 149 531 181 572 L272 619 C316 641 333 601 297 572 Z" fill="url(#skin)"/>
+ <path d="M416 536 Q454 523 478 547 Q481 578 446 590 L387 605 Q360 601 353 575 Q358 548 416 536 Z" fill="url(#skin)"/>
+ <path d="M277 563 Q330 602 382 575" fill="none" stroke="#e7ac7e" stroke-width="7"/>
+ <path d="M321 313 C318 279 338 246 391 236 C439 240 476 277 483 316 L468 375 L444 426 C404 460 352 444 337 402 Z" fill="url(#skin)"/>
+ <path d="M322 355 Q310 317 289 324 Q276 345 302 372 L328 380" fill="url(#skin)" stroke-width="9"/>
+ <!-- pelo característico y puntas de Goku -->
+ <path d="M302 340 L226 318 274 280 194 259 291 240 260 177 345 214 344 147 405 210 444 139 459 224 519 184 493 264 568 266 506 307 526 350 482 350 Q465 305 425 285 L382 297 Q350 321 337 361 Z" fill="#171824"/>
+ <path d="M345 258 Q382 235 419 265 M403 225 L430 177 M301 259 L260 240" fill="none" stroke="#3d4050" stroke-width="7"/>
+ <path d="M364 362 Q386 349 407 362 M438 357 Q449 348 465 354" fill="none" stroke="#382f32" stroke-width="6"/>
+ <path d="M397 397 Q419 409 439 389" fill="none" stroke="#9b554b" stroke-width="5"/>
+ <path d="M354 430 Q407 462 453 411 L461 461 Q407 495 350 470 Z" fill="url(#skin)" stroke-width="9"/>
+ <!-- apoyado sobre Snorlax -->
+ <path d="M451 450 Q490 456 508 482 Q506 506 481 513 L417 495" fill="url(#skin)" stroke-width="9"/>
+ <path d="M185 574 Q227 591 266 618" fill="none" stroke="#d65319" stroke-width="9"/>
+ <path d="M305 676 Q348 697 385 676" fill="none" stroke="#bf4318" stroke-width="9"/>
+</g>
+<!-- bordes y chispitas tiernas, todo con transparencia -->
+<g fill="#ffcf4e" stroke="#ff9e39" stroke-width="3"><path d="M520 290 l8 18 19 5 -19 7 -8 19 -7 -19 -19 -7 19 -5 Z"/><path d="M173 393 l7 14 15 5 -15 5 -7 16 -6 -16 -16 -5 16 -5 Z"/><path d="M1095 309 l7 14 15 5 -15 5 -7 16 -6 -16 -16 -5 16 -5 Z"/></g>
+<g font-family="sans-serif" font-weight="900" fill="#4b86a1" stroke="#ffffff" stroke-width="5" paint-order="stroke" transform="rotate(12 1085 110)"><text x="1090" y="121" font-size="73">Z</text><text x="1132" y="79" font-size="52">z</text><text x="1162" y="43" font-size="35">z</text></g>
+</svg>
