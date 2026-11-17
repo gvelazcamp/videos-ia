@@ -1,0 +1,65 @@
+name: Charizard vs Gemini - publicar MP4 verificados
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/charizard-vs-gemini-publicar-mp4.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: charizard-vs-gemini-publicar-mp4
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Recuperar video final renderizado y version movil confirmados
+        run: |
+          mkdir -p experimentos/charizard-vs-gemini-01
+          curl --fail --location --retry 3 --silent --show-error \
+            'https://d2ol7oe51mr4n9.cloudfront.net/user_3I6MEpvFp5hLW0psUqgXdDfyZXe/0d8927ed-9c71-477f-9229-71e07e571bc3.mp4' \
+            -o experimentos/charizard-vs-gemini-01/charizard-vs-gemini.mp4
+          curl --fail --location --retry 3 --silent --show-error \
+            'https://d2ol7oe51mr4n9.cloudfront.net/user_3I6MEpvFp5hLW0psUqgXdDfyZXe/83576310-e357-4c16-9c41-472b8e30e59f.mp4' \
+            -o experimentos/charizard-vs-gemini-01/charizard-vs-gemini-movil.mp4
+      - name: Comprobar integridad, sonido, duracion y reproduccion movil
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,subprocess
+          src=Path("experimentos/charizard-vs-gemini-01")
+          for name,w,h in [("charizard-vs-gemini.mp4",540,960),
+                           ("charizard-vs-gemini-movil.mp4",480,854)]:
+              p=src/name
+              info=json.loads(subprocess.check_output(
+                 ["ffprobe","-v","error","-show_format","-show_streams","-of","json",str(p)]))
+              d=float(info["format"]["duration"])
+              assert 70.0<d<71.5,(name,d)
+              assert any(s.get("codec_type")=="audio" and s.get("codec_name")=="aac" for s in info["streams"])
+              assert any(s.get("codec_type")=="video" and s.get("codec_name")=="h264"
+                         and s.get("width")==w and s.get("height")==h for s in info["streams"])
+              assert p.stat().st_size>1_000_000
+              print("OK",name,p.stat().st_size,d)
+          PY
+      - name: Guardar únicamente nuevos MP4 en GitHub
+        run: |
+          git add -- experimentos/charizard-vs-gemini-01/charizard-vs-gemini.mp4 \
+                     experimentos/charizard-vs-gemini-01/charizard-vs-gemini-movil.mp4
+          if git diff --cached --quiet; then
+            echo "Los MP4 ya se encuentran publicados."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Publicar video Charizard vs Gemini IA y version compatible movil"
+          git pull --rebase origin main
+          git push origin HEAD:main
