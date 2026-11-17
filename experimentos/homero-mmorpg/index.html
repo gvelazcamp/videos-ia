@@ -64,7 +64,7 @@ footer{font-size:11px;color:#7f97ad;text-align:center;margin:14px}
 <div id="toast" role="status" aria-live="polite"></div>
 </div>
 <div class="controls">
-<div class="help"><b>PC:</b> Flechas o WASD · Shift para correr<br><b>Celular:</b> Flechas táctiles · Botón CORRER<br><b>Objetivo:</b> Explorá Springfield y juntá 8 donas.</div>
+<div class="help"><b>PC:</b> Flechas o WASD · Shift para correr<br><b>Celular:</b> Tocá una flecha para avanzar o mantenela apretada · CORRER<br><b>Objetivo:</b> Explorá Springfield y juntá 8 donas.</div>
 <div class="pad" aria-label="Controles táctiles">
 <button data-dir="up" class="up" aria-label="Caminar arriba">▲</button><button data-dir="left" class="left" aria-label="Caminar a la izquierda">◀</button>
 <button data-dir="down" class="down" aria-label="Caminar abajo">▼</button><button data-dir="right" class="right" aria-label="Caminar a la derecha">▶</button>
@@ -189,13 +189,31 @@ window.addEventListener("keydown",function(e){if(mapping[e.code]){key[mapping[e.
 window.addEventListener("keyup",function(e){if(mapping[e.code]){key[mapping[e.code]]=false;e.preventDefault()}if(e.code==="ShiftLeft"||e.code==="ShiftRight")shift=false});
 window.addEventListener("blur",function(){Object.keys(key).forEach(function(k){key[k]=false});shift=false});
 document.querySelectorAll("[data-dir]").forEach(function(b){
-var d=b.dataset.dir;
-b.addEventListener("pointerdown",function(e){e.preventDefault();key[d]=true;target=null;b.classList.add("pressed");b.setPointerCapture(e.pointerId)});
-["pointerup","pointercancel","lostpointercapture"].forEach(function(event){b.addEventListener(event,function(){key[d]=false;b.classList.remove("pressed")})})});
+var d=b.dataset.dir,pressedAt=0,active=false;
+var steps={up:[0,-115],down:[0,115],left:[-115,0],right:[115,0]};
+function release(e){
+if(!active)return;
+var wasTap=e.type==="pointerup"&&performance.now()-pressedAt<240;
+active=false;key[d]=false;b.classList.remove("pressed");
+if(wasTap){
+// Un toque corto también camina: no exige mantener la flecha pulsada.
+target={x:Math.max(30,Math.min(MW-30,px+steps[d][0])),y:Math.max(30,Math.min(MH-30,py+steps[d][1]))};
+}
+if(e.cancelable)e.preventDefault();
+}
+b.addEventListener("pointerdown",function(e){
+if(active)return;
+e.preventDefault();active=true;pressedAt=performance.now();key[d]=true;target=null;b.classList.add("pressed");
+if(b.setPointerCapture)try{b.setPointerCapture(e.pointerId)}catch(err){}
+});
+b.addEventListener("pointerup",release);
+b.addEventListener("pointercancel",release);
+b.addEventListener("lostpointercapture",release);
+});
 document.getElementById("run").addEventListener("click",function(){run=!run;this.classList.toggle("active",run);this.textContent=run?"CORRIENDO":"CORRER"});
 document.getElementById("talk").addEventListener("click",talk);
 cv.addEventListener("pointerdown",function(e){var r=cv.getBoundingClientRect();target={x:(e.clientX-r.left)/r.width*W+camX,y:(e.clientY-r.top)/r.height*H+camY}});
-camX=px-W/2;camY=py-H*.55;show("Mové a Homero por Springfield y juntá 8 donas.",5);requestAnimationFrame(tick);
+camX=px-W/2;camY=py-H*.55;show("Tocá una flecha para caminar. Mantenela apretada para seguir.",5);requestAnimationFrame(tick);
 })();
 </script>
 </body></html>
