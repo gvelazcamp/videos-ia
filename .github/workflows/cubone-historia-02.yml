@@ -1,0 +1,78 @@
+name: Cubone 02 - Pokédex y objetos (render MP4)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "experimentos/cubone-historia-02/render/**"
+      - ".github/workflows/cubone-historia-02.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: cubone-historia-02
+  cancel-in-progress: false
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Preparar librerías y video
+        run: |
+          python -m pip install --disable-pip-version-check --quiet "Pillow>=10,<12" "numpy>=1.26,<3"
+          ffmpeg -version | head -n 1
+      - name: Validar sintaxis de las herramientas
+        run: |
+          python -m py_compile experimentos/cubone-historia-01/render/descargar_assets.py
+          python -m py_compile experimentos/cubone-historia-01/render/make_scenes.py
+          python -m py_compile experimentos/cubone-historia-01/render/render_cubone.py
+          python -m py_compile experimentos/cubone-historia-02/render/generar_overlays.py
+          python -m py_compile experimentos/cubone-historia-02/render/render_v2.py
+      - name: Reconstruir video base desde voz y escenas originales (no guardarlo)
+        run: |
+          python experimentos/cubone-historia-01/render/descargar_assets.py
+          python experimentos/cubone-historia-01/render/make_scenes.py
+          python experimentos/cubone-historia-01/render/render_cubone.py
+      - name: Dibujar Pokédex, cráneo y hueso como objetos separados
+        run: python experimentos/cubone-historia-02/render/generar_overlays.py
+      - name: Montar video nuevo con transiciones y efectos de interfaz
+        run: python experimentos/cubone-historia-02/render/render_v2.py
+      - name: Comprobar duración, sonido, tamaño y assets
+        run: |
+          python - <<'PY'
+          import json,subprocess
+          from pathlib import Path
+          p=Path("experimentos/cubone-historia-02/cubone-historia-02.mp4")
+          obj=json.loads(subprocess.check_output([
+              "ffprobe","-v","error","-show_streams","-show_format","-of","json",str(p)
+          ]))
+          duration=float(obj["format"]["duration"])
+          assert 61.0 <= duration <= 63.0, duration
+          streams=obj["streams"]
+          assert any(s.get("codec_type")=="audio" for s in streams)
+          assert any(s.get("codec_type")=="video" and s.get("width")==540 and s.get("height")==960 for s in streams)
+          assert p.stat().st_size > 500_000
+          assert len(list(Path("experimentos/cubone-historia-02/objetos").glob("*.png"))) >= 8
+          print("VALIDADO:",p,p.stat().st_size,"bytes,",duration,"segundos")
+          PY
+      - name: Guardar MP4 y assets nuevos en GitHub, manteniendo intacta la versión 1
+        run: |
+          git add -- experimentos/cubone-historia-02/cubone-historia-02.mp4 experimentos/cubone-historia-02/objetos/
+          if git diff --cached --quiet; then
+            echo "No hay cambios nuevos en Cubone 02."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Cubone 02: video MP4 y assets de Pokédex y objetos"
+          git pull --rebase origin main
+          git push origin HEAD:main
