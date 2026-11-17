@@ -1,0 +1,90 @@
+name: Pokemon combate 02 - estilo ilustrado aprobado
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/pokemon-combate-02-referencia.yml"
+      - "experimentos/pokemon-combate-02-referencia/render_referencia.py"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pokemon-combate-02-estilo-referencia
+  cancel-in-progress: false
+
+jobs:
+  generar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Instalar herramientas gratuitas
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --disable-pip-version-check -q "numpy>=1.26,<3" "Pillow>=10,<13" "opencv-python-headless>=4.8,<5"
+      - name: Comprobar fuente, voz y sintaxis
+        run: |
+          python -m py_compile experimentos/pokemon-combate-02-referencia/render_referencia.py
+          test -s experimentos/pokemon-combate-01/voz-gemini-charon.mp3
+          ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1 experimentos/pokemon-combate-01/voz-gemini-charon.mp3
+      - name: Render completo sin modificar batalla anterior
+        run: |
+          python experimentos/pokemon-combate-02-referencia/render_referencia.py \
+            --voice experimentos/pokemon-combate-01/voz-gemini-charon.mp3 \
+            --output experimentos/pokemon-combate-02-referencia/pikachu-vs-cubone-estilo-aprobado.mp4
+      - name: Crear version compatible con celulares
+        run: |
+          ffmpeg -hide_banner -nostdin -y -loglevel error \
+            -i experimentos/pokemon-combate-02-referencia/pikachu-vs-cubone-estilo-aprobado.mp4 \
+            -vf "scale=480:854:flags=lanczos,format=yuv420p" \
+            -c:v libx264 -preset veryfast -crf 27 -profile:v baseline -level 3.0 -r 24 \
+            -c:a aac -b:a 112k -ac 2 -movflags +faststart \
+            experimentos/pokemon-combate-02-referencia/pikachu-vs-cubone-estilo-aprobado-movil.mp4
+      - name: Validar video, audio y tamaños
+        run: |
+          python - <<'PY'
+          import json,subprocess
+          from pathlib import Path
+          root=Path("experimentos/pokemon-combate-02-referencia")
+          for name,width,height in [
+              ("pikachu-vs-cubone-estilo-aprobado.mp4",540,960),
+              ("pikachu-vs-cubone-estilo-aprobado-movil.mp4",480,854)
+          ]:
+              f=root/name
+              meta=json.loads(subprocess.check_output(
+                  ["ffprobe","-v","error","-show_format","-show_streams","-of","json",str(f)]))
+              dur=float(meta["format"]["duration"])
+              assert 60.5 < dur < 62, dur
+              assert any(s.get("codec_type")=="video" and s.get("codec_name")=="h264"
+                         and s.get("width")==width and s.get("height")==height for s in meta["streams"])
+              assert any(s.get("codec_type")=="audio" and s.get("codec_name")=="aac" for s in meta["streams"])
+              assert 500000 < f.stat().st_size < 60000000
+              print(name,"OK",f.stat().st_size,dur)
+          assert (root/"assets/referencia-estilo-aprobado.png").stat().st_size>100000
+          for name in ["pikachu-sprite.png","cubone-sprite.png","escenario-sin-personajes.jpg"]:
+              assert (root/"assets"/name).stat().st_size>10000,name
+          PY
+      - name: Guardar nuevo MP4 y assets en GitHub
+        run: |
+          git add -- \
+            experimentos/pokemon-combate-02-referencia/pikachu-vs-cubone-estilo-aprobado.mp4 \
+            experimentos/pokemon-combate-02-referencia/pikachu-vs-cubone-estilo-aprobado-movil.mp4 \
+            experimentos/pokemon-combate-02-referencia/assets/
+          if git diff --cached --quiet; then
+            echo "Todo actualizado."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Guardar combate estilo ilustrado con imagen aprobada y version movil"
+          git pull --rebase origin main
+          git push origin HEAD:main
