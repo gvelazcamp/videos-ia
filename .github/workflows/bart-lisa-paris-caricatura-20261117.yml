@@ -1,0 +1,49 @@
+name: Bart y Lisa en París caricatura (escenario del usuario)
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/bart-lisa-paris-caricatura-20261117.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: bart-lisa-paris-caricatura-20261117
+  cancel-in-progress: false
+
+jobs:
+  montar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Instalar Pillow
+        run: python -m pip install --disable-pip-version-check pillow
+      - name: Usar el escenario cargado por el usuario y ambos personajes recortados
+        run: python experimentos/bart-lisa-paris-caricatura-20261117/montar_escenario.py
+      - name: Guardar únicamente este escenario y su montaje
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add -- experimentos/bart-lisa-paris-caricatura-20261117/escenario-paris-caricatura-original.png
+          git add -- experimentos/bart-lisa-paris-caricatura-20261117/bart-y-lisa-en-este-paris.png
+          if git diff --cached --quiet; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Guardar escenario París del usuario y Bart y Lisa'
+          git pull --rebase origin main
+          git push origin HEAD:main
+      - name: PNG final de la nueva escena
+        uses: actions/upload-artifact@v4
+        with:
+          name: bart-lisa-paris-caricatura-20261117
+          path: experimentos/bart-lisa-paris-caricatura-20261117/bart-y-lisa-en-este-paris.png
+          if-no-files-found: error
+          retention-days: 7
