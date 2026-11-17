@@ -1,0 +1,71 @@
+name: Pokemon combate 01 - Pikachu vs Cubone (MP4)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/pokemon-combate-01.yml"
+      - "experimentos/pokemon-combate-01/render_combate.py"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pokemon-combate-01
+  cancel-in-progress: false
+
+jobs:
+  generar-video:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Instalar herramientas de video
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --disable-pip-version-check --quiet "Pillow>=10,<13" "numpy>=1.26,<3"
+      - name: Validar script y audio existente
+        run: |
+          python -m py_compile experimentos/pokemon-combate-01/render_combate.py
+          test -s experimentos/pokemon-combate-01/voz-gemini-charon.mp3
+          ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1 experimentos/pokemon-combate-01/voz-gemini-charon.mp3
+      - name: Producir pelea animada, HUD y efectos con voz Gemini
+        run: |
+          python experimentos/pokemon-combate-01/render_combate.py \
+            --duration 61.032 \
+            --voice experimentos/pokemon-combate-01/voz-gemini-charon.mp3 \
+            --output experimentos/pokemon-combate-01/pokemon-pikachu-vs-cubone.mp4
+      - name: Verificar archivo MP4 final
+        run: |
+          python - <<'PY'
+          import json, subprocess
+          from pathlib import Path
+          p=Path("experimentos/pokemon-combate-01/pokemon-pikachu-vs-cubone.mp4")
+          meta=json.loads(subprocess.check_output(["ffprobe","-v","error","-show_streams","-show_format","-of","json",str(p)]))
+          s=meta["streams"]
+          duration=float(meta["format"]["duration"])
+          assert 60 <= duration <= 62, duration
+          assert any(q.get("codec_type")=="video" and q.get("width")==540 and q.get("height")==960 for q in s)
+          assert any(q.get("codec_type")=="audio" for q in s)
+          assert p.stat().st_size>1000000
+          print("Video validado",p.stat().st_size,"bytes",duration,"segundos")
+          PY
+      - name: Guardar nuevo video y sprites en GitHub
+        run: |
+          git add -- experimentos/pokemon-combate-01/pokemon-pikachu-vs-cubone.mp4 experimentos/pokemon-combate-01/assets/
+          if git diff --cached --quiet; then
+            echo "Video idéntico al existente: nada que publicar."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Publicar video batalla Pikachu vs Cubone desde GitHub Actions"
+          git pull --rebase origin main
+          git push origin HEAD:main
