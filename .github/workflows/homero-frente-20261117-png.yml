@@ -1,0 +1,44 @@
+name: Exportar Homero PNG transparente
+on:
+  push:
+    branches: [main]
+    paths:
+      - "experimentos/homero-frente-20261117/homero-frente.svg"
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: homero-frente-20261117
+  cancel-in-progress: false
+jobs:
+  convertir:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Convertir SVG a PNG real
+        run: |
+          python -m pip install --disable-pip-version-check cairosvg pillow
+          python - <<'PY'
+          from pathlib import Path
+          import cairosvg
+          from PIL import Image
+          carpeta = Path("experimentos/homero-frente-20261117")
+          origen = carpeta / "homero-frente.svg"
+          destino = carpeta / "homero-frente.png"
+          cairosvg.svg2png(url=str(origen), write_to=str(destino), output_width=700, output_height=1050)
+          with Image.open(destino) as im:
+              im.load()
+              rgba = im.convert("RGBA")
+              assert im.format == "PNG" and im.size == (700,1050)
+              assert rgba.getchannel("A").getextrema() == (0,255), "Debe tener fondo transparente"
+              print(f"PNG válido: {destino}, 700x1050, transparencia verificada")
+          PY
+      - name: Guardar únicamente el PNG generado
+        run: |
+          git add -- experimentos/homero-frente-20261117/homero-frente.png
+          if git diff --cached --quiet; then exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Generar PNG transparente de Homero"
+          git pull --rebase origin main
+          git push origin HEAD:main
