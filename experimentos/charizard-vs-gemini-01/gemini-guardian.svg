@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1050" viewBox="0 0 900 1050">
+<defs>
+<linearGradient id="cape" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#3c1e89"/><stop offset=".44" stop-color="#7a39c9"/><stop offset="1" stop-color="#143f90"/></linearGradient>
+<linearGradient id="plasma" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#f2c7ff"/><stop offset=".3" stop-color="#a5b0ff"/><stop offset=".62" stop-color="#53f5f1"/><stop offset="1" stop-color="#4466d9"/></linearGradient>
+<linearGradient id="steel" x1="0" x2=".8" y1="0" y2="1"><stop stop-color="#e8e4ff"/><stop offset=".22" stop-color="#b2abff"/><stop offset=".55" stop-color="#554ca2"/><stop offset="1" stop-color="#202c69"/></linearGradient>
+<linearGradient id="body" x1=".1" x2="1" y1="0" y2="1"><stop stop-color="#9186ef"/><stop offset=".48" stop-color="#403c9a"/><stop offset="1" stop-color="#1b2b61"/></linearGradient>
+<linearGradient id="glass" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#12274b"/><stop offset=".55" stop-color="#231c60"/><stop offset="1" stop-color="#091a38"/></linearGradient>
+<linearGradient id="shine" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#fff7ff"/><stop offset=".3" stop-color="#b3fbfa"/><stop offset=".7" stop-color="#966aff"/><stop offset="1" stop-color="#4852e9"/></linearGradient>
+<filter id="glow"><feGaussianBlur stdDeviation="19"/></filter>
+<filter id="smallglow"><feGaussianBlur stdDeviation="8"/></filter>
+</defs>
+<!-- persistent light aura behind the character -->
+<ellipse cx="458" cy="510" rx="240" ry="420" fill="#7888ff" opacity=".31" filter="url(#glow)"/>
+<g stroke-linejoin="round" stroke-linecap="round">
+<!-- ripped energy cape with sparkling asymmetry -->
+<path d="M331 365 Q204 387 138 607 L84 837 212 768 153 1007 370 870 435 907 510 870 698 997 634 743 816 844 Q750 543 571 363Z" fill="url(#cape)" stroke="#1d1f62" stroke-width="18"/>
+<path d="M315 412 Q222 542 177 847 L340 799 M562 423 Q690 530 730 806 L587 759" stroke="#8e9ffb" opacity=".53" stroke-width="14" fill="none"/>
+<path d="M174 909 287 812 194 939 M697 917 605 831 666 962" stroke="#78edff" stroke-width="9" opacity=".61" fill="none"/>
+<!-- floating shoulder fins -->
+<path d="M228 370 143 248 220 293 255 226 320 343Z" fill="url(#plasma)" stroke="#222868" stroke-width="15"/>
+<path d="M624 352 750 240 687 340 790 360 652 434Z" fill="url(#plasma)" stroke="#222868" stroke-width="15"/>
+<!-- legs levitating -->
+<path d="M364 689 337 835 274 933 355 973 433 843 449 702Z" fill="url(#steel)" stroke="#171a52" stroke-width="20"/>
+<path d="M466 702 483 842 561 957 639 923 554 813 550 682Z" fill="url(#steel)" stroke="#171a52" stroke-width="20"/>
+<path d="M279 942 355 970 321 1004 218 997Z" fill="#3157b9" stroke="#172758" stroke-width="15"/>
+<path d="M568 951 644 919 700 977 611 1007Z" fill="#3157b9" stroke="#172758" stroke-width="15"/>
+<path d="M259 983 321 990 289 1024 M614 993 665 976 692 1008" stroke="#74faff" stroke-width="12" opacity=".8"/>
+<!-- chest armor with geometry -->
+<path d="M341 319 Q438 277 572 336 L632 566 568 756 376 756 277 563Z" fill="url(#body)" stroke="#172258" stroke-width="23"/>
+<path d="M309 423 367 374 447 411 524 375 590 429 558 576 452 665 354 575Z" fill="url(#steel)" stroke="#a3baff" stroke-width="10"/>
+<path d="M358 431 451 449 543 424 524 570 447 617 373 563Z" fill="#242456" stroke="#9ba3ff" stroke-width="11"/>
+<!-- chest jewel is distinctive gemini sparkle -->
+<path d="M453 447 Q479 504 525 515 Q466 523 454 590 Q441 530 387 517 Q435 503 453 447Z" fill="url(#shine)" stroke="#fff8ff" stroke-width="9"/>
+<path d="M453 483 467 515 451 540 437 516Z" fill="#fff6ff" opacity=".95"/>
+<circle cx="454" cy="517" r="75" fill="#aefaff" opacity=".25" filter="url(#smallglow)"/>
+<path d="M312 590 370 652 369 712 304 668 M584 595 534 658 553 714 625 665" fill="#2a3879" stroke="#151d57" stroke-width="12"/>
+<path d="M365 724 533 728 512 762 386 762Z" fill="#e0d4ff" stroke="#6b88e8" stroke-width="12"/>
+<!-- left arm -->
+<path d="M309 367 233 395 173 539 226 578 340 456Z" fill="url(#steel)" stroke="#182357" stroke-width="19"/>
+<path d="M197 516 245 541 219 634 151 613Z" fill="url(#body)" stroke="#252462" stroke-width="16"/>
+<path d="M170 592 115 598 109 633 149 660 192 647 233 623 214 591Z" fill="url(#steel)" stroke="#161e4e" stroke-width="13"/>
+<path d="M110 632 75 627 M132 650 110 685 M159 651 164 698" stroke="#8cf8fe" stroke-width="13"/>
+<!-- right raised arm, digital casting -->
+<path d="M576 359 676 361 721 485 665 526 551 441Z" fill="url(#steel)" stroke="#1e215d" stroke-width="18"/>
+<path d="M700 477 754 445 795 532 715 567Z" fill="url(#body)" stroke="#211b66" stroke-width="17"/>
+<path d="M735 534 753 569 806 580 831 565 847 536 819 493 798 483 782 531Z" fill="url(#steel)" stroke="#1a2459" stroke-width="15"/>
+<path d="M803 497 824 443 M827 519 858 486 M823 549 871 537" stroke="#9bedff" stroke-width="13"/>
+<!-- multi facet helmet -->
+<path d="M322 139 417 99 567 143 605 248 561 365 444 411 324 348 286 249Z" fill="url(#steel)" stroke="#121d54" stroke-width="22"/>
+<path d="M295 216 244 186 252 292 325 323 M588 220 680 179 642 314 577 333" fill="url(#plasma)" stroke="#1c2364" stroke-width="15"/>
+<path d="M335 201 426 163 545 191 564 291 495 343 370 312Z" fill="url(#glass)" stroke="#9cc6ff" stroke-width="10"/>
+<!-- visor bright narrow luminous eyes -->
+<path d="M351 252 416 235 446 256 412 278 353 273Z" fill="#a4f9ff" stroke="#ffffff" stroke-width="4"/>
+<path d="M458 254 522 239 543 257 517 272 462 283Z" fill="#dba7ff" stroke="#ffe3ff" stroke-width="4"/>
+<path d="M378 270 413 260 M472 270 511 259" stroke="#ffffff" stroke-width="7" opacity=".76"/>
+<path d="M397 324 467 350 524 323" stroke="#5e76cb" stroke-width="8" fill="none"/>
+<path d="M335 147 393 111 M534 141 566 193" stroke="#f3e9ff" stroke-width="12" opacity=".7"/>
+<!-- Gemini head crest / four point star -->
+<path d="M451 7 Q471 77 528 101 Q472 120 452 196 Q430 123 370 102 Q429 81 451 7Z" fill="url(#shine)" stroke="#efeeff" stroke-width="14"/>
+<path d="M451 61 465 101 452 143 439 102Z" fill="#fbffff"/>
+<path d="M456 16 Q468 75 522 101" stroke="#ffffff" stroke-width="5" opacity=".7" fill="none"/>
+<!-- circuitry -->
+<path d="M369 405 345 474 370 510 M530 407 552 476 527 514" stroke="#7ce9ee" stroke-width="8" opacity=".7" fill="none"/>
+<circle cx="349" cy="477" r="9" fill="#bcfaff"/>
+<circle cx="555" cy="478" r="9" fill="#bcfaff"/>
+</g>
+<!-- orbit sparks -->
+<g fill="#c2e7ff">
+<path d="M164 320 173 348 202 356 173 364 164 394 155 364 126 356 154 348Z"/>
+<path d="M730 154 739 182 766 190 738 200 730 229 721 200 694 191 721 183Z"/>
+<path d="M820 673 827 694 847 702 828 709 820 731 811 710 793 702 812 694Z"/>
+<circle cx="243" cy="137" r="10"/><circle cx="653" cy="122" r="7"/><circle cx="799" cy="403" r="7"/>
+</g>
+</svg>
