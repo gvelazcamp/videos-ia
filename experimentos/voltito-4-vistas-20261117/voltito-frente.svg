@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="700" viewBox="0 0 500 700">
+
+<defs>
+  <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#FFE887"/>
+    <stop offset=".50" stop-color="#FFC64D"/>
+    <stop offset="1" stop-color="#F29A3A"/>
+  </linearGradient>
+  <linearGradient id="sun" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#FFF3B7"/>
+    <stop offset=".75" stop-color="#FFDB71"/>
+    <stop offset="1" stop-color="#F2AE4A"/>
+  </linearGradient>
+  <linearGradient id="teal" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#B4FFF0"/>
+    <stop offset=".58" stop-color="#35D9C4"/>
+    <stop offset="1" stop-color="#1A8D9F"/>
+  </linearGradient>
+  <linearGradient id="belly" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FFF4CE"/>
+    <stop offset="1" stop-color="#E4FFDD"/>
+  </linearGradient>
+  <radialGradient id="glow">
+    <stop offset="0" stop-color="#FFFFFA"/>
+    <stop offset=".25" stop-color="#DFFFFB"/>
+    <stop offset="1" stop-color="#28DECB"/>
+  </radialGradient>
+</defs>
+<g stroke-linecap="round" stroke-linejoin="round">
+
+<!-- Cola eléctrica detrás del cuerpo -->
+<path d="M343 381 L389 326 L367 294 L458 225 L426 312 L467 343 L399 430 L360 452 Z"
+  fill="url(#teal)" stroke="#214C59" stroke-width="10" stroke-linejoin="round"/>
+<path d="M388 341 L414 306 L404 326 L435 337 L398 391" fill="none"
+  stroke="#EFFFF8" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+<!-- Orejas asimétricas de hoja -->
+<path d="M179 217 Q126 163 113 73 Q169 91 219 182 L229 239 Z"
+  fill="url(#gold)" stroke="#394650" stroke-width="10" stroke-linejoin="round"/>
+<path d="M113 73 Q144 92 160 121 L142 144 Q126 118 113 73 Z"
+  fill="url(#teal)" stroke="#394650" stroke-width="6"/>
+<path d="M282 218 Q326 96 397 61 Q403 163 327 236 Z"
+  fill="url(#gold)" stroke="#394650" stroke-width="10" stroke-linejoin="round"/>
+<path d="M397 61 Q386 108 361 135 L341 124 Q370 82 397 61 Z"
+  fill="url(#teal)" stroke="#394650" stroke-width="6"/>
+<path d="M178 196 Q167 145 161 132 M335 186 Q355 144 370 118"
+  fill="none" stroke="#FFF4B1" stroke-width="8" stroke-linecap="round" opacity=".8"/>
+<!-- Patitas -->
+<path d="M178 514 Q135 531 135 564 Q144 595 198 585 L234 554 L237 507 Z"
+  fill="url(#gold)" stroke="#394650" stroke-width="10"/>
+<path d="M300 514 Q353 519 363 557 Q359 591 312 590 L274 554 Z"
+  fill="url(#gold)" stroke="#394650" stroke-width="10"/>
+<path d="M159 578 L169 568 M184 587 L194 576 M323 583 L313 570 M345 574 L333 566"
+  stroke="#8E6D45" stroke-width="5" stroke-linecap="round"/>
+<!-- Brazos detrás -->
+<path d="M163 388 Q120 385 115 427 Q109 454 141 464 L189 437 Z"
+  fill="url(#gold)" stroke="#394650" stroke-width="10"/>
+<path d="M341 386 Q382 385 391 427 Q390 460 361 468 L324 440 Z"
+  fill="url(#gold)" stroke="#394650" stroke-width="10"/>
+<path d="M119 445 Q135 439 147 447 M374 447 Q359 437 346 443"
+  stroke="#EFFFF8" stroke-width="8" stroke-linecap="round"/>
+<!-- Cuerpo -->
+<path d="M168 363 Q145 409 162 492 Q178 553 249 557 Q325 563 347 497 Q359 440 339 360 Z"
+  fill="url(#gold)" stroke="#394650" stroke-width="11"/>
+<path d="M208 412 Q188 478 222 519 Q251 545 291 515 Q318 472 296 409 Z"
+  fill="url(#belly)" opacity=".97"/>
+<path d="M252 420 L273 452 L256 453 L268 478 L229 442 L250 441 Z"
+  fill="#39CFC0" stroke="#189898" stroke-width="2" stroke-linejoin="round"/>
+<!-- Cabeza ancha, ojos azul marino -->
+<path d="M144 255 Q153 188 220 174 Q271 155 328 192 Q364 218 366 286 Q368 351 302 388 Q248 412 191 386 Q128 357 140 289 Z"
+  fill="url(#sun)" stroke="#394650" stroke-width="11" stroke-linejoin="round"/>
+<path d="M176 230 Q199 194 245 193" stroke="#FFFFDD" stroke-width="13"
+  stroke-linecap="round" fill="none" opacity=".66"/>
+<!-- Copete único -->
+<path d="M224 174 L214 140 L242 156 L256 115 L272 158 L299 145 L283 182 Z"
+  fill="url(#teal)" stroke="#394650" stroke-width="8" stroke-linejoin="round"/>
+<!-- Ojos -->
+<ellipse cx="203" cy="278" rx="23" ry="29" fill="#263B55"/>
+<ellipse cx="299" cy="278" rx="23" ry="29" fill="#263B55"/>
+<ellipse cx="196" cy="268" rx="8" ry="10" fill="white"/>
+<ellipse cx="292" cy="268" rx="8" ry="10" fill="white"/>
+<circle cx="213" cy="291" r="4" fill="#73FFF1"/>
+<circle cx="309" cy="291" r="4" fill="#73FFF1"/>
+<path d="M176 249 Q194 235 212 244 M292 244 Q311 236 324 249"
+  stroke="#845C3C" stroke-width="6" stroke-linecap="round" fill="none"/>
+<!-- Rayos de mejillas turquesa -->
+<path d="M156 304 L171 313 L164 330 L188 328 L177 353 L178 335 L153 337 Z"
+  fill="url(#teal)" stroke="#168E99" stroke-width="3" stroke-linejoin="round"/>
+<path d="M345 303 L330 313 L337 330 L313 328 L324 352 L323 335 L348 336 Z"
+  fill="url(#teal)" stroke="#168E99" stroke-width="3" stroke-linejoin="round"/>
+<path d="M246 304 Q252 300 258 304 L251 316 Z" fill="#714A46"/>
+<path d="M232 329 Q250 351 272 329" fill="none" stroke="#794B43" stroke-width="6" stroke-linecap="round"/>
+<circle cx="180" cy="357" r="5" fill="#FFF9CF"/>
+<circle cx="321" cy="355" r="5" fill="#FFF9CF"/>
+</g>
+</svg>

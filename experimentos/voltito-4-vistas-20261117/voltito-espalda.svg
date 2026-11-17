@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="700" viewBox="0 0 500 700">
+
+<defs>
+  <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#FFE887"/>
+    <stop offset=".50" stop-color="#FFC64D"/>
+    <stop offset="1" stop-color="#F29A3A"/>
+  </linearGradient>
+  <linearGradient id="sun" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#FFF3B7"/>
+    <stop offset=".75" stop-color="#FFDB71"/>
+    <stop offset="1" stop-color="#F2AE4A"/>
+  </linearGradient>
+  <linearGradient id="teal" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#B4FFF0"/>
+    <stop offset=".58" stop-color="#35D9C4"/>
+    <stop offset="1" stop-color="#1A8D9F"/>
+  </linearGradient>
+  <linearGradient id="belly" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FFF4CE"/>
+    <stop offset="1" stop-color="#E4FFDD"/>
+  </linearGradient>
+  <radialGradient id="glow">
+    <stop offset="0" stop-color="#FFFFFA"/>
+    <stop offset=".25" stop-color="#DFFFFB"/>
+    <stop offset="1" stop-color="#28DECB"/>
+  </radialGradient>
+</defs>
+<g stroke-linecap="round" stroke-linejoin="round">
+
+<!-- Cola saliendo del costado derecho -->
+<path d="M339 385 L391 337 L366 301 L460 233 L427 315 L463 350 L399 430 L359 448 Z"
+ fill="url(#teal)" stroke="#394650" stroke-width="10" stroke-linejoin="round"/>
+<path d="M399 359 L423 328 L412 357" fill="none" stroke="#E5FFF2" stroke-width="7"/>
+<!-- Orejas vista posterior -->
+<path d="M177 216 Q122 158 115 71 Q179 92 227 195 Z"
+ fill="#E4A447" stroke="#394650" stroke-width="10" stroke-linejoin="round"/>
+<path d="M115 71 Q137 88 154 117 L141 134 Z"
+ fill="url(#teal)" stroke="#394650" stroke-width="5"/>
+<path d="M279 199 Q325 92 395 58 Q399 153 327 230 Z"
+ fill="#E7A648" stroke="#394650" stroke-width="10" stroke-linejoin="round"/>
+<path d="M395 58 Q369 88 352 119 L373 131 Z"
+ fill="url(#teal)" stroke="#394650" stroke-width="5"/>
+<!-- Patas -->
+<path d="M181 510 Q143 529 141 567 Q149 591 202 583 L229 544 Z"
+ fill="#EBA04A" stroke="#394650" stroke-width="10"/>
+<path d="M307 510 Q355 528 361 560 Q357 590 309 586 L271 549 Z"
+ fill="#EBA04A" stroke="#394650" stroke-width="10"/>
+<!-- Brazos -->
+<path d="M164 381 Q112 407 118 441 Q130 466 170 450 L194 406 Z"
+ fill="url(#gold)" stroke="#394650" stroke-width="10"/>
+<path d="M333 381 Q386 408 387 439 Q370 470 331 450 L307 409 Z"
+ fill="url(#gold)" stroke="#394650" stroke-width="10"/>
+<!-- Cuerpo visto de atrás -->
+<path d="M163 353 Q142 402 164 486 Q190 551 247 559 Q318 567 345 491 Q358 414 335 355 Z"
+ fill="url(#gold)" stroke="#394650" stroke-width="11"/>
+<!-- Tres rayas dorsales asimétricas -->
+<path d="M187 396 L233 414 L210 439 L169 420 Z"
+ fill="#CF8443" opacity=".90" />
+<path d="M315 397 L273 414 L297 441 L342 420 Z"
+ fill="#CF8443" opacity=".90" />
+<path d="M226 460 L253 472 L237 495 L207 482 Z"
+ fill="#CF8443" opacity=".75"/>
+<path d="M286 461 L260 473 L274 497 L302 484 Z"
+ fill="#CF8443" opacity=".75"/>
+<!-- Cabeza por detrás -->
+<path d="M142 254 Q152 187 222 175 Q271 157 330 196 Q362 222 362 289 Q359 360 298 386 Q242 402 185 379 Q132 353 142 254 Z"
+ fill="url(#gold)" stroke="#394650" stroke-width="11" stroke-linejoin="round"/>
+<!-- Copete azul trasero -->
+<path d="M216 177 L213 147 L240 159 L254 121 L272 159 L302 145 L286 184 Z"
+ fill="#269D9D" stroke="#394650" stroke-width="8" stroke-linejoin="round"/>
+<!-- Espiral de energía dorsal (no coincide con marca frontal) -->
+<path d="M230 295 Q252 270 276 298 Q280 315 260 319 Q246 319 246 309 Q248 304 256 304"
+ fill="none" stroke="#FFF3B5" stroke-width="12" stroke-linecap="round"/>
+<path d="M211 349 Q254 357 302 343" fill="none" stroke="#EDB263" stroke-width="8" stroke-linecap="round"/>
+</g>
+</svg>

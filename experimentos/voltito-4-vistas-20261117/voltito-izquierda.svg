@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="700" viewBox="0 0 500 700">
+
+<defs>
+  <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#FFE887"/>
+    <stop offset=".50" stop-color="#FFC64D"/>
+    <stop offset="1" stop-color="#F29A3A"/>
+  </linearGradient>
+  <linearGradient id="sun" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#FFF3B7"/>
+    <stop offset=".75" stop-color="#FFDB71"/>
+    <stop offset="1" stop-color="#F2AE4A"/>
+  </linearGradient>
+  <linearGradient id="teal" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#B4FFF0"/>
+    <stop offset=".58" stop-color="#35D9C4"/>
+    <stop offset="1" stop-color="#1A8D9F"/>
+  </linearGradient>
+  <linearGradient id="belly" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FFF4CE"/>
+    <stop offset="1" stop-color="#E4FFDD"/>
+  </linearGradient>
+  <radialGradient id="glow">
+    <stop offset="0" stop-color="#FFFFFA"/>
+    <stop offset=".25" stop-color="#DFFFFB"/>
+    <stop offset="1" stop-color="#28DECB"/>
+  </radialGradient>
+</defs>
+<g stroke-linecap="round" stroke-linejoin="round">
+
+<!-- Vista hacia la izquierda: punta del hocico a la izquierda, cola atrás -->
+<path d="M330 374 L383 342 L367 300 L452 240 L426 309 L468 344 L401 424 L347 441 Z"
+  fill="url(#teal)" stroke="#394650" stroke-width="10" stroke-linejoin="round"/>
+<path d="M379 357 L416 331 L407 352 L434 353" fill="none"
+ stroke="#EFFFFB" stroke-width="7" stroke-linecap="round"/>
+<!-- Oreja posterior -->
+<path d="M276 224 Q323 110 380 76 Q390 150 315 244 Z"
+ fill="url(#gold)" stroke="#394650" stroke-width="10" stroke-linejoin="round"/>
+<path d="M380 76 Q367 112 351 128 L336 119 Q361 90 380 76 Z"
+ fill="url(#teal)" stroke="#394650" stroke-width="5"/>
+<!-- Patas con perspectiva -->
+<path d="M230 510 Q198 525 196 558 Q196 588 247 591 L286 560 L285 513 Z"
+ fill="url(#gold)" stroke="#394650" stroke-width="10"/>
+<path d="M306 510 Q356 520 365 555 Q369 583 331 590 L292 562 Z"
+ fill="#EFA744" stroke="#394650" stroke-width="10"/>
+<!-- Cuerpo profile -->
+<path d="M203 374 Q175 412 190 485 Q206 550 284 553 Q348 546 358 485 Q358 420 331 366 Z"
+ fill="url(#gold)" stroke="#394650" stroke-width="11"/>
+<path d="M203 406 Q186 463 219 508 Q238 527 258 527 Q233 461 261 401 Z"
+ fill="url(#belly)"/>
+<!-- Brazo que alcanza al frente -->
+<path d="M204 408 Q157 415 148 456 Q154 476 182 468 L237 432 Z"
+ fill="url(#gold)" stroke="#394650" stroke-width="10"/>
+<path d="M160 453 L183 451" stroke="#EFFFF3" stroke-width="7" stroke-linecap="round"/>
+<!-- Cara lateral con hocico anguloso -->
+<path d="M309 202 Q262 181 212 205 Q162 221 154 263 L99 295 Q91 315 113 333 Q120 378 181 388 Q261 410 318 365 Q356 333 352 277 Q350 228 309 202 Z"
+ fill="url(#sun)" stroke="#394650" stroke-width="11" stroke-linejoin="round"/>
+<path d="M147 277 Q157 233 200 223" fill="none" stroke="#FFFFD7" stroke-width="10"
+ stroke-linecap="round" opacity=".65"/>
+<!-- Oreja delantera visible -->
+<path d="M211 217 Q163 128 145 59 Q224 87 257 194 Z"
+ fill="url(#gold)" stroke="#394650" stroke-width="10" stroke-linejoin="round"/>
+<path d="M145 59 Q174 83 188 117 L165 134 Q152 94 145 59 Z"
+ fill="url(#teal)" stroke="#394650" stroke-width="5"/>
+<path d="M206 195 L194 159 L221 171 L243 132 L251 183 Z"
+ fill="url(#teal)" stroke="#394650" stroke-width="8" stroke-linejoin="round"/>
+<!-- Un ojo grande de perfil -->
+<ellipse cx="184" cy="277" rx="22" ry="29" fill="#263B55"/>
+<ellipse cx="179" cy="269" rx="8" ry="10" fill="white"/>
+<circle cx="195" cy="294" r="4" fill="#73FFF1"/>
+<!-- Hocico y sonrisa -->
+<path d="M101 300 L121 294 L121 310 Z" fill="#704A46"/>
+<path d="M122 334 Q145 352 173 332" fill="none"
+ stroke="#794B43" stroke-width="6" stroke-linecap="round"/>
+<!-- Marca rayo de la mejilla -->
+<path d="M222 308 L237 316 L229 332 L255 328 L238 359 L240 340 L218 342 Z"
+ fill="url(#teal)" stroke="#168E99" stroke-width="4" stroke-linejoin="round"/>
+<!-- Aleta dorsal turquesa -->
+<path d="M332 378 L351 397 L339 421" fill="none" stroke="#D78B33" stroke-width="9" stroke-linecap="round"/>
+</g>
+</svg>
