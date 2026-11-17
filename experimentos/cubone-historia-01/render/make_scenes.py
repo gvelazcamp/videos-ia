@@ -3,7 +3,7 @@ from pathlib import Path
 import numpy as np, math, random, os
 P=Path(__file__).resolve().parent.parent; W,H=720,1280; random.seed(104)
 OUT=P/"escenas";OUT.mkdir(exist_ok=True)
-FONT="/usr/share/fonts/truetype/higgsfield/Montserrat-ExtraBold.ttf"
+FONT="/usr/share/fonts/truetype/higgsfield/Montserrat-ExtraBold.ttf"\nif not Path(FONT).exists(): FONT="/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
 TEXT="/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
 def font(s,bold=True):return ImageFont.truetype(FONT if bold else TEXT,s)
 def blend(c1,c2,t):return tuple(int(c1[i]*(1-t)+c2[i]*t) for i in range(3))
