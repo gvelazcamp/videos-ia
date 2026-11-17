@@ -51,7 +51,7 @@ h1 span{color:#ffb2d1}
 <h1>PARÍS <span>PIXEL QUEST</span></h1>
 <p class="lead">Mové a Pikachu, saltá los charcos, juntá al menos 6 croissants y llegá al final del paseo. En el celular o con las flechas del teclado.</p>
 <section class="frame" aria-label="Minijuego de plataformas pixel art en París">
- <div class="hud"><div>🥐 <b id="score">0/6</b></div><div>VIDAS <span id="hearts" class="hearts">♥ ♥ ♥</span></div><div>PARÍS <b id="progress">0%</b></div></div>
+ <div class="hud"><div>🥐 <b id="score">0/8</b></div><div>VIDAS <span id="hearts" class="hearts">♥ ♥ ♥</span></div><div>PARÍS <b id="progress">0%</b></div></div>
  <canvas id="game" width="400" height="256" aria-label="Pikachu con boina y vestido pasea por un videojuego pixel art de París"></canvas>
  <div class="overlay" id="overlay"><div class="modal">
  <span class="pixelicon">🥐 ✦ 🗼</span><h2 id="modalTitle">BONJOUR, PIKACHU!</h2>
@@ -124,7 +124,7 @@ function newGame(){
 }
 function updateHud(){
  const n=collected.filter(Boolean).length;
- ui.score.textContent=n+"/6";
+ ui.score.textContent=n+"/8";
  ui.hearts.textContent=("♥ ".repeat(player.hearts)).trim()||"—";
  ui.progress.textContent=Math.round(Math.min(100,player.x/(WORLD-125)*100))+"%";
  ui.distance.textContent=Math.floor(player.x)+" m";
