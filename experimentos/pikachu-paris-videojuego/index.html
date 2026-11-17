@@ -95,6 +95,7 @@ function fallbackSprite(){
  rect(c,15,15,31,9,"#262637");rect(c,18,8,26,10,"#262637");rect(c,12,41,34,15,"#2a2738");rect(c,15,39,30,5,"#f5e2c3");rect(c,12,53,34,4,"#dd527b");}
 fallbackSprite();
 let loaded=0;
+const assetImages=[];
 sources.forEach((src,i)=>{
  const img=new Image();img.crossOrigin='anonymous';
  img.onload=()=>{
@@ -109,7 +110,6 @@ sources.forEach((src,i)=>{
  img.onerror=()=>{loaded++;console.warn("Asset no disponible; se usará sprite local",src)};
  assetImages.push(img);img.src=src;
 });
-const assetImages=[];
 const coinsX=[165,307,448,570,714,870,1025,1172];
 const hazards=[340,661,985,1104];
 const keys={left:false,right:false,jump:false};
