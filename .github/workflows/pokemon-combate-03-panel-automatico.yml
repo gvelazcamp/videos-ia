@@ -1,0 +1,69 @@
+name: Pokemon combate 03 - selector automatico de poderes
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/pokemon-combate-03-panel-automatico.yml"
+      - "experimentos/pokemon-combate-03-panel-automatico/panel_automatico.py"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pokemon-combate-03-automatico
+  cancel-in-progress: false
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Instalar FFmpeg y Pillow
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          python -m pip install --disable-pip-version-check -q "Pillow>=10,<13"
+      - name: Verificar fuente original
+        run: |
+          python -m py_compile experimentos/pokemon-combate-03-panel-automatico/panel_automatico.py
+          test -s experimentos/pokemon-combate-02-referencia/pikachu-vs-cubone-estilo-aprobado.mp4
+          ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1 experimentos/pokemon-combate-02-referencia/pikachu-vs-cubone-estilo-aprobado.mp4
+      - name: Generar menu que cambia segun quien ataca, conservando audio original
+        run: |
+          python experimentos/pokemon-combate-03-panel-automatico/panel_automatico.py \
+            --input experimentos/pokemon-combate-02-referencia/pikachu-vs-cubone-estilo-aprobado.mp4 \
+            --output experimentos/pokemon-combate-03-panel-automatico/pikachu-vs-cubone-panel-automatico.mp4
+      - name: Verificar archivo final
+        run: |
+          python - <<'PY'
+          import json,subprocess
+          from pathlib import Path
+          path=Path("experimentos/pokemon-combate-03-panel-automatico/pikachu-vs-cubone-panel-automatico.mp4")
+          data=json.loads(subprocess.check_output(["ffprobe","-v","error","-show_streams","-show_format","-of","json",str(path)]))
+          assert 60.0 < float(data["format"]["duration"]) < 62.0
+          assert any(s.get("codec_type")=="video" and s.get("codec_name")=="h264"
+                     and s.get("width")==540 and s.get("height")==960 for s in data["streams"])
+          assert any(s.get("codec_type")=="audio" and s.get("codec_name")=="aac" for s in data["streams"])
+          assert 1_000_000 < path.stat().st_size < 25_000_000
+          print("Nuevo video:",path.stat().st_size,"bytes, sonido intacto")
+          PY
+      - name: Guardar solo la version nueva
+        run: |
+          git add -- experimentos/pokemon-combate-03-panel-automatico/pikachu-vs-cubone-panel-automatico.mp4
+          if git diff --cached --quiet; then
+            echo "No hay modificaciones."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Crear video de combate con seleccion automatica de poderes"
+          git pull --rebase origin main
+          git push origin HEAD:main
