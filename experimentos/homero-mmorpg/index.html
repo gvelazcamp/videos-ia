@@ -79,16 +79,16 @@ footer{font-size:11px;color:#7f97ad;text-align:center;margin:14px}
 <path d="M47 82q13 7 23-2" fill="none" stroke="#54422e" stroke-width="2.6" stroke-linecap="round"/>
 </svg>
 </div>
-<div class="hud"><strong>HOMERO · <b>NIVEL 1</b></strong><div class="hp"></div><div id="score">🍩 Donas: 0 / 8</div></div>
+<div class="hud"><strong>HOMERO · <b>NIVEL 1</b></strong><div class="hp"></div><div id="score">🍩 Donas: 0 / 8</div><div id="place-name">Springfield</div></div>
 <div id="toast" role="status" aria-live="polite"></div>
 </div>
 <div class="controls">
-<div class="help"><b>PC:</b> Flechas o WASD · Shift para correr<br><b>Celular:</b> Tocá una flecha para avanzar o mantenela apretada · CORRER<br><b>Objetivo:</b> Explorá Springfield y juntá 8 donas.</div>
+<div class="help"><b>PC:</b> Flechas o WASD · Shift para correr<br><b>Celular:</b> Tocá una flecha para avanzar o mantenela apretada · CORRER<br><b>Objetivo:</b> Juntá 8 donas. Acercate a la puerta de casa Simpson y tocá ENTRAR (o F).</div>
 <div class="pad" aria-label="Controles táctiles">
 <button data-dir="up" class="up" aria-label="Caminar arriba">▲</button><button data-dir="left" class="left" aria-label="Caminar a la izquierda">◀</button>
 <button data-dir="down" class="down" aria-label="Caminar abajo">▼</button><button data-dir="right" class="right" aria-label="Caminar a la derecha">▶</button>
 </div>
-<div class="actions"><button id="run" type="button">CORRER</button><button id="talk" type="button">HABLAR</button></div>
+<div class="actions"><button id="run" type="button">CORRER</button><button id="talk" type="button">HABLAR</button><button id="enter-house" type="button" style="display:none">ENTRAR A CASA</button></div>
 </div>
 <footer>Demo independiente de un jugador, inspirada en RPG/MMORPG. No es multijugador ni modifica juegos existentes.</footer>
 </main>
@@ -97,9 +97,16 @@ footer{font-size:11px;color:#7f97ad;text-align:center;margin:14px}
 "use strict";
 var cv=document.getElementById("world"),ctx=cv.getContext("2d"),avatar=document.getElementById("avatar");
 var toast=document.getElementById("toast"),score=document.getElementById("score");
+var enterButton=document.getElementById("enter-house"),placeName=document.getElementById("place-name");
 var portraitCheck=new Image();portraitCheck.onerror=function(){avatar.classList.add("fallback")};portraitCheck.src="./homero-original-mmorpg.png";
 var W=960,H=540,MW=2520,MH=1840,camX=0,camY=0,px=1275,py=975,anim=0,last=0,notice=0;
 var key={up:false,down:false,left:false,right:false},shift=false,run=false,target=null,dir="down";
+// Escena interior independiente; se conserva la posicion exterior para regresar al mismo lugar.
+var indoors=false,returnX=0,returnY=0,frontDoor={x:742.5,y:690};
+var furniture={};["sofa","mesa","lampara","cuadro","alfombra","televisor"].forEach(function(name){
+var img=new Image();img.onload=function(){furniture[name].ready=true};
+img.onerror=function(){furniture[name].ready=false};furniture[name]={img:img,ready:false};img.src="./assets/"+name+".png";
+});
 var homes=[{x:550,y:385,w:385,h:280,roof:"#dd7d55",title:"CASA SIMPSON"},
 {x:1680,y:335,w:385,h:275,roof:"#8866b8",title:"ESCUELA"},
 {x:1640,y:1130,w:385,h:275,roof:"#e45c65",title:"KWIK-E-MART"},
@@ -168,6 +175,45 @@ function npc(x,y,name,color){
 oval(x,y+3,20,7,"#557a4b");box(x-15,y-59,30,42,color);box(x-12,y-18,10,21,"#405fa5");box(x+3,y-18,10,21,"#405fa5");
 oval(x,y-76,17,20,"#f7c66e","#4c3d30",2);oval(x-6,y-78,5,6,"#fff");oval(x+6,y-78,5,6,"#fff");oval(x-5,y-76,2,2,"#111");oval(x+7,y-76,2,2,"#111");
 words(name,x,y-113,14,"#f6fff0")}
+// Interiores: pared rosa, piso verde y los seis objetos PNG sin fondo del living.
+function asset(name,x,y,w,h){
+var a=furniture[name];if(a&&a.ready){ctx.drawImage(a.img,x,y,w,h);return}
+ctx.save();
+if(name==="alfombra"){oval(x+w/2,y+h/2,w/2,h/2,"#df678e");oval(x+w/2,y+h/2,w*.38,h*.38,"#9253ac");oval(x+w/2,y+h/2,w*.25,h*.26,"#4db4ce");oval(x+w/2,y+h/2,w*.12,h*.13,"#f2a25e")}
+else if(name==="sofa"){box(x+10,y+25,w-20,h-25,"#ae5f1d");oval(x+w/2,y+65,w*.46,h*.31,"#bd751e","#734319",4);box(x+40,y+h*.57,w-80,h*.28,"#c27a29")}
+else if(name==="mesa"){box(x+25,y+h*.33,w-50,h*.66,"#774a87");box(x,y+h*.48,w,20,"#9c6ba6");box(x+18,y+h*.13,34,h*.35,"#cf903d");oval(x+35,y+h*.11,27,22,"#864799");box(x+w*.54,y+h*.38,60,32,"#36b1a4")}
+else if(name==="lampara"){box(x+w*.6,y+40,9,h-40,"#86539c");oval(x+w*.63,y+h-6,w*.20,10,"#85539c");ctx.fillStyle="#a66120";ctx.fillRect(x,y,w*.52,h*.18)}
+else if(name==="cuadro"){box(x,y,w,h,"#c99b5c");box(x+8,y+8,w-16,h-16,"#66c9d9");ctx.fillStyle="white";ctx.beginPath();ctx.moveTo(x+w*.5,y+15);ctx.lineTo(x+w*.27,y+h*.65);ctx.lineTo(x+w*.68,y+h*.65);ctx.fill();box(x+w*.3,y+h*.65,w*.5,14,"#ad4b24")}
+else if(name==="televisor"){box(x,y,w,h,"#435072");box(x+12,y+22,w*.62,h*.7,"#697da5");box(x+w*.78,y+20,12,h*.65,"#313952")}
+ctx.restore()
+}
+function drawInside(){
+box(0,0,W,375,"#cf8798");box(0,375,W,H-375,"#148d77");
+box(0,366,W,14,"#b9677e");box(0,379,W,9,"#0d6a5c");
+box(0,0,14,H,"#b46c80");box(W-14,0,14,H,"#b46c80");
+asset("cuadro",361,47,228,181);
+asset("alfombra",245,376,500,150);
+asset("sofa",308,211,400,218);
+asset("mesa",105,188,188,263);
+asset("lampara",735,104,142,286);
+asset("televisor",693,402,240,125);
+box(428,525,105,15,"#c59a53");words("SALIDA",480,519,13,"#fff2c8");
+}
+function indoorBlocked(x,y){
+if(x<45||x>915||y<260||y>513)return true;
+if(x>305&&x<699&&y>298&&y<406)return true; // respaldo y asiento
+if(x>112&&x<287&&y>330&&y<438)return true; // mesa
+if(x>742&&x<863&&y>330&&y<412)return true; // lampara
+if(x>688&&x<934&&y>445&&y<522)return true; // televisor
+return false
+}
+function nearHouseDoor(){return !indoors&&Math.hypot(px-frontDoor.x,py-frontDoor.y)<83}
+function toggleHouse(){
+if(!indoors){if(!nearHouseDoor()){show("Acercate a la puerta de CASA SIMPSON.",3);return}
+returnX=px;returnY=py;px=480;py=475;indoors=true;camX=0;camY=0;placeName.textContent="Living de los Simpson";show("¡Entraste a casa! Mirá el sillón, el cuadro, la mesa, la lámpara y la TV.",4)}
+else{px=returnX;py=returnY;indoors=false;placeName.textContent="Springfield";show("Volviste a Springfield.",3)}
+target=null;Object.keys(key).forEach(function(k){key[k]=false});enterButton.textContent=indoors?"SALIR DE CASA":"ENTRAR A CASA";
+}
 function blocked(x,y){
 if(x<30||y<30||x>MW-30||y>MH-30)return true;
 if(Math.hypot(x-395,y-223)<235)return true;
@@ -175,6 +221,7 @@ for(var i=0;i<homes.length;i++){var h=homes[i];if(x>h.x+15&&x<h.x+h.w-15&&y>h.y+
 return false}
 function show(s,sec){toast.textContent=s;toast.classList.add("show");notice=anim+(sec||3)}
 function talk(){
+if(indoors){show("Homero: ¡Mi sillón! D\u0027oh... ¿Dónde está el control remoto?",4);return}
 if(Math.hypot(px-1830,py-1450)<270){show("Apu: ¡Hoy tenemos donas fresquitas!",4);return}
 if(Math.hypot(px-740,py-680)<270){show("¡D'oh! Llegué a casa.",3);return}
 show("Acercate a la tienda o a la casa para hablar.",3)}
@@ -183,20 +230,24 @@ var dx=(key.right?1:0)-(key.left?1:0),dy=(key.down?1:0)-(key.up?1:0);
 if(dx||dy)target=null;
 if(!dx&&!dy&&target){dx=target.x-px;dy=target.y-py;if(Math.hypot(dx,dy)<13){target=null;dx=dy=0}}
 var mag=Math.hypot(dx,dy),walking=mag>0.001;avatar.classList.toggle("walk",walking);
-if(walking){dx/=mag;dy/=mag;var speed=(shift||run?355:205)*dt;if(!blocked(px+dx*speed,py))px+=dx*speed;
-if(!blocked(px,py+dy*speed))py+=dy*speed;
+if(walking){dx/=mag;dy/=mag;var speed=(shift||run?355:205)*dt;if(!(indoors?indoorBlocked(px+dx*speed,py):blocked(px+dx*speed,py)))px+=dx*speed;
+if(!(indoors?indoorBlocked(px,py+dy*speed):blocked(px,py+dy*speed)))py+=dy*speed;
 var d=Math.abs(dx)>Math.abs(dy)?(dx>0?"right":"left"):(dy>0?"down":"up");
 if(d!==dir){dir=d;avatar.style.filter=(dir==="left"?"drop-shadow(0 4px 2px #142a2c80)":"drop-shadow(0 4px 2px #142a2c80)")}
 }
-for(var j=0;j<donuts.length;j++)if(!got[j]&&Math.hypot(px-donuts[j].x,py-donuts[j].y)<40){
+for(var j=0;j<donuts.length;j++)if(!indoors&&!got[j]&&Math.hypot(px-donuts[j].x,py-donuts[j].y)<40){
 got[j]=true;count++;score.textContent="🍩 Donas: "+count+" / 8";
 show(count===8?"¡Completaste las 8 donas de Springfield!":"¡Dona conseguida! "+count+" / 8",3)}
+if(indoors){camX=0;camY=0}else{
 camX+=(Math.max(0,Math.min(MW-W,px-W*.5))-camX)*Math.min(1,dt*7);
-camY+=(Math.max(0,Math.min(MH-H,py-H*.55))-camY)*Math.min(1,dt*7);
+camY+=(Math.max(0,Math.min(MH-H,py-H*.55))-camY)*Math.min(1,dt*7)}
+var canEnter=indoors||nearHouseDoor();enterButton.style.display=canEnter?"inline-block":"none";
 if(notice>0&&anim>notice){toast.classList.remove("show");notice=0}
 }
 function render(){
-ctx.clearRect(0,0,W,H);ctx.save();ctx.translate(-Math.round(camX),-Math.round(camY));
+ctx.clearRect(0,0,W,H);
+if(indoors){drawInside();avatar.style.left=px/W*100+"%";avatar.style.top=py/H*100+"%";return}
+ctx.save();ctx.translate(-Math.round(camX),-Math.round(camY));
 ground();pond();for(var i=0;i<homes.length;i++)house(homes[i]);for(var j=0;j<trees.length;j++)tree(trees[j]);plaza();
 for(var k=0;k<donuts.length;k++)if(!got[k])donut(donuts[k],k);
 npc(1610,930,"NED","#86a66b");npc(945,945,"LISA","#d56b63");npc(795,1110,"MOE","#557fa8");
@@ -205,7 +256,7 @@ avatar.style.left=(px-camX)/W*100+"%";avatar.style.top=(py-camY)/H*100+"%";
 }
 function tick(ms){var dt=Math.min(.045,(ms-last)/1000||.016);last=ms;anim+=dt;update(dt);render();requestAnimationFrame(tick)}
 var mapping={ArrowUp:"up",ArrowDown:"down",ArrowLeft:"left",ArrowRight:"right",KeyW:"up",KeyS:"down",KeyA:"left",KeyD:"right"};
-window.addEventListener("keydown",function(e){if(mapping[e.code]){key[mapping[e.code]]=true;e.preventDefault()}if(e.code==="ShiftLeft"||e.code==="ShiftRight")shift=true;if(e.code==="KeyE")talk()});
+window.addEventListener("keydown",function(e){if(mapping[e.code]){key[mapping[e.code]]=true;e.preventDefault()}if(e.code==="ShiftLeft"||e.code==="ShiftRight")shift=true;if(e.code==="KeyE")talk();if(e.code==="KeyF"&&!e.repeat)toggleHouse()});
 window.addEventListener("keyup",function(e){if(mapping[e.code]){key[mapping[e.code]]=false;e.preventDefault()}if(e.code==="ShiftLeft"||e.code==="ShiftRight")shift=false});
 window.addEventListener("blur",function(){Object.keys(key).forEach(function(k){key[k]=false});shift=false});
 document.querySelectorAll("[data-dir]").forEach(function(b){
@@ -232,8 +283,10 @@ b.addEventListener("lostpointercapture",release);
 });
 document.getElementById("run").addEventListener("click",function(){run=!run;this.classList.toggle("active",run);this.textContent=run?"CORRIENDO":"CORRER"});
 document.getElementById("talk").addEventListener("click",talk);
-cv.addEventListener("pointerdown",function(e){var r=cv.getBoundingClientRect();target={x:(e.clientX-r.left)/r.width*W+camX,y:(e.clientY-r.top)/r.height*H+camY}});
-camX=px-W/2;camY=py-H*.55;show("Tocá una flecha para caminar. Mantenela apretada para seguir.",5);requestAnimationFrame(tick);
+enterButton.addEventListener("click",toggleHouse);
+cv.addEventListener("pointerdown",function(e){var r=cv.getBoundingClientRect();var tx=(e.clientX-r.left)/r.width*W+camX,ty=(e.clientY-r.top)/r.height*H+camY;
+if(indoors&&tx>428&&tx<533&&ty>490){toggleHouse();return}target={x:tx,y:ty}});
+camX=px-W/2;camY=py-H*.55;show("Caminá por Springfield y entrá a casa Simpson por la puerta.",5);requestAnimationFrame(tick);
 })();
 </script>
 </body></html>
