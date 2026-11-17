@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="298" height="342" viewBox="0 0 298 342">
+<defs>
+<linearGradient id="black" x2="1" y2="1"><stop stop-color="#555066"/><stop offset=".42" stop-color="#272535"/><stop offset="1" stop-color="#12131f"/></linearGradient>
+<linearGradient id="cream" x2="1" y2="1"><stop stop-color="#fff4dc"/><stop offset="1" stop-color="#d9bea9"/></linearGradient>
+<linearGradient id="red" x2=".8" y2="1"><stop stop-color="#f67b7b"/><stop offset=".5" stop-color="#c63253"/><stop offset="1" stop-color="#852344"/></linearGradient>
+<linearGradient id="gold" x2="1" y2="1"><stop stop-color="#fff4b4"/><stop offset=".5" stop-color="#db9f40"/><stop offset="1" stop-color="#986123"/></linearGradient>
+<pattern id="stripes" width="20" height="27" patternUnits="userSpaceOnUse"><rect width="20" height="27" fill="#f6e8d6"/><path d="M0 0h20v12H0Z" fill="#252330"/></pattern>
+</defs>
+<!-- Boina francesa, ubicada sobre la cabeza sin cubrir el rostro -->
+<g id="boina" transform="rotate(-12 160 51)">
+<path d="M105 56Q119 6 179 11Q226 12 231 48Q226 65 177 75Q123 83 100 69Z" fill="url(#black)" stroke="#1b1824" stroke-width="3"/>
+<path d="M115 56Q151 38 218 50" stroke="#847682" stroke-width="3" opacity=".5" fill="none"/>
+<path d="M169 19Q171 5 164 2" stroke="#24202c" stroke-width="8" stroke-linecap="round" fill="none"/>
+<path d="M142 47Q120 39 118 56Q124 71 143 59L159 56Q179 73 185 50Q174 35 157 50Z" fill="url(#red)" stroke="#8e233f" stroke-width="2"/>
+<circle cx="152" cy="53" r="7" fill="url(#gold)" stroke="#fff0c1" stroke-width="1.5"/>
+<path d="M150 52q2-5 5 0l-3 4Z" fill="#9d3151"/>
+</g>
+<!-- Vestido de rayas marineras con cuello -->
+<g id="vestido">
+<path d="M115 176Q97 174 90 197Q86 211 99 219L117 213Q131 235 217 218L242 227Q251 203 233 186L218 176Z" fill="url(#stripes)" stroke="#2a2530" stroke-width="2.2"/>
+<path d="M116 207L104 245Q95 257 84 289Q111 314 167 321Q224 322 260 293L231 243L218 207Z" fill="url(#black)" stroke="#242231" stroke-width="3"/>
+<path d="M101 291Q124 305 157 307Q215 315 247 294" fill="none" stroke="#efdcc5" stroke-width="5"/>
+<path d="M111 244L96 285M139 245L135 311M181 247L193 314M213 244L243 296" stroke="#817381" stroke-width="2" opacity=".56"/>
+<path d="M112 173Q141 161 164 183Q180 159 225 175Q215 201 170 199L163 194Q134 204 113 182Z" fill="url(#cream)" stroke="#282532" stroke-width="3"/>
+<path d="M124 175Q151 167 161 190M211 174Q181 168 172 193" fill="none" stroke="#fffef1" stroke-width="3" opacity=".65"/>
+<circle cx="166" cy="206" r="5" fill="url(#gold)"/><circle cx="169" cy="222" r="5" fill="url(#gold)"/>
+<path d="M108 237Q167 246 223 237" fill="none" stroke="#181824" stroke-width="15"/>
+<rect x="168" y="230" width="16" height="16" rx="4" fill="url(#gold)" stroke="#5f433e" stroke-width="2"/>
+<!-- lazo rojo -->
+<path d="M208 243Q183 222 186 255Q193 271 215 256L224 249Q247 274 252 253Q254 228 227 242Z" fill="url(#red)" stroke="#8e263f" stroke-width="2"/>
+<path d="M218 250L212 284L228 275L238 283L232 250" fill="url(#red)" stroke="#8e263f" stroke-width="2"/>
+<ellipse cx="221" cy="249" rx="9" ry="8" fill="#cf4360"/>
+</g>
+<!-- Zapatos discretos debajo del vestido -->
+<g id="zapatos">
+<path d="M98 316Q85 321 89 338Q104 346 130 337L141 323Z" fill="url(#black)" stroke="#1c1c2c" stroke-width="3"/>
+<path d="M198 324Q211 335 241 339Q250 327 238 316L210 308Z" fill="url(#black)" stroke="#1c1c2c" stroke-width="3"/>
+<path d="M95 324H129M214 324H241" stroke="url(#gold)" stroke-width="5"/>
+<path d="M103 327l-10-7v12zm3 0l12-7v12M221 326l-10-7v12zm3 0l12-7v12" fill="#c52e4f"/>
+</g>
+<!-- Bolso con asa y cadena dorada, junto a una mano -->
+<g id="bolso" transform="translate(40 221) rotate(8 46 42)">
+<path d="M17 23Q20 -4 45 -3Q71 -4 74 23" fill="none" stroke="#3d3645" stroke-width="10"/>
+<path d="M17 23Q20 -4 45 -3Q71 -4 74 23" fill="none" stroke="#c6a57a" stroke-width="2"/>
+<path d="M10 26Q6 20 3 39L5 76Q44 88 85 75L87 31Q82 20 72 22Z" fill="url(#black)" stroke="#b58a59" stroke-width="3"/>
+<path d="M9 28Q45 44 82 29L78 49Q43 68 13 49Z" fill="#3e3646" stroke="url(#gold)" stroke-width="2"/>
+<path d="M13 58L77 75M14 75L76 58M16 36L70 63M19 64L69 36" stroke="#a3a0a9" stroke-width="1" opacity=".33"/>
+<path d="M3 34Q-5 48 7 62" fill="none" stroke="#d7b170" stroke-width="4" stroke-dasharray="4 2"/>
+<path d="M42 43Q38 38 33 43Q32 48 45 57Q60 47 56 42Q50 37 45 44Z" fill="url(#gold)" stroke="#fce3b0" stroke-width="1"/>
+</g>
+<!-- Pequeña baguette a la derecha (elemento parisino) -->
+<g id="baguette" transform="translate(255 237) rotate(32)">
+<rect x="-13" y="-31" width="25" height="84" rx="12" fill="#d78b3a" stroke="#ac6533" stroke-width="2"/>
+<path d="M-5-19L8-7M-5-2L8 10M-5 15L8 27M-5 31L8 42" stroke="#fff0bc" stroke-width="5" stroke-linecap="round"/>
+<path d="M-11-14Q-15 10 -11 35" stroke="#f4be75" stroke-width="3" fill="none"/>
+</g>
+</svg>
