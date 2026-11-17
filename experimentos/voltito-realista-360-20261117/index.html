@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5">
+<meta name="theme-color" content="#092b32">
+<title>Voltito realista · Giro 360°</title>
+<style>
+:root{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#effffc;background:#0a242c}
+*{box-sizing:border-box}
+body{margin:0;min-height:100dvh;background:radial-gradient(ellipse at 50% 5%,#276a71 0%,#0b303b 48%,#081e27 100%);display:flex;justify-content:center;align-items:center}
+main{width:100%;max-width:850px;margin:auto;padding:15px}
+.panel{position:relative;border:1px solid #b0eee330;border-radius:25px;overflow:hidden;box-shadow:0 24px 60px #0006;background:radial-gradient(ellipse at 50% 37%,#397d81 0%,#205b67 30%,#0d333f 70%,#0a222d 100%)}
+.panel:before{content:"";pointer-events:none;position:absolute;inset:0;background:radial-gradient(ellipse at 48% 44%,#fff8 0%,transparent 45%);opacity:.1}
+.header{display:flex;gap:10px;justify-content:space-between;align-items:center;padding:16px 19px 4px;position:relative;z-index:2}
+h1{margin:0;font-size:clamp(23px,4.8vw,34px);letter-spacing:.11em;font-weight:900;color:#fff2ae;line-height:1.1}
+.desc{font-size:12px;color:#b4e4e0;margin-top:5px}
+.tag{font-size:11px;color:#cbffec;background:#1ca59a34;border:1px solid #7be6d066;border-radius:100px;padding:7px 10px;text-align:center}
+.stage{position:relative;height:min(66vh,590px);min-height:350px;touch-action:none;user-select:none;-webkit-user-select:none;cursor:grab}
+.stage:active{cursor:grabbing}
+#scene{width:100%;height:100%;display:block;touch-action:none}
+.loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#f6fffa;font-size:15px;text-align:center;padding:30px;background:#102a36;z-index:4}
+.hidden{display:none!important}
+.floating{position:absolute;left:50%;transform:translateX(-50%);bottom:13px;white-space:nowrap;color:#c5eae4;background:#092b37aa;border:1px solid #8fdad144;border-radius:50px;padding:8px 16px;font-size:12px;pointer-events:none}
+.controls{padding:15px 18px 17px;background:#0a222de8;border-top:1px solid #88ddd02e;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px}
+.sliderWrap{display:flex;align-items:center;gap:11px;min-width:0}
+input[type=range]{flex:1;min-width:0;accent-color:#50decd;touch-action:pan-y}
+.degree{min-width:45px;font-size:14px;font-weight:800;color:#ffe7a8;font-variant-numeric:tabular-nums;text-align:right}
+.buttons{display:flex;gap:8px}
+button{border:1px solid #7ac9be65;border-radius:11px;background:#205663;color:#ecfffe;font-weight:750;padding:10px 13px;cursor:pointer;white-space:nowrap}
+button:focus-visible,input:focus-visible{outline:2px solid #ffe9a0;outline-offset:3px}
+.status{text-align:center;font-size:12px;color:#b8e3dd;margin:2px 0 0}
+.notes{font-size:12px;color:#b3d6d5;line-height:1.5;text-align:center;max-width:720px;margin:12px auto 2px}
+.links{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;padding:6px 0}
+.links a{color:#afeadf;font-size:12px;text-decoration:underline;text-underline-offset:3px}
+@media(max-width:500px){main{padding:0}.panel{border-radius:0;min-height:100dvh}.header{padding-top:18px}.stage{height:63dvh;min-height:320px}.controls{grid-template-columns:1fr}.buttons{justify-content:center}.tag{font-size:10px}.floating{font-size:11px}.notes{padding:0 10px}}
+</style>
+</head>
+<body>
+<main>
+<section class="panel">
+<header class="header">
+<div><h1>VOLTITO</h1><div class="desc">La misma criatura eléctrica · cuatro ángulos de referencia</div></div>
+<div class="tag">Giro 360°<br>con el dedo</div>
+</header>
+<div id="stage" class="stage" role="img" aria-label="Visor giratorio de Voltito, frente, perfiles y espalda">
+<canvas id="scene"></canvas>
+<div id="loading" class="loading">Preparando las vistas de Voltito…</div>
+<div class="floating">↔ Deslizá para girarlo</div>
+</div>
+<div class="controls">
+<div class="sliderWrap"><input id="angle" type="range" min="0" max="360" step="1" value="0" aria-label="Ángulo del giro"><strong id="degree" class="degree">0°</strong></div>
+<div class="buttons"><button type="button" id="play">▶ Girar</button><button type="button" id="front">Frente</button></div>
+</div>
+<p id="status" class="status" aria-live="polite">Frente</p>
+</section>
+<p class="notes">Reproduce exactamente las cuatro vistas de la lámina original, con recortes PNG transparentes. Es una <strong>rotación visual simulada</strong> a partir de esas vistas; para un modelo 3D geométrico real hace falta reconstruir su volumen.</p>
+<div class="links"><a href="./voltito-hoja-original.png" target="_blank" rel="noopener">Ver lámina original</a><a href="./vista-previa.png" target="_blank" rel="noopener">Ver cuatro vistas</a></div>
+</main>
+<script>
+(()=>{
+"use strict";
+const canvas=document.getElementById("scene"),stage=document.getElementById("stage"),ctx=canvas.getContext("2d",{alpha:true});
+const range=document.getElementById("angle"),degree=document.getElementById("degree"),play=document.getElementById("play"),front=document.getElementById("front"),status=document.getElementById("status"),loading=document.getElementById("loading");
+const names=["Frente","Perfil izquierdo","Espalda","Perfil derecho"];
+const paths=["voltito-frente.png","voltito-izquierda.png","voltito-espalda.png","voltito-derecha.png"];
+let angle=0,autoplay=false,down=false,px=0,last=null,images=[],ready=0;
+function update(a){
+ angle=((a%360)+360)%360;
+ range.value=Math.round(angle);
+ degree.textContent=Math.round(angle)+"°";
+ let id=Math.round(angle/90)%4;
+ status.textContent=names[id];
+ render();
+}
+function drawFrame(img,cx,cy,sc,alpha,lean){
+ if(!img||!img.complete||!img.naturalWidth||alpha<=0)return;
+ ctx.save();
+ ctx.translate(cx,cy);
+ ctx.transform(sc,0,lean,1,0,0);
+ ctx.globalAlpha=alpha;
+ const h=Math.min(canvas.clientHeight*.92,560),w=h*460/560;
+ ctx.drawImage(img,-w/2,-h*.88,w,h);
+ ctx.restore();
+}
+function render(){
+ if(!ctx)return;
+ const dpr=Math.min(window.devicePixelRatio||1,2);
+ const width=Math.max(1,Math.floor(canvas.clientWidth*dpr)),height=Math.max(1,Math.floor(canvas.clientHeight*dpr));
+ if(width!==canvas.width||height!==canvas.height){canvas.width=width;canvas.height=height;}
+ ctx.setTransform(dpr,0,0,dpr,0,0);
+ const w=canvas.clientWidth,h=canvas.clientHeight;
+ ctx.clearRect(0,0,w,h);
+ const cy=h*.86,cx=w/2;
+ // Soft floor shadow below the character
+ const shadow=ctx.createRadialGradient(cx,cy-1,4,cx,cy-1,w*.36);
+ shadow.addColorStop(0,"#000a");shadow.addColorStop(.58,"#0003");shadow.addColorStop(1,"#0000");
+ ctx.save();ctx.translate(cx,cy+9);ctx.scale(1,.12);ctx.fillStyle=shadow;ctx.beginPath();ctx.arc(0,0,w*.36,0,2*Math.PI);ctx.fill();ctx.restore();
+ const k=angle/90,base=Math.floor(k)%4,fraction=k-Math.floor(k),next=(base+1)%4;
+ // Perspective cue between cardinal viewpoints; short fade around halfway
+ const contraction=1-.13*Math.sin(fraction*Math.PI);
+ const lean=.045*Math.sin(k*Math.PI/2);
+ const centerX=cx+Math.sin(k*Math.PI/2)*w*.015;
+ const mix=Math.max(0,Math.min(1,(fraction-.36)/.28));
+ const t=mix*mix*(3-2*mix);
+ drawFrame(images[base],centerX,cy,contraction,1-t,lean);
+ drawFrame(images[next],centerX,cy,contraction,t,lean);
+}
+function setPlay(v){autoplay=v;play.textContent=v?"Ⅱ Pausar":"▶ Girar"}
+function pointerStart(e){down=true;setPlay(false);px=e.clientX;stage.setPointerCapture?.(e.pointerId)}
+function pointerMove(e){if(!down)return;let dx=e.clientX-px;px=e.clientX;update(angle+dx*.85);}
+function pointerStop(){down=false}
+stage.addEventListener("pointerdown",pointerStart);
+stage.addEventListener("pointermove",pointerMove);
+stage.addEventListener("pointerup",pointerStop);
+stage.addEventListener("pointercancel",pointerStop);
+range.addEventListener("input",()=>{setPlay(false);update(+range.value)});
+play.addEventListener("click",()=>setPlay(!autoplay));
+front.addEventListener("click",()=>{setPlay(false);update(0)});
+window.addEventListener("resize",render,{passive:true});
+function tick(t){if(last!==null&&autoplay)update(angle+Math.min(50,t-last)*.025);last=t;requestAnimationFrame(tick)}
+const loads=paths.map(name=>new Promise(resolve=>{
+ const img=new Image();img.decoding="async";
+ img.onload=()=>{ready++;resolve(img)};
+ img.onerror=()=>resolve(null);
+ img.src="./"+name;
+}));
+Promise.all(loads).then(result=>{
+ images=result;
+ const missing=result.filter(x=>!x).length;
+ loading.classList.add("hidden");
+ if(missing){status.textContent="No se pudieron cargar todas las vistas. Abrí este visor desde el enlace público del proyecto."; }
+ render();requestAnimationFrame(tick);
+});
+})();
+</script>
+</body>
+</html>
