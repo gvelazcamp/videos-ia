@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="es-UY">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<meta name="theme-color" content="#211f38"/>
+<title>Pikachu en París · La petite aventure</title>
+<meta name="description" content="Una postal animada de París: Pikachu con boina, vestido y accesorios chic, Torre Eiffel caricaturesca y paseo entre pétalos."/>
+<style>
+:root{color-scheme:dark;--ink:#fef4ed;--sub:#c4bacc;--pink:#eb9dbb;--gold:#ebc99c;--edge:#4b3f64}
+*{box-sizing:border-box}html{min-width:0;scroll-behavior:smooth}body{margin:0;min-width:0;background:radial-gradient(circle at 40% -20%,#694964 0,transparent 42%),#171728;color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}button,a{font:inherit}a{color:#ffe2ba;text-underline-offset:4px}
+button:focus-visible,a:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.wrapper{max-width:1220px;margin:0 auto;padding:25px clamp(12px,3.5vw,32px) 36px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:23px;flex-wrap:wrap}
+.brand{font-size:11px;letter-spacing:.17em;text-transform:uppercase;font-weight:850;display:flex;align-items:center;gap:9px;color:#ead7e5}.brand .mark{display:grid;place-items:center;width:31px;height:31px;border-radius:10px;background:#b75882;color:#fff6cf;font-size:18px}
+header small{font-size:11px;color:#cbb6cb;text-transform:uppercase;letter-spacing:.1em}
+.intro{margin-bottom:19px}h1{font-size:clamp(40px,5.8vw,69px);font-family:Georgia,serif;letter-spacing:-.045em;font-weight:500;line-height:1.03;margin:0 0 12px}h1 em{color:#f4b0ca;font-style:italic}.intro p{font-size:14px;color:#d0c0d0;margin:0;max-width:820px;line-height:1.65}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 292px;gap:18px;align-items:start}
+.scene{aspect-ratio:1400/900;position:relative;isolation:isolate;overflow:hidden;border:1px solid #785670;border-radius:22px;box-shadow:0 23px 64px #08060c9f;background:#a2a9d4;--step:0px;--bob:0px;--tilt:0deg}
+.scene>.landscape{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:53% 50%;z-index:0;filter:saturate(.99);animation:background-move 18s ease-in-out infinite alternate}
+.scene:before{content:"";position:absolute;inset:0;pointer-events:none;z-index:1;background:linear-gradient(180deg,#4f416200 35%,#5142520e 57%,#49394b45 100%)}
+.scene.night>.landscape{filter:brightness(.69) saturate(.95) hue-rotate(10deg)}
+.sunshine{position:absolute;inset:0;z-index:2;pointer-events:none;background:radial-gradient(ellipse at 71% 19%,#ffe8b057,transparent 40%);mix-blend-mode:screen}
+.scene.night .sunshine{opacity:.3}
+.title-in-scene{position:absolute;z-index:8;left:5%;top:5%;font:italic clamp(29px,4.5vw,55px)/1.1 Georgia,serif;color:#fff4e1;text-shadow:0 3px 13px #5b425999;transform:rotate(-4deg);pointer-events:none}
+.title-in-scene span{display:block;font:bold 10px/2 system-ui,sans-serif;font-style:normal;letter-spacing:.25em;color:#fff1e2}
+#petals{position:absolute;z-index:7;inset:0;width:100%;height:100%;pointer-events:none}
+.shadow{position:absolute;z-index:3;width:24%;height:4%;left:37%;bottom:11.7%;border-radius:50%;background:#55465865;filter:blur(9px);transform:translateX(var(--step));pointer-events:none}
+.pikachu{position:absolute;z-index:5;width:31%;max-width:330px;aspect-ratio:298/342;bottom:10.5%;left:37%;transform:translate3d(calc(-50% + var(--step)),var(--bob),0) rotate(var(--tilt));transform-origin:50% 94%;will-change:transform}
+.pikachu img{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;display:block;user-select:none;-webkit-user-drag:none;pointer-events:none}
+.pikachu .original{filter:drop-shadow(2px 9px 9px #35263e7d)}
+.pikachu .outfit{z-index:1}
+.pikachu.no-outfit .outfit{display:none}
+.merci{position:absolute;z-index:9;top:13%;left:20%;font:bold clamp(13px,2vw,19px) Georgia,serif;background:#fff8efef;color:#76516d;border:3px solid #f2bcda;border-radius:21px;padding:9px 13px;box-shadow:0 7px 0 #aa7b9944;transform:translate(-50%,15px) rotate(-7deg) scale(.9);opacity:0;pointer-events:none}
+.merci.show{animation:bonjour 1.6s ease-out}
+.bottom-stamp{position:absolute;bottom:13px;left:14px;z-index:9;font-size:10px;letter-spacing:.13em;text-transform:uppercase;font-weight:850;background:#493e60bf;color:#fff4e8;padding:10px 13px;border:1px solid #fff9e25c;border-radius:30px;backdrop-filter:blur(7px)}
+.lamp-caption{position:absolute;bottom:16px;right:17px;z-index:9;font:italic 18px Georgia,serif;color:#fff8e9;text-shadow:0 2px 7px #453447b5}
+.panel{background:linear-gradient(147deg,#30263f,#242137 78%);border:1px solid #60506e;border-radius:22px;padding:21px 19px;box-shadow:0 12px 34px #0e091d3e}
+.kicker{font-size:10px;font-weight:900;letter-spacing:.17em;color:#ffbbce;text-transform:uppercase;margin-bottom:12px}
+.panel h2{font:normal 29px/1.15 Georgia,serif;letter-spacing:-.02em;margin:0 0 10px}
+.panel p{color:#d3c2d4;font-size:12px;line-height:1.7;margin:0 0 16px}
+.control{display:flex;gap:9px;align-items:center;width:100%;min-height:47px;border:1px solid #655875;background:#433652;color:#fff6ef;border-radius:13px;padding:11px 13px;margin:9px 0 0;text-align:left;font-size:12px;font-weight:780;transition:transform .15s ease,background .15s}
+.control:hover{background:#554667;transform:translateY(-1px)}
+.control.primary{background:#f3b8c8;color:#49283f;border-color:#f7ced9;justify-content:center;font-size:13px;font-weight:900}
+.control.primary:hover{background:#ffccda}
+.control[aria-pressed="true"]:not(.primary){border-color:#ffcbd9;background:#62435e}
+.control span.icon{font-size:17px}
+.stats{margin-top:18px;border-top:1px solid #66546f;padding-top:13px;display:grid;gap:10px}
+.stats div{display:flex;justify-content:space-between;gap:12px;font-size:11px;color:#bcb0c5}
+.stats strong{font-weight:750;color:#f4dde9;text-align:right}
+.links{border-top:1px solid #66546f;margin-top:17px;padding-top:14px;display:flex;flex-direction:column;gap:9px;font-size:12px}
+.foot{font-size:11px;color:#bcaec2;line-height:1.75;max-width:940px;margin:16px 4px 0}
+.foot b{color:#f0c9df}
+body.paused .landscape{animation-play-state:paused}
+@keyframes background-move{from{transform:scale(1.025) translateX(-.45%)}to{transform:scale(1.05) translateX(.4%)}}
+@keyframes bonjour{0%{opacity:0;transform:translate(-50%,20px) rotate(-7deg) scale(.83)}20%,76%{opacity:1;transform:translate(-50%,0) rotate(-7deg) scale(1)}100%{opacity:0;transform:translate(-50%,-10px) rotate(-7deg) scale(.95)}}
+@media(max-width:920px){.layout{grid-template-columns:1fr}.panel{display:grid;grid-template-columns:1fr 1fr;gap:3px 10px}.panel h2,.panel p,.panel .kicker,.panel .stats,.panel .links{grid-column:1/-1}.panel p{margin-bottom:7px}.panel .control{margin-top:5px}}
+@media(max-width:540px){.wrapper{padding:14px 9px 26px}header{margin-bottom:14px}header small{display:none}h1{font-size:43px}.intro p{font-size:12px}.scene{aspect-ratio:3/4;border-radius:16px}.scene>.landscape{object-position:55% 50%}.pikachu{width:58%;max-width:260px;left:35%;bottom:10.5%}.shadow{width:42%;left:35%;bottom:10%}.title-in-scene{left:5%;top:5%;font-size:39px}.bottom-stamp{font-size:8px;bottom:10px;left:8px;padding:8px}.lamp-caption{font-size:12px;right:9px;bottom:15px}.merici{top:9%}.panel{padding:15px}.panel h2{font-size:26px}.panel .control{font-size:11px;padding:9px;min-height:44px}}
+@media(prefers-reduced-motion:reduce){.landscape{animation:none!important}}
+</style>
+</head>
+<body>
+<main class="wrapper">
+<header><div class="brand"><span class="mark">✦</span> CUATRO · Laboratorio de imágenes</div><small>Experimento 03 · París</small></header>
+<section class="intro"><h1>Bonjour, <em>París.</em></h1><p>Una aventura parisina de Pikachu: boina con moño, vestido marinero, bolsito y baguette, frente a una Torre Eiffel de cuento. El personaje original sigue siendo la misma imagen transparente.</p></section>
+<div class="layout">
+<section class="scene" id="scene" aria-label="Escena caricaturesca de París con Torre Eiffel y Pikachu vestido de estilo parisino">
+<img class="landscape" src="./escenario-paris.svg" alt="París de caricatura, Torre Eiffel ilustrada, café, río Sena, árboles rosados y faroles" width="1400" height="900">
+<div class="sunshine"></div>
+<div class="title-in-scene">La vie est belle <span>UNE PETITE AVENTURE À PARIS</span></div>
+<div class="shadow" id="shadow"></div>
+<div class="pikachu" id="pika" role="img" aria-label="Pikachu original con boina negra, vestido a rayas y accesorios parisinos">
+<img class="original" id="original" src="../pikachu-castillo-terror/personaje-removebg-web.png" width="298" height="342" alt="">
+<img class="outfit" id="outfit" src="./accesorios-paris.svg" width="298" height="342" alt="">
+</div>
+<div class="merci" id="bonjour">Bonjour ! ♡</div>
+<canvas id="petals" aria-hidden="true"></canvas>
+<div class="bottom-stamp">✦ París · Escena animada</div><div class="lamp-caption">Mon petit rêve</div>
+</section>
+<aside class="panel">
+<div class="kicker">Petite collection · París</div><h2>Un look para<br>pasear por París.</h2>
+<p>El personaje conserva la cara y sus proporciones originales. La ropa es una capa dibujada por separado para que puedas ponerla o sacarla sin afectar la imagen.</p>
+<button id="play" class="control primary" type="button" aria-pressed="true"><span class="icon">❚❚</span> Pausar paseo</button>
+<button id="clothes" class="control" type="button" aria-pressed="true"><span class="icon">♛</span> Quitar accesorios</button>
+<button id="night" class="control" type="button" aria-pressed="false"><span class="icon">☾</span> París de noche</button>
+<button id="hello" class="control" type="button"><span class="icon">♡</span> Decir bonjour</button>
+<div class="stats"><div><span>Escenario</span><strong>Torre Eiffel · ilustración SVG</strong></div><div><span>Personaje</span><strong>PNG original transparente</strong></div><div><span>Vestuario</span><strong>SVG independiente</strong></div><div><span>Animación</span><strong>12 s en bucle</strong></div></div>
+<div class="links"><a href="./escenario-paris.svg" target="_blank" rel="noopener">Ver solo el escenario</a><a href="./accesorios-paris.svg" target="_blank" rel="noopener">Ver solo los accesorios</a><a href="https://github.com/gvelazcamp/videos-ia/tree/main/experimentos/pikachu-paris" target="_blank" rel="noopener">Ver archivos en GitHub</a></div>
+</aside>
+</div>
+<p class="foot"><b>Cómo está construido:</b> París y los accesorios se dibujaron como SVG caricaturescos en archivos separados, inspirados en el conjunto de boina, vestido a rayas y complementos elegido. El personaje es el PNG limpiado por remove.bg; no se modificaron sus rasgos. El movimiento actual es un paseo con balanceo de cuerpo completo, no una caminata articulada por piernas. Las pruebas de surf y castillo se conservaron.</p>
+</main>
+<script>
+(()=>{'use strict';
+const scene=document.getElementById('scene'),pika=document.getElementById('pika'),shadow=document.getElementById('shadow'),canvas=document.getElementById('petals'),ctx=canvas.getContext('2d');
+const play=document.getElementById('play'),clothes=document.getElementById('clothes'),night=document.getElementById('night'),hello=document.getElementById('hello'),bubble=document.getElementById('bonjour');
+const rand=x=>{const n=Math.sin(x*127.3+5.11)*43912.32;return n-Math.floor(n)};
+const petals=Array.from({length:30},(_,i)=>({x:rand(i+91),y:rand(i+6),s:.4+rand(i+29)*.85,r:1.5+rand(i+42)*3.7,o:.3+rand(i+24)*.4,p:rand(i+35)*6.3}));
+let playing=!window.matchMedia('(prefers-reduced-motion: reduce)').matches,clothed=true,nite=false,clock=0,last=0,w=1,h=1,dpr=1,helloTimer=0;
+function resize(){const rect=scene.getBoundingClientRect();w=rect.width;h=rect.height;dpr=Math.min(devicePixelRatio||1,2);canvas.width=Math.ceil(w*dpr);canvas.height=Math.ceil(h*dpr);ctx.setTransform(dpr,0,0,dpr,0,0)}
+new ResizeObserver(resize).observe(scene);
+function pose(t){const speed=Math.sin(t*Math.PI/6);const offset=speed*Math.min(44,w*.09);const bounce=Math.abs(Math.sin(t*7))*3.6;const lean=Math.sin(t*4)*1.8;
+pika.style.setProperty('--step',offset.toFixed(2)+'px');pika.style.setProperty('--bob',(-bounce).toFixed(2)+'px');pika.style.setProperty('--tilt',lean.toFixed(2)+'deg');scene.style.setProperty('--step',offset.toFixed(2)+'px')}
+function paint(t){ctx.clearRect(0,0,w,h);ctx.save();for(let i=0;i<petals.length;i++){const p=petals[i];const x=((p.x*w+t*p.s*18)%(w+35))-17;const y=((p.y*h+t*(p.s*5))%(h+15))-8;ctx.save();ctx.translate(x,y);ctx.rotate(t*.6+p.p);ctx.globalAlpha=p.o;ctx.fillStyle=i%3===0?'#fff0f3':'#f6afcf';ctx.beginPath();ctx.ellipse(0,0,p.r,p.r*1.8,Math.PI/4,0,Math.PI*2);ctx.fill();ctx.restore()}ctx.restore()}
+function frame(ts){if(!last)last=ts;const dt=Math.min(.05,(ts-last)/1000);last=ts;if(playing)clock=(clock+dt)%3600;pose(clock);paint(clock);requestAnimationFrame(frame)}
+function setPlay(on){playing=on;document.body.classList.toggle('paused',!on);play.setAttribute('aria-pressed',String(on));play.innerHTML=on?'<span class="icon">❚❚</span> Pausar paseo':'<span class="icon">▶</span> Reanudar paseo'}
+play.addEventListener('click',()=>setPlay(!playing));
+clothes.addEventListener('click',()=>{clothed=!clothed;pika.classList.toggle('no-outfit',!clothed);clothes.setAttribute('aria-pressed',String(clothed));clothes.innerHTML=clothed?'<span class="icon">♛</span> Quitar accesorios':'<span class="icon">♛</span> Poner accesorios'});
+night.addEventListener('click',()=>{nite=!nite;scene.classList.toggle('night',nite);night.setAttribute('aria-pressed',String(nite));night.innerHTML=nite?'<span class="icon">☀</span> Volver al atardecer':'<span class="icon">☾</span> París de noche'});
+hello.addEventListener('click',()=>{bubble.classList.remove('show');void bubble.offsetWidth;bubble.classList.add('show');clearTimeout(helloTimer);helloTimer=setTimeout(()=>bubble.classList.remove('show'),1600)});
+if(!playing)setPlay(false);resize();requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
