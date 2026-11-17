@@ -1,0 +1,67 @@
+name: Voltito - personaje original 4 vistas PNG
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/voltito-4-vistas-20261117.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: voltito-4-vistas-20261117
+  cancel-in-progress: false
+
+jobs:
+  generar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Instalar dependencias gratuitas
+        run: python -m pip install --disable-pip-version-check pillow cairosvg
+      - name: Generar cuatro poses y lámina
+        run: python experimentos/voltito-4-vistas-20261117/generar_voltito.py
+      - name: Verificar archivos y transparencia
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          d = Path("experimentos/voltito-4-vistas-20261117")
+          views = ("frente", "izquierda", "derecha", "espalda")
+          for v in views:
+              path = d / f"voltito-{v}.png"
+              with Image.open(path) as im:
+                  im.load()
+                  assert im.format == "PNG" and im.mode == "RGBA" and im.size == (1000,1400)
+                  assert im.getchannel("A").getextrema() == (0,255)
+                  print("VISTA OK:", path)
+          with Image.open(d/"voltito-cuatro-vistas.png") as im:
+              im.load()
+              assert im.format == "PNG" and im.size == (2200,1010)
+          print("Todas las imágenes validadas")
+          PY
+      - name: Guardar solamente archivos del personaje nuevo
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add -- experimentos/voltito-4-vistas-20261117/*.svg
+          git add -- experimentos/voltito-4-vistas-20261117/*.png
+          if git diff --cached --quiet; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Voltito: cuatro vistas con transparencia y lámina'
+          git pull --rebase origin main
+          git push origin HEAD:main
+      - name: Adjuntar lámina final y 4 sprites
+        uses: actions/upload-artifact@v4
+        with:
+          name: voltito-4-vistas-png
+          path: experimentos/voltito-4-vistas-20261117/*.png
+          if-no-files-found: error
+          retention-days: 7
