@@ -36,6 +36,19 @@ jobs:
           IMAGE_PATH: experimentos/voltito-png-original-20261117/voltito-referencia-limpia.png
           OUTPUT_PATH: experimentos/voltito-png-original-20261117/voltito-removebg-preview.png
         run: python herramientas/removebg-web/remover.py
+      - name: Guardar muestra del recorte para revisar el resultado de Remove.bg
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add -- experimentos/voltito-png-original-20261117/voltito-removebg-preview.png
+          git add -- experimentos/voltito-png-original-20261117/voltito-referencia-limpia.png
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if ! git diff --cached --quiet; then
+            git commit -m "Voltito original: guardar referencia y máscara Remove.bg para inspección"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
       - name: Recuperar los colores y detalle originales a resolución nativa
         run: python experimentos/voltito-png-original-20261117/recortar.py finalizar
       - name: Verificar PNG RGBA sin fondo
