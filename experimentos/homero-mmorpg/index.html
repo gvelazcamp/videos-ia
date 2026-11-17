@@ -10,8 +10,13 @@ main{max-width:1120px;margin:0 auto;padding:13px}header{display:flex;align-items
 h1{margin:0;font-size:clamp(19px,4vw,29px);letter-spacing:.5px}h1 em{font-style:normal;color:#ffdd52}.tag{font-size:12px;border:1px solid #52718b;background:#1e3349;padding:7px 12px;border-radius:18px}
 small{color:#a3bbd0}.screen{position:relative;overflow:hidden;aspect-ratio:16/9;width:100%;background:#7cb763;border:3px solid #738ca6;border-radius:18px;box-shadow:0 15px 35px #0008;touch-action:none}
 #world{width:100%;height:100%;display:block;touch-action:none}
-#avatar{position:absolute;width:8.6%;min-width:37px;max-width:92px;pointer-events:none;transform:translate(-50%,-97%);filter:drop-shadow(0 4px 2px #142a2c80)}
-#avatar svg{display:block;width:100%;overflow:visible}#avatar .leg-left,#avatar .leg-right,#avatar .arm-left,#avatar .arm-right{transform-box:fill-box}
+#avatar{position:absolute;width:8%;min-width:37px;max-width:84px;pointer-events:none;transform:translate(-50%,-97%);filter:drop-shadow(0 4px 2px #142a2c80)}
+#avatar svg{display:none;width:100%;overflow:visible}
+#avatar img{display:block;width:100%;height:auto;object-fit:contain}
+#avatar.fallback img{display:none}
+#avatar.fallback svg{display:block}
+#avatar.walk img{animation:homero-sway .36s ease-in-out infinite alternate}
+@keyframes homero-sway{from{transform:rotate(-2deg)}to{transform:rotate(2deg)}}#avatar .leg-left,#avatar .leg-right,#avatar .arm-left,#avatar .arm-right{transform-box:fill-box}
 #avatar.walk .leg-left{animation:stride .32s ease-in-out infinite alternate;transform-origin:50% 0}
 #avatar.walk .leg-right{animation:stride .32s ease-in-out infinite alternate-reverse;transform-origin:50% 0}
 #avatar.walk .arm-left{animation:stride .32s ease-in-out infinite alternate-reverse;transform-origin:50% 0}
@@ -40,6 +45,7 @@ footer{font-size:11px;color:#7f97ad;text-align:center;margin:14px}
 <div class="screen" id="screen">
 <canvas id="world" width="960" height="540" aria-label="Mapa de Springfield"></canvas>
 <div id="avatar" aria-label="Homero caminando">
+<img src="./homero-original-mmorpg.png" alt="Homero Simpson de brazos cruzados" draggable="false">
 <svg viewBox="0 0 110 163" xmlns="http://www.w3.org/2000/svg">
 <ellipse cx="55" cy="157" rx="30" ry="6" fill="#1b3e3766"/>
 <g class="leg-left"><path d="M36 119h19l-3 31H37Z" fill="#497bd5" stroke="#39352b" stroke-width="3"/><path d="M30 145h27v11H26q-5-5 4-11Z" fill="#33363b" stroke="#27252b" stroke-width="3"/></g>
@@ -78,6 +84,7 @@ footer{font-size:11px;color:#7f97ad;text-align:center;margin:14px}
 "use strict";
 var cv=document.getElementById("world"),ctx=cv.getContext("2d"),avatar=document.getElementById("avatar");
 var toast=document.getElementById("toast"),score=document.getElementById("score");
+var portrait=avatar.querySelector("img");if(portrait)portrait.addEventListener("error",function(){avatar.classList.add("fallback")});
 var W=960,H=540,MW=2520,MH=1840,camX=0,camY=0,px=1275,py=975,anim=0,last=0,notice=0;
 var key={up:false,down:false,left:false,right:false},shift=false,run=false,target=null,dir="down";
 var homes=[{x:550,y:385,w:385,h:280,roof:"#dd7d55",title:"CASA SIMPSON"},
