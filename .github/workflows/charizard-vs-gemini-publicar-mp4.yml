@@ -22,6 +22,10 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+      - name: Instalar FFmpeg para validar MP4
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
       - name: Recuperar video final renderizado y version movil confirmados
         run: |
           mkdir -p experimentos/charizard-vs-gemini-01
