@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/harry-pikachu-coliseo-20261117.yml'
+      - 'experimentos/harry-pikachu-coliseo-20261117/escena.py'
   workflow_dispatch:
 
 permissions:
