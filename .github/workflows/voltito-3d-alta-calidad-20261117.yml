@@ -1,0 +1,115 @@
+name: Voltito 3D alta calidad - visor movil
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/voltito-3d-alta-calidad-20261117.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: voltito-3d-alta-calidad-20261117
+  cancel-in-progress: false
+
+jobs:
+  preparar-y-verificar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Instalar modulo 3D local de Three.js sin dependencias de CDN durante el uso
+        shell: bash
+        run: |
+          set -euo pipefail
+          dest="experimentos/voltito-3d-alta-calidad-20261117/three.module.js"
+          for url in \
+            "https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js" \
+            "https://unpkg.com/three@0.160.1/build/three.module.js"; do
+            if curl --fail --location --silent --show-error --retry 2 --max-time 40 "$url" --output "$dest"; then
+              break
+            fi
+          done
+          test -s "$dest"
+          test "$(wc -c < "$dest")" -gt 400000
+          grep -q "WebGLRenderer" "$dest"
+          echo "Three.js local: $(wc -c < "$dest") bytes"
+      - name: Preparar Chromium para prueba visual
+        shell: bash
+        run: |
+          python -m pip install --disable-pip-version-check pillow playwright
+          python -m playwright install --with-deps chromium
+      - name: Probar renderizado WebGL y controles tactiles y guardar captura movil
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
+          from threading import Thread
+          from playwright.sync_api import sync_playwright
+
+          root = Path.cwd()
+          class Quiet(SimpleHTTPRequestHandler):
+              def log_message(self,*args):
+                  pass
+          server = ThreadingHTTPServer(("127.0.0.1",8765), lambda *args,**kwargs: Quiet(*args,directory=str(root),**kwargs))
+          Thread(target=server.serve_forever, daemon=True).start()
+          dest = root/"experimentos/voltito-3d-alta-calidad-20261117"
+          errors = []
+          try:
+              with sync_playwright() as pw:
+                  browser = pw.chromium.launch(headless=True,args=["--no-sandbox","--enable-webgl","--use-gl=angle","--use-angle=swiftshader","--enable-unsafe-swiftshader"])
+                  page = browser.new_page(viewport={"width":390,"height":844},device_scale_factor=1,is_mobile=True,has_touch=True)
+                  page.on("pageerror",lambda e: errors.append(str(e)))
+                  page.goto("http://127.0.0.1:8765/experimentos/voltito-3d-alta-calidad-20261117/index.html",wait_until="domcontentloaded",timeout=60000)
+                  page.wait_for_function("document.getElementById('message').style.display === 'none'",timeout=40000)
+                  assert not errors, f"Errores Javascript: {errors}"
+                  assert page.locator("#viewport canvas").count() == 1, "No se construyo canvas 3D"
+                  page.locator("#viewport").screenshot(path=str(dest/"preview-movil.png"))
+                  # El ángulo del modelo debe responder a la barra deslizante.
+                  page.locator("#angle").evaluate("(node)=>{node.value='180';node.dispatchEvent(new Event('input',{bubbles:true}))}")
+                  assert page.locator("#degree").inner_text() == "180°", "No gira al mover la barra"
+                  page.locator("#viewport").screenshot(path=str(dest/"preview-espalda.png"))
+                  page.locator("#reset").click()
+                  assert page.locator("#degree").inner_text() == "0°", "Reset fallido"
+                  browser.close()
+              with Image.open(dest/"preview-movil.png") as pic:
+                  pic.load()
+                  rgb=pic.convert("RGB")
+                  # Comprobar que el personaje amarillo ocupa suficientes pixels.
+                  from collections import Counter
+                  pts=list(rgb.resize((110,180)).getdata())
+                  gold=sum(1 for r,g,b in pts if r>120 and g>75 and b<130 and r>g*1.05)
+                  print("Pixeles dorados de Voltito:",gold)
+                  assert gold>45, "No se detecta a Voltito en la imagen; visor no válido"
+              print("Prueba visual móvil y giro 180 grados: OK")
+          finally:
+              server.shutdown()
+          PY
+      - name: Guardar únicamente assets nuevos del visor validado
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add -- experimentos/voltito-3d-alta-calidad-20261117/three.module.js
+          git add -- experimentos/voltito-3d-alta-calidad-20261117/preview-movil.png
+          git add -- experimentos/voltito-3d-alta-calidad-20261117/preview-espalda.png
+          if git diff --cached --quiet; then exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Voltito: Three.js local y vistas moviles verificadas"
+          git pull --rebase origin main
+          git push origin HEAD:main
+      - name: Guardar capturas del visor
+        uses: actions/upload-artifact@v4
+        with:
+          name: voltito-3d-alta-calidad-capturas
+          path: experimentos/voltito-3d-alta-calidad-20261117/preview-*.png
+          if-no-files-found: error
+          retention-days: 7
