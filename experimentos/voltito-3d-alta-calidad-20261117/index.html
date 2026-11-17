@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#102f39">
+<title>Voltito — modelo 3D de alta calidad · giro 360°</title>
+<style>
+:root{color-scheme:dark;font-family:system-ui,-apple-system,'Segoe UI',sans-serif}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:#081c24;color:#f5fffd}
+body{display:flex;justify-content:center;align-items:flex-start}
+main{width:100%;max-width:880px;min-height:100dvh;margin:auto;background:radial-gradient(ellipse at 50% 36%,#356c6b 0%,#194c5b 43%,#102d38 78%,#091c29 100%);overflow:hidden;position:relative}
+header{height:93px;display:flex;justify-content:space-between;gap:14px;align-items:center;padding:20px 21px 7px;position:relative;z-index:2}
+h1{font-size:clamp(25px,5.7vw,38px);letter-spacing:.13em;line-height:1;margin:0;font-weight:900;color:#fff2b8;text-shadow:0 2px 16px #0004}
+header p{font-size:12px;color:#c4e4df;margin:8px 0 0}
+.pill{font-size:11px;border-radius:99px;border:1px solid #8fd9c65c;background:#2c79703d;color:#d3fbf1;padding:7px 10px;white-space:nowrap}
+#viewport{width:100%;height:min(70dvh,680px);min-height:380px;touch-action:none;cursor:grab;position:relative;overflow:hidden}
+#viewport:active{cursor:grabbing}
+#viewport canvas{display:block;width:100%;height:100%;touch-action:none}
+#fallback{position:absolute;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;gap:8px;padding:25px;text-align:center;background:#173844}
+#fallback img{max-height:85%;max-width:100%;object-fit:contain}
+#fallback p{font-size:12px;color:#bdddd7;margin:0}
+#message{position:absolute;top:18px;left:50%;transform:translateX(-50%);color:#dffbf3;background:#092d3dbd;border:1px solid #8ddbd055;border-radius:30px;padding:7px 14px;pointer-events:none;white-space:nowrap;font-size:12px;opacity:.95}
+#hint{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);padding:9px 15px;border-radius:30px;background:#052535a6;border:1px solid #68c9be4d;font-size:12px;color:#d7ece7;pointer-events:none;white-space:nowrap}
+.controls{padding:15px 18px 16px;background:#092733d9;border-top:1px solid #74bcba55;display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:center}
+#angle{flex:1;min-width:100px;max-width:620px;accent-color:#64e4cd;cursor:pointer}
+#degree{font-size:16px;font-weight:800;min-width:46px;text-align:right;color:#fff3b6;font-variant-numeric:tabular-nums}
+button{cursor:pointer;background:#23545e;color:#edfffb;border:1px solid #73c9be66;padding:10px 13px;border-radius:11px;font-weight:750;font-size:13px}
+button:focus-visible,#angle:focus-visible{outline:2px solid #fff3b2;outline-offset:2px}
+#status{margin:0;background:#092733df;text-align:center;padding:0 12px 14px;font-size:12px;color:#bbdcd8}
+.note{font-size:11px;text-align:center;color:#95bbb6;margin:0;padding:13px 20px 19px;line-height:1.5}
+@media(max-width:550px){
+ main{min-height:100dvh}
+ header{height:83px;padding:18px 15px 5px}
+ h1{font-size:27px}
+ header p{font-size:10px}
+ .pill{font-size:10px;padding:7px 9px}
+ #viewport{height:61dvh;min-height:360px}
+ .controls{padding:12px 13px;gap:10px}
+ #hint{font-size:11px}
+}
+</style>
+</head>
+<body>
+<main>
+<header><div><h1>VOLTITO</h1><p>Criatura eléctrica · modelo tridimensional</p></div><div class="pill">360° real · táctil</div></header>
+<section id="viewport" aria-label="Modelo 3D giratorio de Voltito">
+<div id="fallback"><img alt="Voltito, ilustración original" src="../voltito-realista-360-20261117/voltito-hoja-original.png"><p>No se pudo abrir la vista 3D en este navegador.</p></div>
+<div id="message">Preparando el modelo 3D…</div>
+<div id="hint">↔ Arrastrá con el dedo para girar</div>
+</section>
+<div class="controls"><input id="angle" aria-label="Ángulo de rotación" type="range" min="0" max="360" value="0" step="1"><span id="degree">0°</span><button id="toggle">▶ Girar</button><button id="reset">Frente</button></div>
+<p id="status" aria-live="polite">Vista frontal · deslizá para girar</p>
+<p class="note">Nuevo personaje 3D modelado a partir del diseño visual de Voltito. No se estiran ni mezclan cuatro fotografías: todo el cuerpo gira de forma continua. La geometría es una interpretación original del dibujo de referencia.</p>
+</main>
+<script type="module">
+import * as THREE from "./three.module.js";
+
+const viewport=document.getElementById('viewport'),bar=document.getElementById('angle'),
+degree=document.getElementById('degree'),toggle=document.getElementById('toggle'),
+reset=document.getElementById('reset'),status=document.getElementById('status'),
+message=document.getElementById('message'), fallback=document.getElementById('fallback');
+let renderer;
+try { renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:"high-performance"}); }
+catch(error){fallback.style.display="flex";message.textContent="El navegador no admite WebGL";throw error;}
+renderer.setPixelRatio(Math.min(2,window.devicePixelRatio||1));
+renderer.outputColorSpace=THREE.SRGBColorSpace;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=1.42;
+renderer.shadowMap.enabled=true;
+renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+viewport.insertBefore(renderer.domElement,viewport.firstChild);
+
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(38,1,.1,100);
+camera.position.set(0,1.9,8.8);
+camera.lookAt(0,1.79,0);
+const hemi=new THREE.HemisphereLight(0xd3fcff,0x745e37,2.5);scene.add(hemi);
+const key=new THREE.DirectionalLight(0xfff5d6,3.4);key.position.set(-3.8,7.6,7);
+key.castShadow=true;key.shadow.mapSize.set(1024,1024);key.shadow.camera.near=.1;key.shadow.camera.far=17;key.shadow.bias=-.00015;
+key.shadow.camera.left=-6;key.shadow.camera.right=6;key.shadow.camera.top=7;key.shadow.camera.bottom=-6;scene.add(key);
+const fill=new THREE.DirectionalLight(0x87eeeb,2.25);fill.position.set(5,4,-3);scene.add(fill);
+const warm=new THREE.PointLight(0xffcb6c,18,9);warm.position.set(2.5,4.4,5);scene.add(warm);
+
+const COLOR={
+ fur:0xfbc14c,head:0xffd46a,ear:0xf6b948,cream:0xffefd1,
+ turquoise:0x24dac2,tealDeep:0x16aca7,eye:0x142e58,iris:0x185c9d,
+ brown:0x9c683f,rose:0xdf897a,inside:0x5a2d38,white:0xffffff
+};
+const furMat=new THREE.MeshStandardMaterial({color:COLOR.fur,roughness:.9,metalness:0});
+const headMat=new THREE.MeshStandardMaterial({color:COLOR.head,roughness:.89,metalness:0});
+const creamMat=new THREE.MeshStandardMaterial({color:COLOR.cream,roughness:1});
+const tealMat=new THREE.MeshPhysicalMaterial({color:COLOR.turquoise,roughness:.28,metalness:.08,clearcoat:.72,clearcoatRoughness:.21});
+const darkTeal=new THREE.MeshPhysicalMaterial({color:COLOR.tealDeep,roughness:.28,metalness:.08,clearcoat:.45});
+const eyeMat=new THREE.MeshPhysicalMaterial({color:COLOR.eye,roughness:.07,metalness:.02,clearcoat:1,clearcoatRoughness:.025});
+const irisMat=new THREE.MeshPhysicalMaterial({color:COLOR.iris,roughness:.15,clearcoat:.9});
+const whiteMat=new THREE.MeshBasicMaterial({color:0xffffff});
+const brownMat=new THREE.MeshStandardMaterial({color:COLOR.brown,roughness:.7});
+const mouthMat=new THREE.MeshStandardMaterial({color:COLOR.inside,roughness:.6});
+const roseMat=new THREE.MeshStandardMaterial({color:COLOR.rose,roughness:.85});
+const earMat=new THREE.MeshStandardMaterial({color:COLOR.ear,roughness:.82,side:THREE.DoubleSide});
+const innerEarMat=new THREE.MeshStandardMaterial({color:COLOR.turquoise,roughness:.61,side:THREE.DoubleSide,vertexColors:false});
+const goldHighlight=new THREE.MeshStandardMaterial({color:0xffe6a6,roughness:.7});
+const body=new THREE.Group();scene.add(body);
+
+function ellipsoid(name,mat,x,y,z,sx,sy,sz,segments=32){
+ const mesh=new THREE.Mesh(new THREE.SphereGeometry(1,segments,Math.round(segments*.72)),mat);
+ mesh.name=name;mesh.position.set(x,y,z);mesh.scale.set(sx,sy,sz);
+ mesh.castShadow=true;mesh.receiveShadow=true;body.add(mesh);return mesh;
+}
+function pipe(points,r,mat,segments=6){
+ const curve=new THREE.CatmullRomCurve3(points.map(x=>new THREE.Vector3(...x)));
+ const mesh=new THREE.Mesh(new THREE.TubeGeometry(curve,Math.max(16,points.length*8),r,segments,false),mat);
+ mesh.castShadow=true;body.add(mesh);return mesh;
+}
+function segment(a,b,r,mat){
+ const aa=new THREE.Vector3(...a),bb=new THREE.Vector3(...b);
+ const v=new THREE.Vector3().subVectors(bb,aa);
+ const obj=new THREE.Mesh(new THREE.CylinderGeometry(r,r*.94,v.length(),10),mat);
+ obj.position.copy(aa).add(bb).multiplyScalar(.5);
+ obj.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),v.clone().normalize());
+ obj.castShadow=true;body.add(obj);
+ ellipsoid('joint',mat,...b,r*1.06,r*1.06,r*1.06,16);
+}
+// Volumetric body/cream tummy (golden plush, round silhouette)
+ellipsoid('body',furMat,0,.91,.0,.78,.88,.59,52);
+ellipsoid('cream belly',creamMat,0,.85,.49,.56,.64,.22,42);
+ellipsoid('front bib',creamMat,0,1.36,.49,.35,.24,.18,26);
+// Feet and rounded paws
+for(const sign of [-1,1]){
+ ellipsoid('foot',furMat,sign*.52,.23,.35,.42,.21,.49,36);
+ ellipsoid('toe highlight',goldHighlight,sign*.53,.17,.67,.23,.078,.12,20);
+ ellipsoid('arm',furMat,sign*.78,1.05,.20,.27,.43,.28,32).rotation.z=sign*.26;
+ ellipsoid('side ring',darkTeal,sign*.785,1.01,.23,.07,.31,.29,24);
+ ellipsoid('side turquoise',tealMat,sign*.824,1.01,.235,.041,.20,.19,20);
+ ellipsoid('brown tummy marking',brownMat,sign*.31,1.02,.682,.17,.125,.042,26);
+}
+// Big head, integrated snout and cheek volume
+ellipsoid('head',headMat,0,2.30,.02,1.08,.99,.84,64);
+ellipsoid('muzzle',headMat,0,1.92,.63,.46,.28,.29,36);
+// Back fur tuft and markings
+for(const sign of [-1,1])ellipsoid('back mark',brownMat,sign*.36,1.15,-.59,.23,.17,.065,24);
+ellipsoid('back teal symbol',darkTeal,0,2.54,-.806,.24,.17,.032,26);
+
+// Wide three-dimensional leaf ears: tapered geometry with frontal/side thickness
+function leaf(sign,inner=false){
+ const rings=38,across=14,positions=[],indices=[],colors=[];
+ for(let j=0;j<=rings;j++){
+  const t=j/rings, u=inner?.16+.74*t:t;
+  const x=sign*(.57 + .78*u + .09*Math.sin(Math.PI*u));
+  const y=2.99 + 1.31*u;
+  const z=-.045 - .17*u;
+  const width=(inner?.205:.335)*Math.pow(Math.sin(Math.PI*u),.78)*(inner?1:1.09);
+  const dx=.78+Math.PI*.09*Math.cos(Math.PI*u),dy=1.31,mag=Math.hypot(dx,dy);
+  const nx=dy/mag,ny=-dx/mag;
+  for(let k=0;k<=across;k++){
+   const v=(k/across-.5)*2;
+   positions.push(x+nx*width*v,y+ny*width*v,z+(inner?.132:0)+Math.sqrt(Math.max(0,1-v*v))*(inner?.09:.16));
+  }
+ }
+ for(let i=0;i<rings;i++)for(let j=0;j<across;j++){
+  const a=i*(across+1)+j,b=a+across+1;
+  indices.push(a,b,a+1,a+1,b,b+1);
+ }
+ const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));geo.setIndex(indices);geo.computeVertexNormals();
+ const m=new THREE.Mesh(geo,inner?innerEarMat:earMat);m.castShadow=true;m.receiveShadow=true;body.add(m);
+ if(!inner){
+   // Back face to ensure physical thickness/visibility from 360 degrees
+   const backgeo=geo.clone(), v=backgeo.attributes.position;
+   for(let n=0;n<v.count;n++)v.setZ(n,v.getZ(n)-.21);
+   backgeo.computeVertexNormals();
+   const back=new THREE.Mesh(backgeo,earMat);back.castShadow=true;body.add(back);
+ }else{
+   const vein=[];
+   for(let j=0;j<=16;j++){
+    const u=.20+.68*j/16;
+    vein.push([sign*(.57+.78*u+.09*Math.sin(Math.PI*u)),2.99+1.31*u,-.045-.17*u+.24]);
+   }
+   pipe(vein,.015,goldHighlight,5);
+ }
+}
+for(const sign of [-1,1]){leaf(sign,false);leaf(sign,true);}
+// Head crest – three pearl turquoise leaves/spikes
+for(const [dx,len] of [[-.2,.31],[0,.42],[.2,.31]]){
+ let spike=ellipsoid('crest',tealMat,dx,3.38,-.04,.105,len,.105,24);
+ spike.rotation.z=-dx*.55;
+}
+// Eyes: blue iris/glossy corneas, white catchlights
+for(const s of [-1,1]){
+ const eye=ellipsoid('large blue eye',eyeMat,s*.43,2.44,.722,.225,.286,.118,38);
+ eye.rotation.y=s*.23;
+ ellipsoid('iris',irisMat,s*.434,2.44,.828,.158,.202,.051,24);
+ ellipsoid('catchlight',whiteMat,s*.49-.075,2.55,.877,.061,.077,.013,18);
+ ellipsoid('second reflection',whiteMat,s*.43+.071,2.35,.878,.027,.027,.011,16);
+ // Cheek lightning emblem pinned onto the curved head surface
+ const z=.69,xx=s*.82;
+ const pts=[
+  [xx-s*.07,2.13,z-.12],[xx+s*.08,2.10,z-.13],
+  [xx-s*.02,1.99,z-.08],[xx+s*.11,1.97,z-.085],
+  [xx-s*.01,1.86,z-.02]
+ ];
+ pipe(pts,.040,tealMat,5);
+ ellipsoid('cheek base light',headMat,s*.81,1.99,.56,.14,.13,.045,16);
+}
+// mouth, pink tongue, nose, smile
+ellipsoid('smile open',mouthMat,0,1.93,.858,.25,.16,.05,32);
+ellipsoid('tongue',roseMat,0,1.847,.895,.142,.063,.018,22);
+ellipsoid('small nose',brownMat,0,2.108,.889,.087,.065,.045,22);
+pipe([[-.26,2.01,.843],[-.13,1.91,.91],[0,1.89,.914],[.13,1.91,.91],[.26,2.01,.843]],.018,brownMat,6);
+
+// Bright forked lightning tail with branching, angular segments
+const tailPts=[
+ [-.50,.96,-.45],[-1.13,1.17,-.48],[-1.47,1.46,-.43],
+ [-1.24,1.76,-.48],[-2.10,1.93,-.37]
+];
+for(let i=0;i<tailPts.length-1;i++)segment(tailPts[i],tailPts[i+1],.092,tealMat);
+const forks=[
+ [[-1.49,1.48,-.43],[-1.86,1.37,-.43],[-2.18,1.58,-.37]],
+ [[-1.26,1.75,-.46],[-1.47,2.19,-.44],[-1.91,2.27,-.38]]
+];
+for(const a of forks)for(let i=0;i<a.length-1;i++)segment(a[i],a[i+1],.079,tealMat);
+
+// Short strands of fur as real 3D instanced meshes, with tiny colored variation.
+let seed=927413;function rand(){seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;}
+const hairGeo=new THREE.ConeGeometry(.011,.080,3);
+hairGeo.translate(0,.035,0);
+const dummy=new THREE.Object3D();
+function addFur(count,cx,cy,cz,rx,ry,rz,baseHue=42){
+ const mesh=new THREE.InstancedMesh(hairGeo,new THREE.MeshStandardMaterial({color:0xffffff,roughness:1,side:THREE.DoubleSide}),count);
+ const gold=new THREE.Color(COLOR.fur),light=new THREE.Color(0xffe29a),dark=new THREE.Color(0xe9a137);
+ for(let i=0;i<count;i++){
+  const v=rand()*2-1,t=rand()*Math.PI*2,h=Math.sqrt(1-v*v);
+  const nx=h*Math.cos(t),ny=v,nz=h*Math.sin(t);
+  // no hairs on inside of shell; surface near overlaps get hidden by head/body and ears
+  const point=new THREE.Vector3(cx+nx*rx,cy+ny*ry,cz+nz*rz);
+  const normal=new THREE.Vector3(nx/rx,ny/ry,nz/rz).normalize();
+  dummy.position.copy(point);dummy.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),normal);
+  const scale=.55+rand()*.8;dummy.scale.set(scale,scale,scale);dummy.updateMatrix();
+  mesh.setMatrixAt(i,dummy.matrix);
+  const color=gold.clone().lerp(rand()>.5?light:dark,rand()*.38);
+  mesh.setColorAt(i,color);
+ }
+ mesh.instanceMatrix.needsUpdate=true;
+ mesh.castShadow=false;mesh.frustumCulled=false;body.add(mesh);
+}
+addFur(1900,0,2.30,.02,1.084,.993,.845);
+addFur(900,0,.91,.0,.784,.883,.595);
+for(const s of [-1,1]){
+ addFur(250,s*.52,.23,.35,.422,.213,.493);
+}
+
+// Podium and contact shadow
+const floor=new THREE.Mesh(new THREE.CircleGeometry(4.7,96),new THREE.MeshStandardMaterial({color:0x123d46,roughness:1}));
+floor.rotation.x=-Math.PI/2;floor.position.y=-.012;floor.receiveShadow=true;scene.add(floor);
+const disc=new THREE.Mesh(new THREE.CylinderGeometry(1.35,1.45,.18,96),new THREE.MeshStandardMaterial({color:0x174a56,metalness:.28,roughness:.42}));
+disc.position.y=-.13;disc.receiveShadow=true;scene.add(disc);
+const ring=new THREE.Mesh(new THREE.TorusGeometry(1.36,.018,8,96),new THREE.MeshBasicMaterial({color:0x48f3dc}));
+ring.rotation.x=Math.PI/2;ring.position.y=-.036;scene.add(ring);
+
+// Framing: turntable centered on the actual character geometry.
+let yaw=0,auto=false,dragging=false,lastX=0,lastY=0,lastTime=0;
+function showDegree(){const n=((Math.round(yaw*180/Math.PI)%360)+360)%360;degree.textContent=n+"°";bar.value=n;
+ const names=["Frente","Tres cuartos","Perfil","Tres cuartos","Espalda","Tres cuartos","Perfil","Tres cuartos"];
+ status.textContent=names[Math.round(n/45)%8]+" · modelo 3D continuo";}
+function setYaw(r){yaw=((r%(Math.PI*2))+Math.PI*2)%(Math.PI*2);body.rotation.y=yaw;showDegree();}
+function resize(){
+ const w=viewport.clientWidth,h=viewport.clientHeight;
+ renderer.setSize(w,h,false);camera.aspect=w/h;camera.fov=w<600?41:39;camera.updateProjectionMatrix();
+}
+new ResizeObserver(resize).observe(viewport);resize();
+viewport.addEventListener("pointerdown",e=>{dragging=true;auto=false;toggle.textContent="▶ Girar";lastX=e.clientX;lastY=e.clientY;viewport.setPointerCapture(e.pointerId)});
+viewport.addEventListener("pointermove",e=>{if(!dragging)return;const dx=e.clientX-lastX;lastX=e.clientX;lastY=e.clientY;setYaw(yaw+dx*.014)});
+for(const e of ["pointerup","pointercancel","pointerleave"])viewport.addEventListener(e,()=>dragging=false);
+bar.addEventListener("input",()=>{auto=false;toggle.textContent="▶ Girar";setYaw(+bar.value*Math.PI/180)});
+toggle.addEventListener("click",()=>{auto=!auto;toggle.textContent=auto?"Ⅱ Pausar":"▶ Girar"});
+reset.addEventListener("click",()=>{auto=false;toggle.textContent="▶ Girar";setYaw(0)});
+window.addEventListener("visibilitychange",()=>{if(document.hidden)lastTime=0;});
+function frame(ts){if(auto&&lastTime)setYaw(yaw+(ts-lastTime)*.00064);
+ lastTime=ts;renderer.render(scene,camera);requestAnimationFrame(frame);}
+message.style.display="none";setYaw(0);requestAnimationFrame(frame);
+</script>
+</body></html>
