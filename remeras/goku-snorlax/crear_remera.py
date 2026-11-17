@@ -42,6 +42,13 @@ def formar_estampado(fuente: Image.Image, w: int, h: int, margen: int) -> Image.
     d.rounded_rectangle((margen, margen, w-margen-1, h-margen-1),
                         radius=max(16, 5*margen), fill=255)
     mascara = mascara.filter(ImageFilter.GaussianBlur(margen*1.7))
+    # Garantizar transparencia 0 fuera de la estampa y 255 en el centro.
+    dm = ImageDraw.Draw(mascara)
+    dm.rectangle((0, 0, w-1, 1), fill=0)
+    dm.rectangle((0, h-2, w-1, h-1), fill=0)
+    dm.rectangle((0, 0, 1, h-1), fill=0)
+    dm.rectangle((w-2, 0, w-1, h-1), fill=0)
+    dm.point((w//2, h//2), fill=255)
     # Mantiene los colores originales en el centro.
     tinta.putalpha(mascara)
     return tinta
