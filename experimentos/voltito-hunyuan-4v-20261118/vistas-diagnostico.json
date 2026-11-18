@@ -2,49 +2,49 @@
   "frente": {
     "input_size": [
       346,
-      511
+      552
     ],
     "canvas_size": [
       768,
       1024
     ],
-    "alpha_coverage": 0.45,
-    "bytes": 386193
+    "alpha_coverage": 0.417,
+    "bytes": 345102
   },
   "espalda": {
     "input_size": [
       346,
-      511
+      552
     ],
     "canvas_size": [
       768,
       1024
     ],
-    "alpha_coverage": 0.397,
-    "bytes": 344972
+    "alpha_coverage": 0.367,
+    "bytes": 306681
   },
   "izquierda": {
     "input_size": [
       346,
-      511
+      552
     ],
     "canvas_size": [
       768,
       1024
     ],
-    "alpha_coverage": 0.334,
-    "bytes": 278583
+    "alpha_coverage": 0.323,
+    "bytes": 261030
   },
   "derecha": {
     "input_size": [
       346,
-      511
+      552
     ],
     "canvas_size": [
       768,
       1024
     ],
-    "alpha_coverage": 0.346,
-    "bytes": 274748
+    "alpha_coverage": 0.335,
+    "bytes": 258434
   }
 }
