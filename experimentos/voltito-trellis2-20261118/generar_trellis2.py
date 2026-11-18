@@ -92,7 +92,7 @@ def main():
                 "tex_slat_sampling_steps":12,
                 "tex_slat_rescale_t":3.0,
             }
-            log("GENERANDO_TRELLIS2",space,"512 voxel",flush=True)
+            log("GENERANDO_TRELLIS2",space,"512 voxel")
             job=client.submit(**params,api_name="/image_to_3d")
             preview=job.result(timeout=630)
             trial["preview_type"]=type(preview).__name__
@@ -115,5 +115,5 @@ def main():
             continue
     record["estado"]="sin_generacion_3d"
     STATUS.write_text(json.dumps(record,ensure_ascii=False,indent=2))
-    log("SIN_GLB_TRELLIS2_NINGUN_SERVICIO",flush=True)
+    log("SIN_GLB_TRELLIS2_NINGUN_SERVICIO")
 if __name__=="__main__":main()
