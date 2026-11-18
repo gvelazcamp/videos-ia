@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#12323e">
+<title>Voltito - candidato 3D multivista para revisión</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;background:#081c29;color:#e5fcf6;font-family:system-ui,sans-serif}
+main{width:min(100%,880px);margin:auto;min-height:100dvh;background:#102f3d}
+header{padding:16px;display:flex;align-items:center;gap:12px;justify-content:space-between}
+h1{margin:0;font-size:28px;color:#ffe8aa;letter-spacing:.1em}
+header p{font-size:12px;color:#b8dfdb;margin:4px 0}
+small{font-size:11px;color:#a1d1cc}
+#canvas{height:min(69dvh,690px);min-height:360px;width:100%;position:relative;background:radial-gradient(ellipse at center,#367383,#153848 71%,#082331);touch-action:none}
+#canvas canvas{width:100%;height:100%;display:block;touch-action:none}
+#hint{position:absolute;bottom:13px;left:50%;transform:translateX(-50%);border-radius:22px;padding:8px 12px;background:#0b2935bd;font-size:11px;pointer-events:none;white-space:nowrap}
+#loading{position:absolute;inset:0;background:#0b303dd9;display:flex;align-items:center;justify-content:center;padding:30px;text-align:center;color:#fff6d5}
+.controls{background:#0c2b37;padding:13px 14px;display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.controls input{accent-color:#44e8c7;flex:1;min-width:120px}
+button,a.action{background:#275764;border:1px solid #61b6b194;border-radius:10px;padding:10px 12px;color:#eefcf8;text-decoration:none;cursor:pointer;font-weight:650;font-size:12px}
+#degree{width:43px;font-variant-numeric:tabular-nums;text-align:right;color:#ffe4a8;font-weight:800}
+section.info{padding:14px;line-height:1.55;font-size:12px;color:#b9d7d4}
+section.info p{margin:0 0 10px}
+.refs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-top:13px}
+.refs a{background:#1c4451;border-radius:10px;padding:7px 4px;text-decoration:none;color:#e2fff4;text-align:center;font-size:11px}
+.refs img{display:block;width:100%;height:90px;object-fit:contain}
+.badge{color:#ffe2a5;border:1px solid #ffe2a5aa;border-radius:99px;padding:6px 9px;white-space:nowrap;font-size:11px}
+@media(max-width:500px){header h1{font-size:23px}#canvas{height:60dvh;min-height:340px}.refs img{height:72px}.controls{gap:7px}}
+</style>
+</head><body>
+<main>
+<header><div><h1>VOLTITO 3D</h1><p>Candidato real desde 4 vistas · sin aprobación de apariencia</p></div><span class="badge">Geometría sin textura</span></header>
+<div id="canvas"><div id="loading">Cargando malla tridimensional real…</div><div id="hint">Deslizá para girar el modelo sin saltos</div></div>
+<div class="controls">
+<input type="range" id="angle" min="0" max="360" value="0" step="1" aria-label="Ángulo de giro"/>
+<span id="degree">0°</span>
+<button id="spin">▶ Girar</button><button id="reset">Frente</button>
+<a class="action" href="./candidato-voltito-sin-texturas.glb" download>GLB</a>
+</div>
+<section class="info">
+<p><strong>Esta es una malla 3D auténtica generada con Hunyuan3D-2mv desde los cuatro PNG.</strong> No se usan fotografías planas. Se puede girar de forma continua en cualquier ángulo. La forma y los detalles todavía deben compararse con Voltito; los colores amarillos de esta vista son sólo material provisional.</p>
+<p>Las referencias que utilizó la IA no se modificaron:</p>
+<div class="refs">
+<a href="../voltito-360-fiel-nuevas-vistas-20261118/voltito-frente.png"><img src="../voltito-360-fiel-nuevas-vistas-20261118/voltito-frente.png">Frente</a>
+<a href="../voltito-360-fiel-nuevas-vistas-20261118/voltito-izquierda.png"><img src="../voltito-360-fiel-nuevas-vistas-20261118/voltito-izquierda.png">Izquierda</a>
+<a href="../voltito-360-fiel-nuevas-vistas-20261118/voltito-espalda.png"><img src="../voltito-360-fiel-nuevas-vistas-20261118/voltito-espalda.png">Espalda</a>
+<a href="../voltito-360-fiel-nuevas-vistas-20261118/voltito-derecha.png"><img src="../voltito-360-fiel-nuevas-vistas-20261118/voltito-derecha.png">Derecha</a>
+</div>
+</section>
+</main>
+<script type="module">
+import * as THREE from '../voltito-3d-alta-calidad-20261117/three.module.js';
+import {GLTFLoader} from './GLTFLoader.js';
+const el=document.getElementById("canvas"),loading=document.getElementById("loading");
+const range=document.getElementById("angle"),degree=document.getElementById("degree");
+const spin=document.getElementById("spin");
+const scene=new THREE.Scene();
+const cam=new THREE.PerspectiveCamera(35,1,.01,200);
+const renderer=new THREE.WebGLRenderer({alpha:true,antialias:true,powerPreference:"high-performance"});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+renderer.outputColorSpace=THREE.SRGBColorSpace;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=1.3;
+el.insertBefore(renderer.domElement,el.firstChild);
+scene.add(new THREE.HemisphereLight(0xffffff,0x687c8e,3.3));
+const key=new THREE.DirectionalLight(0xfff3df,3.7);key.position.set(-4,8,6);scene.add(key);
+const rim=new THREE.DirectionalLight(0x66e9d7,2.1);rim.position.set(4,3,-6);scene.add(rim);
+const modelRoot=new THREE.Group();scene.add(modelRoot);
+let yaw=0,tilt=0,auto=false,ready=false,lastX=0,lastY=0,drag=false,lastT=null,distance=8;
+function resize(){const w=el.clientWidth,h=el.clientHeight;renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();}
+if(window.ResizeObserver)new ResizeObserver(resize).observe(el);
+window.addEventListener('resize',resize);resize();
+function setAngle(rad){yaw=(rad%(2*Math.PI)+2*Math.PI)%(2*Math.PI);modelRoot.rotation.y=yaw;const deg=Math.round(yaw*180/Math.PI)%360;range.value=deg;degree.textContent=deg+"°";}
+function setAuto(v){auto=v;spin.textContent=v?'Ⅱ Pausar':'▶ Girar';}
+range.addEventListener("input",()=>{setAuto(false);setAngle(Number(range.value)*Math.PI/180)});
+spin.addEventListener("click",()=>setAuto(!auto));
+document.getElementById("reset").addEventListener("click",()=>{setAuto(false);tilt=0;modelRoot.rotation.x=0;setAngle(0)});
+el.addEventListener("pointerdown",e=>{drag=true;setAuto(false);lastX=e.clientX;lastY=e.clientY;el.setPointerCapture(e.pointerId)});
+el.addEventListener("pointermove",e=>{if(!drag)return;const dx=e.clientX-lastX,dy=e.clientY-lastY;lastX=e.clientX;lastY=e.clientY;setAngle(yaw+dx*.012);tilt=THREE.MathUtils.clamp(tilt+dy*.006,-.42,.42);modelRoot.rotation.x=tilt});
+for(const name of ["pointerup","pointercancel","lostpointercapture"])el.addEventListener(name,()=>drag=false);
+el.addEventListener("wheel",e=>{e.preventDefault();cam.position.z=THREE.MathUtils.clamp(cam.position.z+e.deltaY*.008,2,20)},{passive:false});
+new GLTFLoader().load('./candidato-voltito-sin-texturas.glb',gltf=>{
+ const mesh=gltf.scene;
+ mesh.traverse(child=>{
+   if(child.isMesh){
+     child.material=new THREE.MeshStandardMaterial({color:0xffd86c,roughness:.89,metalness:0,side:THREE.DoubleSide});
+     child.frustumCulled=false;
+   }
+ });
+ modelRoot.add(mesh);
+ const bounds=new THREE.Box3().setFromObject(modelRoot),size=new THREE.Vector3(),mid=new THREE.Vector3();
+ bounds.getSize(size);bounds.getCenter(mid);
+ mesh.position.sub(mid);
+ const height=Math.max(size.y,.001),width=Math.max(size.x,.001),depth=Math.max(size.z,.001);
+ const fov=cam.fov*Math.PI/180, maxDimension=Math.max(height*1.26,width*cam.aspect*1.10,depth*.95);
+ distance=(maxDimension/2)/Math.tan(fov/2)+Math.max(.4,depth*.4);
+ cam.position.set(0,0,distance);
+ cam.near=Math.max(.01,distance/400);cam.far=distance*12;cam.updateProjectionMatrix();cam.lookAt(0,0,0);
+ loading.style.display="none";
+ ready=true;
+ window.__VOLTITO_3D__={ready:true,getAngle:()=>modelRoot.rotation.y,meshCount:()=>mesh.children.length,geometryBounds:{height,width,depth}};
+},undefined,err=>{loading.textContent="No se pudo abrir el GLB: "+String(err?.message||err);console.error(err)});
+function tick(t){if(lastT!==null&&auto)setAngle(yaw+Math.min(80,t-lastT)*.0007);lastT=t;renderer.render(scene,cam);requestAnimationFrame(tick)}
+requestAnimationFrame(tick);
+</script>
+</body></html>
