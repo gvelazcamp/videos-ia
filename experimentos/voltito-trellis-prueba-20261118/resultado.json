@@ -1,0 +1,94 @@
+{
+  "status": "candidato_3d_real_sin_aprobacion_visual",
+  "motor": "trellis-community/TRELLIS",
+  "metodo": "8 vistas horizontales alimentadas a la red multivista, no proyección 2D",
+  "vista_superior_inferior": "Conservadas como referencia pero no enviadas a esta generación 8 horizontales",
+  "seed": 27,
+  "modo": "multidiffusion",
+  "duracion_segundos": 47,
+  "modelo": {
+    "filename": "voltito-trellis-multivista-candidato.glb",
+    "bytes": 1444268,
+    "faces": 9840,
+    "vertices": 6422,
+    "dims": [
+      0.6155108213424683,
+      0.9996675252914429,
+      0.5643182694911957
+    ]
+  },
+  "inputs": [
+    {
+      "angle": "000",
+      "original": "experimentos/voltito-hunyuan-4v-20261118/voltito-frente.png",
+      "size": [
+        768,
+        1024
+      ],
+      "prepared": "experimentos/voltito-trellis-prueba-20261118/entradas/voltito-000.png"
+    },
+    {
+      "angle": "045",
+      "original": "experimentos/voltito-3d-10-vistas-20261118/voltito-045.png",
+      "size": [
+        768,
+        1024
+      ],
+      "prepared": "experimentos/voltito-trellis-prueba-20261118/entradas/voltito-045.png"
+    },
+    {
+      "angle": "090",
+      "original": "experimentos/voltito-hunyuan-4v-20261118/voltito-derecha.png",
+      "size": [
+        768,
+        1024
+      ],
+      "prepared": "experimentos/voltito-trellis-prueba-20261118/entradas/voltito-090.png"
+    },
+    {
+      "angle": "135",
+      "original": "experimentos/voltito-3d-10-vistas-20261118/voltito-135.png",
+      "size": [
+        768,
+        1024
+      ],
+      "prepared": "experimentos/voltito-trellis-prueba-20261118/entradas/voltito-135.png"
+    },
+    {
+      "angle": "180",
+      "original": "experimentos/voltito-hunyuan-4v-20261118/voltito-espalda.png",
+      "size": [
+        768,
+        1024
+      ],
+      "prepared": "experimentos/voltito-trellis-prueba-20261118/entradas/voltito-180.png"
+    },
+    {
+      "angle": "225",
+      "original": "experimentos/voltito-3d-10-vistas-20261118/voltito-225.png",
+      "size": [
+        768,
+        1024
+      ],
+      "prepared": "experimentos/voltito-trellis-prueba-20261118/entradas/voltito-225.png"
+    },
+    {
+      "angle": "270",
+      "original": "experimentos/voltito-hunyuan-4v-20261118/voltito-izquierda.png",
+      "size": [
+        768,
+        1024
+      ],
+      "prepared": "experimentos/voltito-trellis-prueba-20261118/entradas/voltito-270.png"
+    },
+    {
+      "angle": "315",
+      "original": "experimentos/voltito-3d-10-vistas-20261118/voltito-315.png",
+      "size": [
+        768,
+        1024
+      ],
+      "prepared": "experimentos/voltito-trellis-prueba-20261118/entradas/voltito-315.png"
+    }
+  ]
+}
