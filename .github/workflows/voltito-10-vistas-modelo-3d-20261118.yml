@@ -1,0 +1,71 @@
+name: Voltito - 3D real mejorado con 10 vistas
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'experimentos/voltito-3d-10-vistas-20261118/voltito-*.png'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: voltito-modelo-3d-10-vistas
+  cancel-in-progress: false
+jobs:
+  modelar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: true}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Preparar modelado 3D gratuito y navegador para comprobar
+        run: |
+          python -m pip install --disable-pip-version-check 'numpy<3' scipy pillow trimesh playwright
+          python -m playwright install --with-deps chromium
+      - name: Comprobar que hay exactamente 10 vistas RGBA de Voltito
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          import json
+          root=Path("experimentos/voltito-3d-10-vistas-20261118")
+          earlier=Path("experimentos/voltito-hunyuan-4v-20261118")
+          for name in ("045","135","225","315","superior","inferior"):
+            with Image.open(root/f"voltito-{name}.png") as img:
+              img.load();assert img.mode=="RGBA" and img.size==(768,1024)
+              assert img.getchannel("A").getextrema()==(0,255)
+          for name in ("frente","derecha","espalda","izquierda"):
+            with Image.open(earlier/f"voltito-{name}.png") as img:
+              img.load();assert img.mode=="RGBA" and img.size==(768,1024)
+          assert (earlier/"voltito-4v-colores.glb").stat().st_size>1000000
+          assert len(json.loads((root/"manifest-vistas.json").read_text())["vistas"])==10
+          print("10 vistas verificadas, malla original Hunyuan intacta")
+          PY
+      - name: Transferir color de diez imágenes a geometría 3D real
+        run: python experimentos/voltito-3d-10-vistas-20261118/colorear_10.py
+      - name: Validar con Chrome móvil: ángulos 37 128 y arriba abajo
+        run: python experimentos/voltito-3d-10-vistas-20261118/validar_3d.py
+      - name: Publicar exclusivamente nuevo candidato GLB y sus capturas
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add -- experimentos/voltito-3d-10-vistas-20261118/voltito-10-vistas-mejorado.glb
+          git add -- experimentos/voltito-3d-10-vistas-20261118/diagnostico-10-vistas.json
+          git add -- experimentos/voltito-3d-10-vistas-20261118/prueba-3d-*.png
+          if git diff --cached --quiet; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Voltito 3D real: color mejorado con diez vistas, revisión de giro continuo'
+          git pull --rebase origin main
+          git push origin HEAD:main
+      - name: Exportar candidato para inspección
+        uses: actions/upload-artifact@v4
+        with:
+          name: voltito-10-vistas-glb-experimental
+          path: |
+            experimentos/voltito-3d-10-vistas-20261118/voltito-10-vistas-mejorado.glb
+            experimentos/voltito-3d-10-vistas-20261118/prueba-3d-*.png
+          if-no-files-found: error
+          retention-days: 7
