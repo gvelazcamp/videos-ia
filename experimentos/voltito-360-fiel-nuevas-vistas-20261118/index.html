@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#082b37">
+<title>Voltito — 360° con sus imágenes originales y Remove.bg</title>
+<style>
+:root{color-scheme:dark;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;min-height:100%;background:#071d26;color:#f0fdf7}
+body{display:flex;justify-content:center}
+main{width:100%;max-width:860px;background:#0d3140;min-height:100dvh;overflow:hidden}
+header{padding:17px 17px 11px;display:flex;align-items:center;justify-content:space-between;gap:14px}
+h1{font-size:clamp(27px,6vw,38px);letter-spacing:.13em;margin:0;color:#fff1bb;font-weight:900}
+.subtitle{font-size:12px;margin:6px 0 0;color:#c6e4de;line-height:1.5}
+.chip{white-space:nowrap;border:1px solid #91e8cb67;border-radius:20px;padding:7px 10px;font-size:11px;font-weight:700;color:#cefff1}
+#stage{position:relative;height:min(68dvh,670px);min-height:380px;touch-action:none;overflow:hidden;cursor:grab;background:radial-gradient(ellipse at 50% 38%,#397f81 0%,#23596a 52%,#0c3344 100%);border-block:1px solid #ffffff21}
+#stage:active{cursor:grabbing}
+#photo{display:block;width:100%;height:100%;object-fit:contain;object-position:center center;padding:12px 13px 8px;pointer-events:none;user-select:none;-webkit-user-drag:none}
+#stage.checker{background-color:#e5e5e5;background-image:linear-gradient(45deg,#ccc 25%,transparent 25%),linear-gradient(-45deg,#ccc 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#ccc 75%),linear-gradient(-45deg,transparent 75%,#ccc 75%);background-size:28px 28px;background-position:0 0,0 14px,14px -14px,-14px 0}
+#stage.checker #hint{background:#163944e8}
+#hint{position:absolute;bottom:11px;left:50%;transform:translateX(-50%);background:#062c3ad6;color:#ebfff9;border-radius:22px;font-size:11px;padding:8px 14px;pointer-events:none;white-space:nowrap}
+#wait{position:absolute;inset:0;display:flex;justify-content:center;align-items:center;background:#153c48;color:#e8fef9;font-size:14px;text-align:center;padding:25px;z-index:5}
+.controls{background:#092b37;padding:14px 13px;display:flex;gap:9px;align-items:center;flex-wrap:wrap;justify-content:center}
+input[type=range]{accent-color:#54e9cf;flex:1;min-width:140px}
+#degrees{width:50px;text-align:right;color:#ffe9a3;font-weight:800;font-variant-numeric:tabular-nums;font-size:17px}
+button{border:1px solid #80dbc459;background:#205463;border-radius:10px;color:#f1fff9;font-weight:750;font-size:12px;padding:11px 13px;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:2px solid #ffe5aa;outline-offset:3px}
+#status{padding:2px 14px 15px;text-align:center;background:#092b37;color:#d1ebe4;margin:0;font-size:13px}
+.heading{font-size:14px;color:#ffe9ac;margin:0 0 9px}
+.gallery{padding:14px 14px 10px;background:#082733}
+.gallery p{color:#badad6;font-size:12px;line-height:1.5;margin:0 0 10px}
+.frames{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.frame{border:1px solid #68c4bb57;border-radius:11px;background:#16424c;display:flex;flex-direction:column;gap:5px;align-items:center;padding:7px 5px;cursor:pointer;color:#f5fff9;min-width:0}
+.frame.active{outline:2px solid #66ead4;outline-offset:1px}
+.frame img{height:104px;width:100%;object-fit:contain;pointer-events:none}
+.frame span{font-size:10px;font-weight:700;text-align:center}
+.info{padding:9px 15px 22px;font-size:11px;line-height:1.6;color:#b0d0ce}
+.info strong{color:#f7ead1}
+.links{display:flex;flex-wrap:wrap;gap:10px;margin-top:11px}
+.links a{color:#afffe6;font-size:12px}
+@media(max-width:500px){#stage{height:59dvh;min-height:350px}.subtitle{font-size:11px}.chip{font-size:10px}header{padding:13px 12px 9px}h1{font-size:26px}.frame img{height:80px}.controls{gap:7px}}
+</style>
+</head>
+<body><main>
+<header><div><h1>VOLTITO</h1><p class="subtitle">Tus imágenes originales · vistas recortadas con Remove.bg</p></div><div class="chip">360° táctil<br>6 poses</div></header>
+<section id="stage" aria-label="Voltito, visor giratorio de poses reales">
+<img id="photo" alt="Voltito de frente" draggable="false" decoding="async">
+<div id="wait">Cargando imágenes de Voltito…</div>
+<div id="hint">↔ Deslizá para cambiar el ángulo</div>
+</section>
+<div class="controls">
+<input id="range" aria-label="Ángulo de giro" type="range" min="0" max="360" value="0" step="1">
+<span id="degrees">0°</span>
+<button id="back" type="button">◀ Vista</button>
+<button id="forward" type="button">Vista ▶</button>
+<button id="spin" type="button">▶ Girar</button>
+<button id="reset" type="button">Frente</button>
+<button id="bg" type="button">Fondo</button>
+</div>
+<p id="status" aria-live="polite">Frente recto</p>
+<section class="gallery">
+<h2 class="heading">Poses originales que podés seleccionar</h2>
+<p>Frente recto y perfil derecho de tu nueva imagen; costado izquierdo y espalda de tus PNG aprobados; dos vistas tres cuartos (una reflejada).</p>
+<div class="frames" id="frames"></div>
+</section>
+<div class="info">
+<strong>Sobre el giro:</strong> este visor conserva los dibujos originales, con transparencia real. Cambia entre seis vistas al recorrer los 360°. No crea un personaje diferente ni pretende ser una malla 3D continua: para un giro perfectamente fluido hacen falta imágenes de los ángulos intermedios o una reconstrucción 3D fiel.
+<div class="links"><a href="./comparacion-vistas.jpg" target="_blank" rel="noopener">Comparar seis vistas</a><a href="../voltito-360-fiel-20261117/index.html">Visor anterior sin modificar</a></div>
+</div>
+<script>
+(()=>{
+"use strict";
+const base="voltito-";
+const poses=[
+ {angle:0,name:"Frente recto",file:"frente"},
+ {angle:45,name:"3/4 reflejado",file:"trescuartos-reflejo"},
+ {angle:90,name:"Costado derecho",file:"derecha"},
+ {angle:180,name:"Espalda",file:"espalda"},
+ {angle:270,name:"Costado izquierdo",file:"izquierda"},
+ {angle:315,name:"3/4 original",file:"trescuartos-original"}
+];
+const stage=document.getElementById("stage"),img=document.getElementById("photo"),
+loading=document.getElementById("wait"),range=document.getElementById("range"),
+degrees=document.getElementById("degrees"),status=document.getElementById("status"),
+frames=document.getElementById("frames"),spin=document.getElementById("spin");
+const buttons={back:document.getElementById("back"),forward:document.getElementById("forward"),reset:document.getElementById("reset"),bg:document.getElementById("bg")};
+let angle=0,playing=false,lastIndex=-1,lastTime=null,down=false,lastX=0,ready=false;
+const cache=poses.map(p=>{const image=new Image();image.src="./"+base+p.file+".png";return image});
+function nearest(a){
+ const distance=(x,y)=>Math.abs(((x-y+540)%360)-180);
+ let best=0;
+ for(let i=1;i<poses.length;i++)if(distance(a,poses[i].angle)<distance(a,poses[best].angle))best=i;
+ return best;
+}
+function update(a){
+ angle=((a%360)+360)%360;
+ const degree=Math.round(angle)%360;
+ range.value=degree;degrees.textContent=degree+"°";
+ if(!ready)return;
+ const i=nearest(angle);
+ if(i!==lastIndex){
+  lastIndex=i;
+  img.src=cache[i].src;
+  img.alt="Voltito: "+poses[i].name;
+  frames.querySelectorAll("button").forEach((b,j)=>b.classList.toggle("active",i===j));
+ }
+ status.textContent=poses[i].name+" · fotograma "+(i+1)+" de "+poses.length;
+}
+function setPlay(v){playing=v;spin.textContent=v?"Ⅱ Pausar":"▶ Girar"}
+for(const [i,p] of poses.entries()){
+ const button=document.createElement("button");
+ button.type="button";button.className="frame";button.setAttribute("aria-label","Ver "+p.name);
+ button.innerHTML='<img src="./voltito-'+p.file+'.png" alt="" loading="lazy"><span>'+p.name+'</span>';
+ button.addEventListener("click",()=>{setPlay(false);update(p.angle)});
+ frames.appendChild(button);
+}
+range.addEventListener("input",()=>{setPlay(false);update(Number(range.value))});
+buttons.reset.addEventListener("click",()=>{setPlay(false);update(0)});
+buttons.back.addEventListener("click",()=>{setPlay(false);const current=nearest(angle);update(poses[(current+poses.length-1)%poses.length].angle)});
+buttons.forward.addEventListener("click",()=>{setPlay(false);const current=nearest(angle);update(poses[(current+1)%poses.length].angle)});
+buttons.bg.addEventListener("click",()=>stage.classList.toggle("checker"));
+spin.addEventListener("click",()=>setPlay(!playing));
+stage.addEventListener("pointerdown",e=>{down=true;lastX=e.clientX;setPlay(false);stage.setPointerCapture(e.pointerId)});
+stage.addEventListener("pointermove",e=>{if(!down)return;const diff=e.clientX-lastX;lastX=e.clientX;update(angle+diff*.9)});
+for(const event of ["pointerup","pointercancel","lostpointercapture"])stage.addEventListener(event,()=>down=false);
+function tick(t){if(lastTime!==null&&playing&&ready)update(angle+Math.min(60,t-lastTime)*.042);lastTime=t;requestAnimationFrame(tick)}
+Promise.all(cache.map(im=>new Promise(resolve=>{
+ if(im.complete)resolve(im.naturalWidth>0);
+ else {im.onload=()=>resolve(true);im.onerror=()=>resolve(false)}
+}))).then(results=>{
+ const errors=results.map((good,i)=>good?null:poses[i].file).filter(Boolean);
+ if(errors.length){loading.textContent="Error: faltan PNG: "+errors.join(", ");status.textContent=loading.textContent;console.error(errors);return;}
+ ready=true;loading.style.display="none";update(0);
+});
+requestAnimationFrame(tick);
+window.__VOLTITO_POSES__={getState:()=>({ready,angle,index:lastIndex,pose:poses[lastIndex]?.file||null,playing}),update,poses};
+})();
+</script>
+</main></body></html>
