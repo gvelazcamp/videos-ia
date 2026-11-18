@@ -1,0 +1,30 @@
+name: TRELLIS - diagnostico de servicio multivista gratuito
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/voltito-trellis-probar-20261118.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  diagnostico:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: true}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Comprobar Spaces de TRELLIS gratis y endpoints multivista
+        run: python experimentos/voltito-trellis-prueba-20261118/probar_servicios.py
+      - name: Guardar resultado sin modificar modelos existentes
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add -- experimentos/voltito-trellis-prueba-20261118/diagnostico-servicios.json
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'TRELLIS: diagnostico gratuito de endpoints remotos' || exit 0
+          git pull --rebase origin main
+          git push origin HEAD:main
