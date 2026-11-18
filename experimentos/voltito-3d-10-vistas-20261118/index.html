@@ -43,7 +43,7 @@ h2{font-size:15px;color:#ffe3ab;margin:0 0 8px}
 <section>
 <h2>Las 10 referencias utilizadas</h2>
 <div class="refs" id="references"></div>
-<p class="note"><strong>Modelo 3D verdadero:</strong> los giros son continuos, no una secuencia de imágenes. La geometría procede de Hunyuan3D-2mv con 4 vistas cardinales; las diagonales y las vistas superior e inferior se proyectaron sobre la malla para mejorar los colores. <strong>Es un candidato sin aprobar:</strong> algunos detalles finos todavía pueden diferir del Voltito original.</p>
+<p class="note"><strong>Modelo 3D verdadero:</strong> los giros son continuos, no una secuencia de imágenes. La geometría procede de Hunyuan3D-2mv con 4 vistas cardinales; las diagonales y las vistas superior e inferior aportan ajustes selectivos de color sobre la malla, sin sobrescribir la cara original. <strong>Es un candidato sin aprobar:</strong> algunos detalles finos todavía pueden diferir del Voltito original.</p>
 <p class="note">La <a href="../voltito-hunyuan-4v-20261118/index.html">versión 3D anterior</a> sigue intacta.</p>
 </section>
 <script type="module">
@@ -84,7 +84,7 @@ host.addEventListener('pointerdown',e=>{dragging=true;px=e.clientX;py=e.clientY;
 host.addEventListener('pointermove',e=>{if(!dragging)return;updateYaw(yaw+(e.clientX-px)*.012);updatePitch(pitch+(e.clientY-py)*.008);px=e.clientX;py=e.clientY});
 for(const evt of ['pointerup','pointercancel','lostpointercapture'])host.addEventListener(evt,()=>dragging=false);
 host.addEventListener('wheel',e=>{e.preventDefault();camera.position.z=THREE.MathUtils.clamp(camera.position.z+e.deltaY*.008,1,30)},{passive:false});
-new GLTFLoader().load('./voltito-10-vistas-mejorado.glb',gltf=>{
+new GLTFLoader().load('./voltito-10-vistas-mejorado.glb?version=20261118-v2',gltf=>{
  const obj=gltf.scene;
  obj.traverse(child=>{if(child.isMesh){child.material=new THREE.MeshBasicMaterial({vertexColors:true,toneMapped:false,side:THREE.DoubleSide});child.frustumCulled=false}});
  root.add(obj);
