@@ -46,6 +46,10 @@ try:
         assert page.locator('#degree').inner_text()=='0°'
         page.locator('#spin').click()
         assert 'Pausar' in page.locator('#spin').inner_text()
+        page.locator('#light').click()
+        assert page.locator('#light').inner_text()=='Color claro'
+        page.locator('#light').click()
+        assert page.locator('#light').inner_text()=='Sombras'
         if errors:raise RuntimeError(str(errors))
         browser.close()
 finally:
