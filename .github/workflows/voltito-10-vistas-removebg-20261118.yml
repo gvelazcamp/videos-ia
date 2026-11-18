@@ -1,0 +1,52 @@
+name: Voltito 3D 10 vistas - preparar PNG transparentes
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/voltito-10-vistas-removebg-20261118.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: voltito-10-vistas-removebg
+  cancel-in-progress: false
+jobs:
+  recortes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Preparar Remove.bg web gratuito
+        run: |
+          python -m pip install --disable-pip-version-check numpy pillow playwright
+          python -m playwright install --with-deps chromium
+      - name: Descargar los dos collages adjuntados por el usuario y separar seis vistas
+        run: python experimentos/voltito-3d-10-vistas-20261118/preparar_10.py preparar
+      - name: Remove.bg en seis vistas, preservando RGB original
+        shell: bash
+        run: |
+          set -euo pipefail
+          for vista in 045 135 225 315 superior inferior; do
+            IMAGE_PATH="experimentos/voltito-3d-10-vistas-20261118/origen-${vista}.png" \
+            OUTPUT_PATH="experimentos/voltito-3d-10-vistas-20261118/removebg-${vista}.png" \
+            python herramientas/removebg-web/remover.py
+          done
+      - name: Verificar seis PNG RGBA y mantener cuatro existentes sin cambios
+        run: python experimentos/voltito-3d-10-vistas-20261118/preparar_10.py finalizar
+      - name: Subir únicamente recursos de la carpeta nueva
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add -- experimentos/voltito-3d-10-vistas-20261118/voltito-*.png
+          git add -- experimentos/voltito-3d-10-vistas-20261118/fuente-*.jpg
+          git add -- experimentos/voltito-3d-10-vistas-20261118/manifest-vistas.json
+          if git diff --cached --quiet; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Voltito: incorporar 6 vistas nuevas transparentes sin tocar versiones existentes'
+          git pull --rebase origin main
+          git push origin HEAD:main
