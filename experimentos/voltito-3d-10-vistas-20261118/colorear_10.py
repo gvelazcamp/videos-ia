@@ -34,7 +34,7 @@ if not INPUT.is_file():raise RuntimeError("No existe el GLB 3D real anterior")
 loaded=trimesh.load(str(INPUT),force="scene",process=False)
 mesh=loaded.dump(concatenate=True)
 verts=np.asarray(mesh.vertices,dtype=np.float64)
-normals=np.asarray(mesh.vertex_normals,dtype=np.float64)
+normals=np.array(mesh.vertex_normals,dtype=np.float64,copy=True)
 normals/=np.maximum(np.linalg.norm(normals,axis=1,keepdims=True),1e-9)
 if len(verts)<20000 or len(mesh.faces)<50000:
     raise RuntimeError("La geometría base 3D está incompleta")
