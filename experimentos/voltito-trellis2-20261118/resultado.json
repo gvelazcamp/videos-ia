@@ -1,0 +1,22 @@
+{
+  "estado": "sin_generacion_3d",
+  "fecha_utc": "2026-11-18T14:40:48.395009+00:00",
+  "fuente": "experimentos/voltito-3d-10-vistas-20261118/voltito-045.png",
+  "modelo": "TRELLIS.2-4B",
+  "vistas_entregadas_al_modelo": 1,
+  "vistas_disponibles_para_comparacion": 10,
+  "aclaracion": "La API oficial de TRELLIS.2 admite una sola vista. No fingir reconstruccion de diez vistas ni exportar falso GLB.",
+  "pruebas": [
+    {
+      "space": "microsoft/TRELLIS.2",
+      "preview_type": "str",
+      "estado": "fallo",
+      "error": "AppError: You have exceeded your ZeroGPU quota (120s requested vs. 169s left). Try again in 23:59:47. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens"
+    },
+    {
+      "space": "henrybit/TRELLIS-2-4B-Demo",
+      "estado": "fallo",
+      "error": "AppError: You have exceeded your ZeroGPU quota (180s requested vs. 169s left). Try again in 23:59:45. Authenticate with a Hugging Face token for more quota - https://huggingface.co/settings/tokens"
+    }
+  ]
+}
