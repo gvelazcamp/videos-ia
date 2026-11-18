@@ -5,6 +5,8 @@ on:
     paths:
       - 'experimentos/voltito-trellis-prueba-20261118/voltito-trellis-multivista-candidato.glb'
       - '.github/workflows/voltito-trellis-validar-20261118.yml'
+      - 'experimentos/voltito-trellis-prueba-20261118/index.html'
+      - 'experimentos/voltito-trellis-prueba-20261118/validar_trellis.py'
   workflow_dispatch:
 permissions:
   contents: write
