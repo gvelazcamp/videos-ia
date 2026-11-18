@@ -1,50 +1,50 @@
 {
   "frente": {
     "input_size": [
-      346,
-      552
-    ],
-    "canvas_size": [
-      768,
-      1024
-    ],
-    "alpha_coverage": 0.417,
-    "bytes": 345102
-  },
-  "espalda": {
-    "input_size": [
-      346,
-      552
+      406,
+      535
     ],
     "canvas_size": [
       768,
       1024
     ],
     "alpha_coverage": 0.367,
-    "bytes": 306681
+    "bytes": 362251
+  },
+  "espalda": {
+    "input_size": [
+      406,
+      535
+    ],
+    "canvas_size": [
+      768,
+      1024
+    ],
+    "alpha_coverage": 0.325,
+    "bytes": 326114
   },
   "izquierda": {
     "input_size": [
-      346,
-      552
+      406,
+      535
     ],
     "canvas_size": [
       768,
       1024
     ],
-    "alpha_coverage": 0.323,
-    "bytes": 261030
+    "alpha_coverage": 0.284,
+    "bytes": 274194
   },
   "derecha": {
     "input_size": [
-      346,
-      552
+      406,
+      535
     ],
     "canvas_size": [
       768,
       1024
     ],
-    "alpha_coverage": 0.335,
-    "bytes": 258434
+    "alpha_coverage": 0.295,
+    "bytes": 270637
   }
 }
