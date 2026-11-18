@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/voltito-trellis-probar-subida-20261118.yml'
+      - 'experimentos/voltito-trellis-prueba-20261118/probar_subida.py'
   workflow_dispatch:
 permissions:
   contents: read
