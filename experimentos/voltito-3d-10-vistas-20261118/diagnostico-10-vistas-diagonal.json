@@ -1,0 +1,81 @@
+{
+  "estado": "candidato experimental (sin aprobación visual)",
+  "geometria": "Nueva malla Hunyuan3D-2mv de 4 vistas diagonales (45/135/225/315), reorientada",
+  "mejora": "Proyección de colores sobre la geometría real desde 8 azimuts y superior/inferior",
+  "no_es": "NO reconstrucción nativa de diez imágenes en el generador Hunyuan",
+  "verts": 220921,
+  "faces": 818508,
+  "size_bytes": 16009688,
+  "views": {
+    "frente": {
+      "angle": 0,
+      "image": "experimentos/voltito-hunyuan-4v-20261118/voltito-frente.png",
+      "pixels": 246058,
+      "affected_vertices": 45027,
+      "weight_mean": 0.06894
+    },
+    "045": {
+      "angle": 45,
+      "image": "experimentos/voltito-3d-10-vistas-20261118/voltito-045.png",
+      "pixels": 238200,
+      "affected_vertices": 54531,
+      "weight_mean": 0.06368
+    },
+    "derecha": {
+      "angle": 90,
+      "image": "experimentos/voltito-hunyuan-4v-20261118/voltito-derecha.png",
+      "pixels": 197435,
+      "affected_vertices": 36698,
+      "weight_mean": 0.05893
+    },
+    "135": {
+      "angle": 135,
+      "image": "experimentos/voltito-3d-10-vistas-20261118/voltito-135.png",
+      "pixels": 231774,
+      "affected_vertices": 51423,
+      "weight_mean": 0.0759
+    },
+    "espalda": {
+      "angle": 180,
+      "image": "experimentos/voltito-hunyuan-4v-20261118/voltito-espalda.png",
+      "pixels": 218217,
+      "affected_vertices": 43397,
+      "weight_mean": 0.05924
+    },
+    "225": {
+      "angle": 225,
+      "image": "experimentos/voltito-3d-10-vistas-20261118/voltito-225.png",
+      "pixels": 241063,
+      "affected_vertices": 50709,
+      "weight_mean": 0.07723
+    },
+    "izquierda": {
+      "angle": 270,
+      "image": "experimentos/voltito-hunyuan-4v-20261118/voltito-izquierda.png",
+      "pixels": 190477,
+      "affected_vertices": 37378,
+      "weight_mean": 0.05523
+    },
+    "315": {
+      "angle": 315,
+      "image": "experimentos/voltito-3d-10-vistas-20261118/voltito-315.png",
+      "pixels": 230266,
+      "affected_vertices": 51844,
+      "weight_mean": 0.0725
+    },
+    "superior": {
+      "angle": "superior",
+      "image": "experimentos/voltito-3d-10-vistas-20261118/voltito-superior.png",
+      "pixels": 60414,
+      "affected_vertices": 4819,
+      "weight_mean": 0.00184
+    },
+    "inferior": {
+      "angle": "inferior",
+      "image": "experimentos/voltito-3d-10-vistas-20261118/voltito-inferior.png",
+      "pixels": 58399,
+      "affected_vertices": 8676,
+      "weight_mean": 0.00413
+    }
+  }
+}
