@@ -67,7 +67,7 @@ jobs:
                   page.wait_for_function("window.__VOLTITO_3D__?.ready===true",timeout=85000)
                   print("Escena 3D y geometría:",page.evaluate("window.__VOLTITO_3D__.geometryBounds"))
                   assert not errors,errors
-                  for angle,name in [(0,"frente"),(90,"perfil"),(180,"espalda"),(270,"otro-perfil")]:
+                  for angle,name in [(0,"frente"),(37,"intermedio-37"),(90,"perfil"),(128,"intermedio-128"),(180,"espalda"),(270,"otro-perfil")]:
                       page.locator("#angle").evaluate("(el,value)=>{el.value=value;el.dispatchEvent(new Event('input',{bubbles:true}));}",angle)
                       assert page.locator("#degree").inner_text()==str(angle)+"°"
                       page.wait_for_timeout(700)
