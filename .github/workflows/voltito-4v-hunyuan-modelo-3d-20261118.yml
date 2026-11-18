@@ -1,0 +1,88 @@
+name: Voltito - Hunyuan3D real desde 4 vistas del mismo tamaño
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/voltito-4v-hunyuan-modelo-3d-20261118.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: voltito-4v-hunyuan-20261118
+  cancel-in-progress: false
+jobs:
+  reconstruir:
+    runs-on: ubuntu-latest
+    timeout-minutes: 28
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Instalar herramientas libres de Hunyuan3D y visor de prueba
+        shell: bash
+        run: |
+          python -m pip install --disable-pip-version-check 'gradio_client>=1.6,<3' pillow 'numpy<3' scipy trimesh playwright
+          python -m playwright install --with-deps chromium
+      - name: Confirmar 4 vistas Remove.bg completas y corregidas (sin pies recortados)
+        shell: bash
+        run: |
+          set -euo pipefail
+          for i in $(seq 1 32); do
+            git fetch --quiet origin main
+            git reset --hard --quiet origin/main
+            if python - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          import json
+          p=Path("experimentos/voltito-hunyuan-4v-20261118")
+          f=p/"vistas-diagnostico.json"
+          if not f.exists():raise SystemExit(1)
+          data=json.loads(f.read_text())
+          for n in ("frente","espalda","izquierda","derecha"):
+              if data.get(n,{}).get("input_size")!=[406,535]:raise SystemExit(1)
+              img=p/f"voltito-{n}.png"
+              if not img.exists():raise SystemExit(1)
+              with Image.open(img) as im:
+                  if im.mode!="RGBA" or im.size!=(768,1024) or im.getchannel("A").getextrema()!=(0,255):
+                      raise SystemExit(1)
+          print("OK: cuatro vistas uniformes completas",flush=True)
+          PY
+            then
+              exit 0
+            fi
+            echo "Aún faltan las cuatro vistas completas con Remove.bg; comprobación $i/32"
+            sleep 15
+          done
+          echo "No se obtuvieron las vistas correctas. No generar 3D parcial." >&2
+          exit 1
+      - name: Reconstruir malla Hunyuan3D-2mv desde las 4 vistas
+        run: python experimentos/voltito-hunyuan-4v-20261118/generar_modelo.py
+      - name: Colorear malla GLB con los colores de la nueva lámina
+        run: python experimentos/voltito-hunyuan-4v-20261118/colorear_malla.py
+      - name: Abrir GLB 3D auténtico en Chrome móvil y comprobar giro continuo
+        run: python experimentos/voltito-hunyuan-4v-20261118/validar_visor.py
+      - name: Publicar sólo los modelos NUEVOS sin reemplazar versiones anteriores
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add -- experimentos/voltito-hunyuan-4v-20261118/voltito-4v-*.glb
+          git add -- experimentos/voltito-hunyuan-4v-20261118/captura-3d-*.png
+          git add -- experimentos/voltito-hunyuan-4v-20261118/estado.json
+          git add -- experimentos/voltito-hunyuan-4v-20261118/proyeccion-diagnostico.json
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Voltito: malla real Hunyuan3D 4 vistas iguales y capturas verificadas'
+          git pull --rebase origin main
+          git push origin HEAD:main
+      - name: Respaldar los modelos reales para revisión
+        uses: actions/upload-artifact@v4
+        with:
+          name: voltito-4v-malla-3d-hunyuan
+          path: |
+            experimentos/voltito-hunyuan-4v-20261118/voltito-4v-*.glb
+            experimentos/voltito-hunyuan-4v-20261118/captura-3d-*.png
+          if-no-files-found: error
+          retention-days: 7
