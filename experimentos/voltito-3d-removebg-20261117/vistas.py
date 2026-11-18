@@ -8,7 +8,7 @@ import sys
 ROOT=Path(__file__).resolve().parents[2]
 DEST=Path(__file__).resolve().parent
 SOURCE=ROOT/"experimentos/voltito-realista-360-20261117/voltito-hoja-original.png"
-BOXES={"izquierda":(840,14,1031,333),"derecha":(1044,14,1239,333),"espalda":(1151,14,1390,333)}
+BOXES={"izquierda":(840,20,1030,330),"derecha":(1050,20,1237,330),"espalda":(1260,20,1520,330)}
 # Espalda en ficha: última vista a partir x 1150.
 OUT_SIZE=(700,920)
 
