@@ -1,0 +1,33 @@
+name: Voltito - TRELLIS.2 diagnostico de disponibilidad gratuito
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/voltito-trellis2-diagnostico-20261118.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Consultar la API pública de TRELLIS.2 sin gastar cuota
+        run: python experimentos/voltito-trellis2-20261118/probar_disponibilidad.py
+      - name: Registrar motores libres y funciones disponibles para Voltito
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add -- experimentos/voltito-trellis2-20261118/disponibilidad.json
+          if git diff --cached --quiet; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Voltito: diagnóstico de Space gratuito TRELLIS.2'
+          git pull --rebase origin main
+          git push origin HEAD:main
