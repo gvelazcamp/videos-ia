@@ -47,7 +47,7 @@ try:
         check_box_rembg=False,
         num_chunks=8000,
         randomize_seed=False,
-        api_name="/generation_all",
+        api_name="/shape_generation",
     )
 except Exception as e:
     print("HUNYUAN_NO_DISPONIBLE:",type(e).__name__,str(e)[:2800],flush=True)
@@ -55,12 +55,13 @@ except Exception as e:
 print("Respuesta multivista",str(result)[:1700],flush=True)
 if not isinstance(result,(tuple,list)) or len(result)<2:
     raise RuntimeError("Respuesta inválida del generador 3D")
-mesh_white,mesh_textured=result[:2]
+mesh_white=result[0]
+mesh_textured=None
 def path_from(data):
     if isinstance(data,dict):
         data=data.get("path") or data.get("name") or data.get("url")
     return Path(str(data))
-for name,file in (("sin-texturas",mesh_white),("texturizado",mesh_textured)):
+for name,file in (("sin-texturas",mesh_white),):
     source=path_from(file)
     if not source.is_file():raise RuntimeError(f"No se descargó GLB del servicio gratuito: {name} {source}")
     raw=source.read_bytes()
@@ -70,4 +71,4 @@ for name,file in (("sin-texturas",mesh_white),("texturizado",mesh_textured)):
     output=HERE/f"candidato-voltito-{name}.glb"
     shutil.copy2(source,output)
     print("MALLA_3D_REAL",name,output,len(raw),flush=True)
-(HERE/"estado.json").write_text(json.dumps({"resultado":"candidato_sin_aprobacion_visual","base":"cuatro_png_originales","modelo":"Hunyuan3D-2mv","malla":"GLB auténtico no verificado por similitud visual"},ensure_ascii=False,indent=2))
+(HERE/"estado.json").write_text(json.dumps({"resultado":"solo_geometria_sin_texturas_y_sin_aprobacion_visual","base":"cuatro_png_originales","modelo":"Hunyuan3D-2mv","malla":"GLB auténtico no verificado por similitud visual"},ensure_ascii=False,indent=2))
