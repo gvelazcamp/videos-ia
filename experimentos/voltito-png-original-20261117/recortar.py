@@ -45,7 +45,7 @@ def finalizar():
             raise ValueError("Remove.bg no entregó transparencia completa")
         if abs((rgba.width/rgba.height)-(original.width/original.height))>.045:
             raise ValueError("Remove.bg alteró demasiado la proporción de la imagen")
-# Quitar únicamente la mancha triangular nacida al borrar el texto
+        # Quitar únicamente la mancha triangular nacida al borrar el texto
         # de la lámina. No forma parte del Voltito original.
         a=a.resize(original.size,Image.Resampling.LANCZOS)
         extra=Image.new("L",original.size,0)
