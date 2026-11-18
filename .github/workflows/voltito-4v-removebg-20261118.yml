@@ -1,0 +1,53 @@
+name: Voltito 4 vistas iguales - Remove.bg para modelo 3D
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/voltito-4v-removebg-20261118.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: voltito-4v-removebg-20261118
+  cancel-in-progress: false
+jobs:
+  preparar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 28
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Instalar remove.bg web gratuito y herramientas PNG
+        shell: bash
+        run: |
+          python -m pip install --disable-pip-version-check pillow numpy playwright
+          python -m playwright install --with-deps chromium
+      - name: Preparar 4 poses de la misma lámina nueva
+        run: python experimentos/voltito-hunyuan-4v-20261118/procesar.py preparar
+      - name: Remove.bg (sin API ni pagos) en las cuatro vistas
+        shell: bash
+        run: |
+          set -euo pipefail
+          for vista in frente espalda izquierda derecha; do
+            IMAGE_PATH="experimentos/voltito-hunyuan-4v-20261118/origen-${vista}.png" \
+            OUTPUT_PATH="experimentos/voltito-hunyuan-4v-20261118/removebg-${vista}.png" \
+            python herramientas/removebg-web/remover.py
+          done
+      - name: Verificar transparencia real y mismo tamaño de las cuatro poses
+        run: python experimentos/voltito-hunyuan-4v-20261118/procesar.py finalizar
+      - name: Publicar sólo nuevas referencias, sin tocar el Voltito anterior
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add -- experimentos/voltito-hunyuan-4v-20261118/lamina-original.jpg
+          git add -- experimentos/voltito-hunyuan-4v-20261118/voltito-*.png
+          git add -- experimentos/voltito-hunyuan-4v-20261118/vistas-diagnostico.json
+          if git diff --cached --quiet; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Voltito: nueva lámina 4 vistas iguales con fondos transparentes'
+          git pull --rebase origin main
+          git push origin HEAD:main
