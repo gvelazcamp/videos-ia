@@ -1,0 +1,33 @@
+{
+  "status": "candidato_vistas_unificadas_sin_aprobacion_visual",
+  "vertices": 200148,
+  "faces": 740548,
+  "color_range": [
+    0,
+    0,
+    0
+  ],
+  "input_views": {
+    "frente": {
+      "pixels": 250541,
+      "mean_weight": 0.10217777158566879,
+      "active_vertices": 55802
+    },
+    "izquierda": {
+      "pixels": 194040,
+      "mean_weight": 0.0898359221306599,
+      "active_vertices": 50705
+    },
+    "espalda": {
+      "pixels": 222542,
+      "mean_weight": 0.09692766335793758,
+      "active_vertices": 51004
+    },
+    "derecha": {
+      "pixels": 201047,
+      "mean_weight": 0.09138168657393296,
+      "active_vertices": 51378
+    }
+  },
+  "bytes": 14492536
+}
