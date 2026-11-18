@@ -7,6 +7,8 @@ from pathlib import Path
 from gradio_client import Client, handle_file
 from PIL import Image
 import json, shutil, struct, sys
+from urllib.request import Request, urlopen
+from urllib.parse import quote
 HERE=Path(__file__).resolve().parent
 ROOT=HERE.parents[1]
 SOURCE=ROOT/"experimentos/voltito-360-fiel-nuevas-vistas-20261118"
@@ -57,18 +59,43 @@ if not isinstance(result,(tuple,list)) or len(result)<2:
     raise RuntimeError("Respuesta inválida del generador 3D")
 mesh_white=result[0]
 mesh_textured=None
-def path_from(data):
+def read_from_space(data):
+    # Gradio returns gr.update(value="/tmp/gradio/…/white_mesh.glb")
+    # not a local downloaded file. Fetch the exact artifact over the public
+    # Space file endpoint: no credentials, no paid API, no replacement model.
     if isinstance(data,dict):
-        data=data.get("path") or data.get("name") or data.get("url")
-    return Path(str(data))
+        data=data.get("path") or data.get("value") or data.get("url")
+    if not data:
+        raise RuntimeError("Servicio no publicó ruta GLB")
+    p=Path(str(data))
+    if p.is_file():
+        return p.read_bytes()
+    service=str(getattr(client,"src","https://tencent-hunyuan3d-2mv.hf.space")).rstrip("/")
+    remote_path=str(data)
+    if not remote_path.startswith("/tmp/gradio/") or not remote_path.endswith(".glb"):
+        raise ValueError("Ruta del fichero de salida inesperada: "+remote_path[:250])
+    paths=[
+        service+"/gradio_api/file="+quote(remote_path,safe="/"),
+        service+"/file="+quote(remote_path,safe="/"),
+    ]
+    for url in paths:
+        try:
+            with urlopen(Request(url,headers={"User-Agent":"Mozilla/5.0"}),timeout=75) as resp:
+                raw=resp.read(60_000_001)
+            if raw[:4]==b"glTF" and len(raw)<60_000_000:
+                print("Malla descargada del endpoint publico:",len(raw),flush=True)
+                return raw
+            print("Fichero remoto invalido",url,raw[:80],flush=True)
+        except Exception as exc:
+            print("Ruta fallida:",type(exc).__name__,str(exc)[:250],flush=True)
+    raise RuntimeError("Malla generada pero la descarga publica no esta disponible")
+
 for name,file in (("sin-texturas",mesh_white),):
-    source=path_from(file)
-    if not source.is_file():raise RuntimeError(f"No se descargó GLB del servicio gratuito: {name} {source}")
-    raw=source.read_bytes()
+    raw=read_from_space(file)
     if len(raw)<40000 or raw[:4]!=b"glTF":raise RuntimeError(f"Malla GLB inválida: {name}")
     magic,version,total=struct.unpack_from("<4sII",raw)
     if version!=2 or total!=len(raw):raise RuntimeError(f"GLB incompleto: {name}")
     output=HERE/f"candidato-voltito-{name}.glb"
-    shutil.copy2(source,output)
+    output.write_bytes(raw)
     print("MALLA_3D_REAL",name,output,len(raw),flush=True)
 (HERE/"estado.json").write_text(json.dumps({"resultado":"solo_geometria_sin_texturas_y_sin_aprobacion_visual","base":"cuatro_png_originales","modelo":"Hunyuan3D-2mv","malla":"GLB auténtico no verificado por similitud visual"},ensure_ascii=False,indent=2))
