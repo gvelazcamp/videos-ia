@@ -1,0 +1,1330 @@
+{
+  "microsoft/TRELLIS.2": {
+    "space": "microsoft/TRELLIS.2",
+    "status": "RUNNING",
+    "hardware": {
+      "current": "zero-a10g",
+      "requested": "zero-a10g"
+    },
+    "sdk": "gradio",
+    "host": "https://microsoft-trellis-2.hf.space",
+    "api_endpoint": "https://microsoft-trellis-2.hf.space/gradio_api/info",
+    "api": {
+      "/start_session": {
+        "parameters": [],
+        "returns": []
+      },
+      "/preprocess_image": {
+        "parameters": [
+          {
+            "name": "input",
+            "type": {
+              "properties": {
+                "path": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "description": "Path to a local file",
+                  "title": "Path"
+                },
+                "url": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "description": "Publicly available url or base64 encoded image",
+                  "title": "Url"
+                },
+                "size": {
+                  "anyOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "description": "Size of image in bytes",
+                  "title": "Size"
+                },
+                "orig_name": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "description": "Original filename",
+                  "title": "Orig Name"
+                },
+                "mime_type": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "description": "mime type of image",
+                  "title": "Mime Type"
+                },
+                "is_stream": {
+                  "default": false,
+                  "description": "Can always be set to False",
+                  "title": "Is Stream",
+                  "type": "boolean"
+                },
+                "meta": {
+                  "additionalProperties": true,
+                  "default": {
+                    "_type": "gradio.FileData"
+                  },
+                  "title": "Meta",
+                  "type": "object"
+                }
+              },
+              "title": "ImageData",
+              "type": "object",
+              "additional_description": "For input, either path or url must be provided. For output, path is always provided."
+            },
+            "example": "None"
+          }
+        ],
+        "returns": [
+          {
+            "type": {
+              "properties": {
+                "path": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "description": "Path to a local file",
+                  "title": "Path"
+                },
+                "url": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "description": "Publicly available url or base64 encoded image",
+                  "title": "Url"
+                },
+                "size": {
+                  "anyOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "description": "Size of image in bytes",
+                  "title": "Size"
+                },
+                "orig_name": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "description": "Original filename",
+                  "title": "Orig Name"
+                },
+                "mime_type": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "description": "mime type of image",
+                  "title": "Mime Type"
+                },
+                "is_stream": {
+                  "default": false,
+                  "description": "Can always be set to False",
+                  "title": "Is Stream",
+                  "type": "boolean"
+                },
+                "meta": {
+                  "additionalProperties": true,
+                  "default": {
+                    "_type": "gradio.FileData"
+                  },
+                  "title": "Meta",
+                  "type": "object"
+                }
+              },
+              "title": "ImageData",
+              "type": "object",
+              "additional_description": "For input, either path or url must be provided. For output, path is always provided."
+            },
+            "label": "Image Prompt"
+          }
+        ]
+      },
+      "/get_seed": {
+        "parameters": [
+          {
+            "name": "randomize_seed",
+            "type": {
+              "type": "boolean"
+            },
+            "example": "None"
+          },
+          {
+            "name": "seed",
+            "type": {
+              "type": "number",
+              "description": "numeric value between 0 and 2147483647"
+            },
+            "example": "None"
+          }
+        ],
+        "returns": [
+          {
+            "type": {
+              "type": "number",
+              "description": "numeric value between 0 and 2147483647"
+            },
+            "label": "Seed"
+          }
+        ]
+      },
+      "/lambda": {
+        "parameters": [],
+        "returns": []
+      },
+      "/image_to_3d": {
+        "parameters": [
+          {
+            "name": "image",
+            "type": {
+              "properties": {
+                "path": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "description": "Path to a local file",
+                  "title": "Path"
+                },
+                "url": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "description": "Publicly available url or base64 encoded image",
+                  "title": "Url"
+                },
+                "size": {
+                  "anyOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "description": "Size of image in bytes",
+                  "title": "Size"
+                },
+                "orig_name": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "description": "Original filename",
+                  "title": "Orig Name"
+                },
+                "mime_type": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "description": "mime type of image",
+                  "title": "Mime Type"
+                },
+                "is_stream": {
+                  "default": false,
+                  "description": "Can always be set to False",
+                  "title": "Is Stream",
+                  "type": "boolean"
+                },
+                "meta": {
+                  "additionalProperties": true,
+                  "default": {
+                    "_type": "gradio.FileData"
+                  },
+                  "title": "Meta",
+                  "type": "object"
+                }
+              },
+              "title": "ImageData",
+              "type": "object",
+              "additional_description": "For input, either path or url must be provided. For output, path is always provided."
+            },
+            "example": "None"
+          },
+          {
+            "name": "seed",
+            "type": {
+              "type": "number",
+              "description": "numeric value between 0 and 2147483647"
+            },
+            "example": "None"
+          },
+          {
+            "name": "resolution",
+            "type": {
+              "enum": [
+                "512",
+                "1024",
+                "1536"
+              ],
+              "title": "Radio",
+              "type": "string"
+            },
+            "example": "None"
+          },
+          {
+            "name": "ss_guidance_strength",
+            "type": {
+              "type": "number",
+              "description": "numeric value between 1.0 and 10.0"
+            },
+            "example": "None"
+          },
+          {
+            "name": "ss_guidance_rescale",
+            "type": {
+              "type": "number",
+              "description": "numeric value between 0.0 and 1.0"
+            },
+            "example": "None"
+          },
+          {
+            "name": "ss_sampling_steps",
+            "type": {
+              "type": "number",
+              "description": "numeric value between 1 and 50"
+            },
+            "example": "None"
+          },
+          {
+            "name": "ss_rescale_t",
+            "type": {
+              "type": "number",
+              "description": "numeric value between 1.0 and 6.0"
+            },
+            "example": "None"
+          },
+          {
+            "name": "shape_slat_guidance_strength",
+            "type": {
+              "type": "number",
+              "description": "numeric value between 1.0 and 10.0"
+            },
+            "example": "None"
+          },
+          {
+            "name": "shape_slat_guidance_rescale",
+            "type": {
+              "type": "number",
+              "description": "numeric value between 0.0 and 1.0"
+            },
+            "example": "None"
+          },
+          {
+            "name": "shape_slat_sampling_steps",
+            "type": {
+              "type": "number",
+              "description": "numeric value between 1 and 50"
+            },
+            "example": "None"
+          },
+          {
+            "name": "shape_slat_rescale_t",
+            "type": {
+              "type": "number",
+              "description": "numeric value between 1.0 and 6.0"
+            },
+            "example": "None"
+          },
+          {
+            "name": "tex_slat_guidance_strength",
+            "type": {
+              "type": "number",
+              "description": "numeric value between 1.0 and 10.0"
+            },
+            "example": "None"
+          },
+          {
+            "name": "tex_slat_guidance_rescale",
+            "type": {
+              "type": "number",
+              "description": "numeric value between 0.0 and 1.0"
+            },
+            "example": "None"
+          },
+          {
+            "name": "tex_slat_sampling_steps",
+            "type": {
+              "type": "number",
+              "description": "numeric value between 1 and 50"
+            },
+            "example": "None"
+          },
+          {
+            "name": "tex_slat_rescale_t",
+            "type": {
+              "type": "number",
+              "description": "numeric value between 1.0 and 6.0"
+            },
+            "example": "None"
+          }
+        ],
+        "returns": [
+          {
+            "type": {
+              "type": "string"
+            },
+            "label": "3D Asset Preview"
+          }
+        ]
+      },
+      "/lambda_1": {
+        "parameters": [],
+        "returns": []
+      },
+      "/extract_glb": {
+        "parameters": [
+          {
+            "name": "decimation_target",
+            "type": {
+              "type": "number",
+              "description": "numeric value between 100000 and 500000"
+            },
+            "example": "None"
+          },
+          {
+            "name": "texture_size",
+            "type": {
+              "type": "number",
+              "description": "numeric value between 1024 and 4096"
+            },
+            "example": "None"
+          }
+        ],
+        "returns": [
+          {
+            "type": {
+              "$defs": {
+                "FileDataMeta": {
+                  "properties": {
+                    "_type": {
+                      "const": "gradio.FileData",
+                      "title": "Type",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "_type"
+                  ],
+                  "title": "FileDataMeta",
+                  "type": "object"
+                }
+              },
+              "properties": {
+                "path": {
+                  "title": "Path",
+                  "type": "string"
+                },
+                "url": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Url"
+                },
+                "size": {
+                  "anyOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Size"
+                },
+                "orig_name": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Orig Name"
+                },
+                "mime_type": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Mime Type"
+                },
+                "is_stream": {
+                  "default": false,
+                  "title": "Is Stream",
+                  "type": "boolean"
+                },
+                "meta": {
+                  "$ref": "#/$defs/FileDataMeta"
+                }
+              },
+              "required": [
+                "path"
+              ],
+              "title": "FileData",
+              "type": "object",
+              "additional_description": "The FileData class is a subclass of the GradioModel class that represents a file object within a Gradio interface. It is used to store file data and metadata when a file is uploaded.\n\nAttributes:\n    path: The server file path where the file is stored.\n    url: The normalized server URL pointing to the file.\n    size: The size of the file in bytes.\n    orig_name: The original filename before upload.\n    mime_type: The MIME type of the file.\n    is_stream: Indicates whether the file is a stream.\n    meta: Additional metadata used internally (should not be changed)."
+            },
+            "label": "Extracted GLB"
+          },
+          {
+            "type": {
+              "$defs": {
+                "FileDataMeta": {
+                  "properties": {
+                    "_type": {
+                      "const": "gradio.FileData",
+                      "title": "Type",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "_type"
+                  ],
+                  "title": "FileDataMeta",
+                  "type": "object"
+                }
+              },
+              "properties": {
+                "path": {
+                  "title": "Path",
+                  "type": "string"
+                },
+                "url": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Url"
+                },
+                "size": {
+                  "anyOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Size"
+                },
+                "orig_name": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Orig Name"
+                },
+                "mime_type": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Mime Type"
+                },
+                "is_stream": {
+                  "default": false,
+                  "title": "Is Stream",
+                  "type": "boolean"
+                },
+                "meta": {
+                  "$ref": "#/$defs/FileDataMeta"
+                }
+              },
+              "required": [
+                "path"
+              ],
+              "title": "FileData",
+              "type": "object",
+              "additional_description": "The FileData class is a subclass of the GradioModel class that represents a file object within a Gradio interface. It is used to store file data and metadata when a file is uploaded.\n\nAttributes:\n    path: The server file path where the file is stored.\n    url: The normalized server URL pointing to the file.\n    size: The size of the file in bytes.\n    orig_name: The original filename before upload.\n    mime_type: The MIME type of the file.\n    is_stream: Indicates whether the file is a stream.\n    meta: Additional metadata used internally (should not be changed)."
+            },
+            "label": "Download GLB"
+          }
+        ]
+      }
+    }
+  },
+  "henrybit/TRELLIS-2-4B-Demo": {
+    "space": "henrybit/TRELLIS-2-4B-Demo",
+    "status": "RUNNING",
+    "hardware": {
+      "current": "zero-a10g",
+      "requested": "zero-a10g"
+    },
+    "sdk": "gradio",
+    "host": "https://henrybit-trellis-2-4b-demo.hf.space",
+    "api_endpoint": "https://henrybit-trellis-2-4b-demo.hf.space/gradio_api/info",
+    "api": {
+      "/start_session": {
+        "parameters": [],
+        "returns": []
+      },
+      "/preprocess_image": {
+        "parameters": [
+          {
+            "name": "input",
+            "type": {
+              "properties": {
+                "path": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "description": "Path to a local file",
+                  "title": "Path"
+                },
+                "url": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "description": "Publicly available url or base64 encoded image",
+                  "title": "Url"
+                },
+                "size": {
+                  "anyOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "description": "Size of image in bytes",
+                  "title": "Size"
+                },
+                "orig_name": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "description": "Original filename",
+                  "title": "Orig Name"
+                },
+                "mime_type": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "description": "mime type of image",
+                  "title": "Mime Type"
+                },
+                "is_stream": {
+                  "default": false,
+                  "description": "Can always be set to False",
+                  "title": "Is Stream",
+                  "type": "boolean"
+                },
+                "meta": {
+                  "additionalProperties": true,
+                  "default": {
+                    "_type": "gradio.FileData"
+                  },
+                  "title": "Meta",
+                  "type": "object"
+                }
+              },
+              "title": "ImageData",
+              "type": "object",
+              "additional_description": "For input, either path or url must be provided. For output, path is always provided."
+            },
+            "example": "None"
+          }
+        ],
+        "returns": [
+          {
+            "type": {
+              "properties": {
+                "path": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "description": "Path to a local file",
+                  "title": "Path"
+                },
+                "url": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "description": "Publicly available url or base64 encoded image",
+                  "title": "Url"
+                },
+                "size": {
+                  "anyOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "description": "Size of image in bytes",
+                  "title": "Size"
+                },
+                "orig_name": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "description": "Original filename",
+                  "title": "Orig Name"
+                },
+                "mime_type": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "description": "mime type of image",
+                  "title": "Mime Type"
+                },
+                "is_stream": {
+                  "default": false,
+                  "description": "Can always be set to False",
+                  "title": "Is Stream",
+                  "type": "boolean"
+                },
+                "meta": {
+                  "additionalProperties": true,
+                  "default": {
+                    "_type": "gradio.FileData"
+                  },
+                  "title": "Meta",
+                  "type": "object"
+                }
+              },
+              "title": "ImageData",
+              "type": "object",
+              "additional_description": "For input, either path or url must be provided. For output, path is always provided."
+            },
+            "label": "Image Prompt"
+          }
+        ]
+      },
+      "/get_seed": {
+        "parameters": [
+          {
+            "name": "randomize_seed",
+            "type": {
+              "type": "boolean"
+            },
+            "example": "None"
+          },
+          {
+            "name": "seed",
+            "type": {
+              "type": "number",
+              "description": "numeric value between 0 and 2147483647"
+            },
+            "example": "None"
+          }
+        ],
+        "returns": [
+          {
+            "type": {
+              "type": "number",
+              "description": "numeric value between 0 and 2147483647"
+            },
+            "label": "Seed"
+          }
+        ]
+      },
+      "/lambda": {
+        "parameters": [],
+        "returns": []
+      },
+      "/image_to_3d": {
+        "parameters": [
+          {
+            "name": "image",
+            "type": {
+              "properties": {
+                "path": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "description": "Path to a local file",
+                  "title": "Path"
+                },
+                "url": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "description": "Publicly available url or base64 encoded image",
+                  "title": "Url"
+                },
+                "size": {
+                  "anyOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "description": "Size of image in bytes",
+                  "title": "Size"
+                },
+                "orig_name": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "description": "Original filename",
+                  "title": "Orig Name"
+                },
+                "mime_type": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "description": "mime type of image",
+                  "title": "Mime Type"
+                },
+                "is_stream": {
+                  "default": false,
+                  "description": "Can always be set to False",
+                  "title": "Is Stream",
+                  "type": "boolean"
+                },
+                "meta": {
+                  "additionalProperties": true,
+                  "default": {
+                    "_type": "gradio.FileData"
+                  },
+                  "title": "Meta",
+                  "type": "object"
+                }
+              },
+              "title": "ImageData",
+              "type": "object",
+              "additional_description": "For input, either path or url must be provided. For output, path is always provided."
+            },
+            "example": "None"
+          },
+          {
+            "name": "seed",
+            "type": {
+              "type": "number",
+              "description": "numeric value between 0 and 2147483647"
+            },
+            "example": "None"
+          },
+          {
+            "name": "resolution",
+            "type": {
+              "enum": [
+                "512",
+                "1024",
+                "1536"
+              ],
+              "title": "Radio",
+              "type": "string"
+            },
+            "example": "None"
+          },
+          {
+            "name": "ss_guidance_strength",
+            "type": {
+              "type": "number",
+              "description": "numeric value between 1.0 and 10.0"
+            },
+            "example": "None"
+          },
+          {
+            "name": "ss_guidance_rescale",
+            "type": {
+              "type": "number",
+              "description": "numeric value between 0.0 and 1.0"
+            },
+            "example": "None"
+          },
+          {
+            "name": "ss_sampling_steps",
+            "type": {
+              "type": "number",
+              "description": "numeric value between 1 and 50"
+            },
+            "example": "None"
+          },
+          {
+            "name": "ss_rescale_t",
+            "type": {
+              "type": "number",
+              "description": "numeric value between 1.0 and 6.0"
+            },
+            "example": "None"
+          },
+          {
+            "name": "shape_slat_guidance_strength",
+            "type": {
+              "type": "number",
+              "description": "numeric value between 1.0 and 10.0"
+            },
+            "example": "None"
+          },
+          {
+            "name": "shape_slat_guidance_rescale",
+            "type": {
+              "type": "number",
+              "description": "numeric value between 0.0 and 1.0"
+            },
+            "example": "None"
+          },
+          {
+            "name": "shape_slat_sampling_steps",
+            "type": {
+              "type": "number",
+              "description": "numeric value between 1 and 50"
+            },
+            "example": "None"
+          },
+          {
+            "name": "shape_slat_rescale_t",
+            "type": {
+              "type": "number",
+              "description": "numeric value between 1.0 and 6.0"
+            },
+            "example": "None"
+          },
+          {
+            "name": "tex_slat_guidance_strength",
+            "type": {
+              "type": "number",
+              "description": "numeric value between 1.0 and 10.0"
+            },
+            "example": "None"
+          },
+          {
+            "name": "tex_slat_guidance_rescale",
+            "type": {
+              "type": "number",
+              "description": "numeric value between 0.0 and 1.0"
+            },
+            "example": "None"
+          },
+          {
+            "name": "tex_slat_sampling_steps",
+            "type": {
+              "type": "number",
+              "description": "numeric value between 1 and 50"
+            },
+            "example": "None"
+          },
+          {
+            "name": "tex_slat_rescale_t",
+            "type": {
+              "type": "number",
+              "description": "numeric value between 1.0 and 6.0"
+            },
+            "example": "None"
+          }
+        ],
+        "returns": [
+          {
+            "type": {
+              "type": "string"
+            },
+            "label": "3D Asset Preview"
+          }
+        ]
+      },
+      "/lambda_1": {
+        "parameters": [],
+        "returns": []
+      },
+      "/extract_glb": {
+        "parameters": [
+          {
+            "name": "decimation_target",
+            "type": {
+              "type": "number",
+              "description": "numeric value between 100000 and 500000"
+            },
+            "example": "None"
+          },
+          {
+            "name": "texture_size",
+            "type": {
+              "type": "number",
+              "description": "numeric value between 1024 and 4096"
+            },
+            "example": "None"
+          }
+        ],
+        "returns": [
+          {
+            "type": {
+              "$defs": {
+                "FileDataMeta": {
+                  "properties": {
+                    "_type": {
+                      "const": "gradio.FileData",
+                      "title": "Type",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "_type"
+                  ],
+                  "title": "FileDataMeta",
+                  "type": "object"
+                }
+              },
+              "properties": {
+                "path": {
+                  "title": "Path",
+                  "type": "string"
+                },
+                "url": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Url"
+                },
+                "size": {
+                  "anyOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Size"
+                },
+                "orig_name": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Orig Name"
+                },
+                "mime_type": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Mime Type"
+                },
+                "is_stream": {
+                  "default": false,
+                  "title": "Is Stream",
+                  "type": "boolean"
+                },
+                "meta": {
+                  "$ref": "#/$defs/FileDataMeta"
+                }
+              },
+              "required": [
+                "path"
+              ],
+              "title": "FileData",
+              "type": "object",
+              "additional_description": "The FileData class is a subclass of the GradioModel class that represents a file object within a Gradio interface. It is used to store file data and metadata when a file is uploaded.\n\nAttributes:\n    path: The server file path where the file is stored.\n    url: The normalized server URL pointing to the file.\n    size: The size of the file in bytes.\n    orig_name: The original filename before upload.\n    mime_type: The MIME type of the file.\n    is_stream: Indicates whether the file is a stream.\n    meta: Additional metadata used internally (should not be changed)."
+            },
+            "label": "Extracted GLB"
+          },
+          {
+            "type": {
+              "$defs": {
+                "FileDataMeta": {
+                  "properties": {
+                    "_type": {
+                      "const": "gradio.FileData",
+                      "title": "Type",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "_type"
+                  ],
+                  "title": "FileDataMeta",
+                  "type": "object"
+                }
+              },
+              "properties": {
+                "path": {
+                  "title": "Path",
+                  "type": "string"
+                },
+                "url": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Url"
+                },
+                "size": {
+                  "anyOf": [
+                    {
+                      "type": "integer"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Size"
+                },
+                "orig_name": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Orig Name"
+                },
+                "mime_type": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "default": null,
+                  "title": "Mime Type"
+                },
+                "is_stream": {
+                  "default": false,
+                  "title": "Is Stream",
+                  "type": "boolean"
+                },
+                "meta": {
+                  "$ref": "#/$defs/FileDataMeta"
+                }
+              },
+              "required": [
+                "path"
+              ],
+              "title": "FileData",
+              "type": "object",
+              "additional_description": "The FileData class is a subclass of the GradioModel class that represents a file object within a Gradio interface. It is used to store file data and metadata when a file is uploaded.\n\nAttributes:\n    path: The server file path where the file is stored.\n    url: The normalized server URL pointing to the file.\n    size: The size of the file in bytes.\n    orig_name: The original filename before upload.\n    mime_type: The MIME type of the file.\n    is_stream: Indicates whether the file is a stream.\n    meta: Additional metadata used internally (should not be changed)."
+            },
+            "label": "Download GLB"
+          }
+        ]
+      }
+    }
+  },
+  "opsiclear-admin/Trellis.2.multiview": {
+    "space": "opsiclear-admin/Trellis.2.multiview",
+    "status": "CONFIG_ERROR",
+    "hardware": {
+      "current": null,
+      "requested": "zero-a10g"
+    },
+    "sdk": "gradio",
+    "host": "https://opsiclear-admin-trellis-2-multiview.hf.space",
+    "api_errors": [
+      "HTTP Error 503: Service Unavailable",
+      "HTTP Error 503: Service Unavailable"
+    ]
+  }
+}
