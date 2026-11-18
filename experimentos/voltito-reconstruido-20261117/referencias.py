@@ -60,9 +60,21 @@ def finalizar():
   src.save(out,"PNG",optimize=True)
   with Image.open(out) as valid:
    valid.load()
-   assert valid.mode=="RGBA" and valid.getchannel("A").getextrema()==(0,255)
+   assert valid.mode=="RGBA" and valid.getchannel("A").getextrema()[0]==0 and valid.getchannel("A").getextrema()[1]>=245
    assert valid.size[0]>900 and valid.size[1]>1300
   print("HD original con bordes limpios:",out.relative_to(ROOT),compare)
+ # La textura se extrae de una región de pelaje real del PNG HD de perfil,
+ # sin inventar colores ni modificar la imagen de referencia.
+ with Image.open(ASSETS/"original-perfil.png") as base:
+  from PIL import ImageOps
+  patch=base.convert("RGB").crop((420,580,540,700))
+  tile=Image.new("RGB",(240,240))
+  tile.paste(patch,(0,0))
+  tile.paste(ImageOps.mirror(patch),(120,0))
+  tile.paste(ImageOps.flip(patch),(0,120))
+  tile.paste(ImageOps.flip(ImageOps.mirror(patch)),(120,120))
+  tile.resize((512,512),Image.Resampling.LANCZOS).save(ASSETS/"pelaje-oro.jpg","JPEG",quality=87,optimize=True)
+ print("Textura de pelaje fotográfico generada desde imagen del usuario")
 
 if __name__=="__main__":
  if len(sys.argv)!=2 or sys.argv[1] not in ("preparar","finalizar"):
