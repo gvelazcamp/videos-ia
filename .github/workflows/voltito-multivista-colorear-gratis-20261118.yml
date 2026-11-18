@@ -1,0 +1,38 @@
+name: Voltito 3D real - colorear desde 4 PNG originales
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/voltito-multivista-colorear-gratis-20261118.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: voltito-multivista-colorear-gratis-20261118
+  cancel-in-progress: false
+jobs:
+  colorear:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: true}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Preparar herramientas para colorear malla real sin APIs pagas
+        run: |
+          python -m pip install --disable-pip-version-check 'numpy<3' pillow scipy trimesh
+      - name: Transferir colores exactos de las 4 imágenes a los vértices
+        run: python experimentos/voltito-3d-multivista-prueba-20261118/colorear_malla.py
+      - name: Guardar únicamente candidato con colores para inspección
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add -- experimentos/voltito-3d-multivista-prueba-20261118/candidato-voltito-proyeccion-color.glb
+          git add -- experimentos/voltito-3d-multivista-prueba-20261118/proyeccion-diagnostico.json
+          if git diff --cached --quiet; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Voltito 3D: candidato con colores de vistas originales, sujeto a revisión'
+          git pull --rebase origin main
+          git push origin HEAD:main
