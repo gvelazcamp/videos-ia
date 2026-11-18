@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/voltito-trellis-generar-20261118.yml'
+      - 'experimentos/voltito-trellis-prueba-20261118/generar_trellis.py'
   workflow_dispatch:
 
 permissions:
