@@ -2,7 +2,9 @@ name: Voltito referencias HD de usuario y Remove.bg
 on:
   push:
     branches: [main]
-    paths: ['.github/workflows/voltito-referencias-hd-20261117.yml']
+    paths:
+      - '.github/workflows/voltito-referencias-hd-20261117.yml'
+      - 'experimentos/voltito-reconstruido-20261117/referencias.py'
   workflow_dispatch:
 permissions:
   contents: write
@@ -41,6 +43,7 @@ jobs:
           set -euo pipefail
           git add -- experimentos/voltito-reconstruido-20261117/referencias/original-*.png
           git add -- experimentos/voltito-reconstruido-20261117/referencias/voltito-*-removebg-hd.png
+          git add -- experimentos/voltito-reconstruido-20261117/referencias/pelaje-oro.jpg
           if git diff --cached --quiet; then exit 0; fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
