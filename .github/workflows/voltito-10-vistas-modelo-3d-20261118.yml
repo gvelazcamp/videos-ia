@@ -45,7 +45,7 @@ jobs:
           PY
       - name: Transferir color de diez imágenes a geometría 3D real
         run: python experimentos/voltito-3d-10-vistas-20261118/colorear_10.py
-      - name: Validar con Chrome móvil: ángulos 37 128 y arriba abajo
+      - name: 'Validar con Chrome móvil: ángulos 37 128 y arriba abajo'
         run: python experimentos/voltito-3d-10-vistas-20261118/validar_3d.py
       - name: Publicar exclusivamente nuevo candidato GLB y sus capturas
         shell: bash
