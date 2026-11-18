@@ -42,6 +42,17 @@ jobs:
           git commit -m 'Voltito TRELLIS.2: candidato real o diagnóstico verificado'
           git pull --rebase origin main
           git push origin HEAD:main
+      - name: Marcar fallo real si ninguna GPU entrego archivo GLB
+        shell: bash
+        run: |
+          set -euo pipefail
+          model='experimentos/voltito-trellis2-20261118/voltito-trellis2-candidato.glb'
+          if [ ! -s "$model" ]; then
+            echo "No se genero GLB: consultar resultado.json; cuota gratuita GPU agotada." >&2
+            exit 1
+          fi
+          echo "GLB de TRELLIS.2 generado y disponible."
+
       - name: Respaldo opcional del modelo resultante
         uses: actions/upload-artifact@v4
         with:
