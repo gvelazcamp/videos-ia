@@ -88,6 +88,7 @@ function bolt(n,coords,z,thick,mat){
 ell("cuerpo dorado",FUR,[0,1.025,-.05],[.70,.84,.62],58);
 ell("vientre color crema",TUMMY,[0,.99,.489],[.49,.66,.233],48);
 ell("pecho cremoso",TUMMY,[0,1.48,.47],[.355,.22,.15],30);
+ell("zona crema inferior de espalda",TUMMY,[0,.73,-.536],[.47,.40,.15],36);
 for(const s of [-1,1]){
  ell("pie "+s,FUR,[s*.43,.19,.31],[.38,.2,.43],36);
  ell("dedos "+s,HEAD,[s*.48,.13,.65],[.25,.09,.13],28);
@@ -103,8 +104,8 @@ for(const s of [-1,1]){
 
 // Head: a separate full rounded 3-D sculpt, not a flat image.
 ell("cabeza principal",HEAD,[0,2.51,.025],[.997,.892,.812],66);
-ell("cachete izquierdo",HEAD,[-.73,2.17,.25],[.29,.28,.44],34);
-ell("cachete derecho",HEAD,[.73,2.17,.25],[.29,.28,.44],34);
+ell("cachete izquierdo",HEAD,[-.73,2.17,.245],[.19,.2,.23],34);
+ell("cachete derecho",HEAD,[.73,2.17,.245],[.19,.2,.23],34);
 ell("hocico amarillo",HEAD,[0,2.15,.722],[.43,.228,.245],38);
 
 // Pair of real volumetric leaf-shaped ears.
@@ -131,7 +132,7 @@ function leafGeometry(sign,which,inside=false,back=false){
    const yy=y+ny*width*u;
    const xx=x+sign*nx*width*u;
    const swell=Math.sqrt(Math.max(0,1-u*u));
-   const zz=z+(back?-1:1)*((inside?.105:.075)+(inside?.015:.07)*swell);
+   const zz=z+.36*u*Math.pow(Math.sin(Math.PI*f),.75)+(back?-1:1)*((inside?.215:.085)+(inside?.02:.055)*swell);
    xyz.push(xx,yy,zz);
   }
  }
@@ -191,37 +192,45 @@ for(const s of [-1,1]){
  bolt("rayo de mejilla "+s,shape,z,.057,TEALMAT);
 }
 // Big joyful smile, rose tongue, fang, nose.
-ell("boca sonriente",MOUTHCOLOR,[0,2.142,.925],[.255,.205,.061],35);
-ell("lengua rosa",TONGUE,[0,2.057,.985],[.155,.077,.029],23);
+ell("boca sonriente",MOUTHCOLOR,[0,2.146,.94],[.204,.163,.066],35);
+ell("lengua rosa",TONGUE,[0,2.075,1.004],[.123,.058,.027],23);
 ell("nariz pequeña",NOSE,[0,2.34,.929],[.08,.056,.039],26);
-line("contorno sonrisa",[[ -.26,2.21,.93],[-.15,2.095,.987],[0,2.065,.99],[.16,2.095,.987],[.26,2.21,.93]],.016,NOSE);
+line("contorno sonrisa",[[-.21,2.20,.96],[-.11,2.105,1.002],[0,2.095,1.004],[.11,2.105,1.002],[.21,2.20,.96]],.013,NOSE);
 const fang=new T.Shape();
-fang.moveTo(.125,2.278);fang.lineTo(.19,2.264);fang.lineTo(.155,2.19);fang.closePath();
+fang.moveTo(.10,2.26);fang.lineTo(.145,2.256);fang.lineTo(.127,2.20);fang.closePath();
 obj("colmillo",new T.ExtrudeGeometry(fang,{depth:.018,bevelEnabled:false}),WHITE,0,0,.982);
 
-// Bright turquoise forked lightning rod tail, fully extruded and beveled.
-// It is anchored behind the torso and remains physical when rotated.
-bolt("cola eléctrica segmento base",[
-[-.34,.96],[-.49,1.13],[-1.06,1.53],[-1.26,1.43],[-.97,1.09],[-.48,.82]
-],-.71,.16,TEALMAT);
-bolt("cola eléctrica zeta",[
-[-1.02,1.51],[-1.32,1.88],[-1.18,2.08],[-1.66,2.10],[-1.47,1.78],[-1.68,1.55],[-1.3,1.45]
-],-.71,.17,GLOWMAT);
-bolt("punta bifurcada arriba",[
-[-1.55,2.04],[-2.25,2.26],[-2.38,2.17],[-1.95,2.04],[-1.67,2.00]
-],-.71,.13,TEALMAT);
-bolt("punta bifurcada abajo",[
-[-1.65,1.56],[-2.28,1.43],[-2.44,1.32],[-1.81,1.35],[-1.49,1.46]
-],-.71,.12,TEALMAT);
-ell("anclaje cola",DARKMAT,[-.4,1.04,-.59],[.14,.16,.06],25);
-ell("botón cola",GLOWMAT,[-.42,1.04,-.65],[.08,.09,.04],23);
+// Full 3-D lightning tail. Its depth is modelled and stays visible in profile.
+function tailSegment(name,aa,bb,r,material){
+ const a=new T.Vector3(...aa),b=new T.Vector3(...bb),v=b.clone().sub(a);
+ const g=new T.CylinderGeometry(r*.80,r,v.length(),6);
+ const m=obj(name,g,material,...a.clone().add(b).multiplyScalar(.5).toArray());
+ m.quaternion.setFromUnitVectors(new T.Vector3(0,1,0),v.normalize());
+ return m;
+}
+const path3d=[
+ [-.34,1.02,-.51],[-.73,1.34,-.99],[-1.15,1.54,-1.22],
+ [-.98,1.85,-1.53],[-1.44,2.05,-1.76],[-1.77,2.18,-2.13]
+];
+for(let i=0;i<path3d.length-1;i++){
+ tailSegment("cola eléctrica 3D "+i,path3d[i],path3d[i+1],.106,GLOWMAT);
+}
+const bif=[
+ [[-1.15,1.54,-1.22],[-1.68,1.35,-1.72],[-2.01,1.43,-2.08]],
+ [[-1.44,2.05,-1.76],[-1.60,2.29,-2.14],[-2.07,2.39,-2.39]]
+];
+for(let j=0;j<bif.length;j++)for(let i=0;i<bif[j].length-1;i++){
+ tailSegment("rama bifurcada "+j+" "+i,bif[j][i],bif[j][i+1],.083,TEALMAT);
+}
+ell("anclaje cola",DARKMAT,[-.34,1.02,-.59],[.14,.14,.08],26);
+ell("núcleo cola",GLOWMAT,[-.35,1.02,-.64],[.095,.09,.045],24);
 
 // Dorsal fur is plain gold, as in the back view.
 // Fine individual fur fibers produce a non-plastic look without using planes.
 let seed=435123;
 function rand(){seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;}
-const hairGeo=new T.ConeGeometry(.0037,.025,3,1);
-hairGeo.translate(0,.0125,0);
+const hairGeo=new T.ConeGeometry(.0019,.015,3,1);
+hairGeo.translate(0,.0075,0);
 const matHair=new T.MeshStandardMaterial({color:0xffffff,roughness:1,side:T.DoubleSide});
 function fibers(name,n,cx,cy,cz,rx,ry,rz,base,variation){
  const im=new T.InstancedMesh(hairGeo,matHair,n);
