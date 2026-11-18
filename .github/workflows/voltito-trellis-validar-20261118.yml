@@ -1,0 +1,47 @@
+name: Voltito TRELLIS - probar GLB real en visor movil
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'experimentos/voltito-trellis-prueba-20261118/voltito-trellis-multivista-candidato.glb'
+      - '.github/workflows/voltito-trellis-validar-20261118.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: voltito-trellis-validacion-20261118
+  cancel-in-progress: false
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: true}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - name: Instalar Chrome de pruebas y Pillow
+        run: |
+          python -m pip install --disable-pip-version-check playwright pillow
+          python -m playwright install --with-deps chromium
+      - name: Verificar giro 3D libre de la malla TRELLIS en celular
+        run: python experimentos/voltito-trellis-prueba-20261118/validar_trellis.py
+      - name: Conservar capturas incluso si falla el examen de color
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: voltito-trellis-capturas-revision
+          path: experimentos/voltito-trellis-prueba-20261118/captura-trellis-*.png
+          if-no-files-found: ignore
+          retention-days: 7
+      - name: Publicar capturas si fueron validadas
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add -- experimentos/voltito-trellis-prueba-20261118/captura-trellis-*.png
+          if git diff --cached --quiet; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Voltito TRELLIS: capturas de malla 3D validada en movil'
+          git pull --rebase origin main
+          git push origin HEAD:main
