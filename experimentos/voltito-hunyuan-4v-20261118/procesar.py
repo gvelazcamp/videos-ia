@@ -14,10 +14,10 @@ URL="https://d2ol7oe51mr4n9.cloudfront.net/user_3I6MEpvFp5hLW0psUqgXdDfyZXe/6650
 # Misma área útil, sin bordes de las tarjetas ni rótulos.
 # Conservan mismo tamaño de imagen y posición de los pies.
 BOXES={
- "frente":(105,107,451,659),
- "espalda":(607,107,953,659),
- "izquierda":(120,800,466,1352),
- "derecha":(616,800,962,1352)
+ "frente":(82,113,488,648),
+ "espalda":(580,113,986,648),
+ "izquierda":(82,812,488,1347),
+ "derecha":(580,812,986,1347)
 }
 SOURCE_SIZE=(1103,1536)
 OUTPUT_SIZE=(768,1024)
@@ -30,7 +30,7 @@ def preparar():
         sheet.convert("RGB").save(HERE/"lamina-original.jpg",quality=98,subsampling=0,optimize=True)
         for name,box in BOXES.items():
             crop=sheet.crop(box).convert("RGB")
-            if crop.size!=(346,552):raise RuntimeError(f"Vista desigual {name}: {crop.size}")
+            if crop.size!=(406,535):raise RuntimeError(f"Vista desigual {name}: {crop.size}")
             crop.save(HERE/f"origen-{name}.png",optimize=True)
             print("LAMINA ORIGINAL",name,crop.size,flush=True)
 def finalizar():
@@ -59,7 +59,7 @@ def finalizar():
         col[:,:,:3]=color.astype(np.uint8)
         rgba=Image.fromarray(col,"RGBA")
         # MISMA escala y ubicación para las 4 poses (nunca encoger uno arbitrariamente).
-        size=(583,930)
+        size=(710,935)
         resized=rgba.resize(size,Image.Resampling.LANCZOS)
         canvas=Image.new("RGBA",OUTPUT_SIZE,(0,0,0,0))
         canvas.alpha_composite(resized,((OUTPUT_SIZE[0]-size[0])//2,42))
