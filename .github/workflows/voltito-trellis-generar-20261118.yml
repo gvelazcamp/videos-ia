@@ -1,0 +1,49 @@
+name: Voltito TRELLIS multivista 3D gratis - generacion real
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/voltito-trellis-generar-20261118.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+concurrency:
+  group: voltito-trellis-generacion-20261118
+  cancel-in-progress: false
+
+jobs:
+  generar_3d:
+    runs-on: ubuntu-latest
+    timeout-minutes: 17
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Instalar solo cliente remoto gratuito y validador GLB
+        run: |
+          python -m pip install --disable-pip-version-check 'gradio_client>=1.6,<3' pillow trimesh
+      - name: Generar nuevo GLB real desde 8 vistas en TRELLIS ZeroGPU
+        run: python experimentos/voltito-trellis-prueba-20261118/generar_trellis.py
+      - name: Publicar únicamente candidato real validado (sin tocar Hunyuan)
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s experimentos/voltito-trellis-prueba-20261118/voltito-trellis-multivista-candidato.glb
+          git add -- experimentos/voltito-trellis-prueba-20261118/voltito-trellis-multivista-candidato.glb
+          git add -- experimentos/voltito-trellis-prueba-20261118/resultado.json
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Voltito: candidato GLB genuino desde TRELLIS con 8 vistas'
+          git pull --rebase origin main
+          git push origin HEAD:main
+      - name: Respaldo del GLB, sólo si la generación fue real
+        uses: actions/upload-artifact@v4
+        with:
+          name: voltito-trellis-multivista-candidato
+          path: experimentos/voltito-trellis-prueba-20261118/voltito-trellis-multivista-candidato.glb
+          if-no-files-found: error
+          retention-days: 7
