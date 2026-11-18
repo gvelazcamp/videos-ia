@@ -37,7 +37,7 @@ mesh=loaded.dump(concatenate=True)
 # frente/derecha/espalda/izquierda. Reorientar +45° al espacio del original.
 mesh.apply_transform(trimesh.transformations.rotation_matrix(np.pi/4,[0,1,0]))
 verts=np.asarray(mesh.vertices,dtype=np.float64)
-normals=np.asarray(mesh.vertex_normals,dtype=np.float64)
+normals=np.array(mesh.vertex_normals,dtype=np.float64,copy=True)
 normals/=np.maximum(np.linalg.norm(normals,axis=1,keepdims=True),1e-9)
 if len(verts)<20000 or len(mesh.faces)<50000:
     raise RuntimeError("La geometría base 3D está incompleta")
