@@ -1,0 +1,118 @@
+name: Voltito 360 fiel - PNG transparentes y visor tactil
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/voltito-360-fiel-20261117.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: voltito-360-fiel-20261117
+  cancel-in-progress: false
+
+jobs:
+  generar-y-probar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Preparar Pillow y herramientas de prueba móvil
+        run: |
+          python -m pip install --disable-pip-version-check pillow playwright
+          python -m playwright install --with-deps chromium
+      - name: Reutilizar fotos PNG transparentes originales y preparar 4 vistas
+        run: python experimentos/voltito-360-fiel-20261117/preparar.py
+      - name: Verificar originales y transparencia real en las cuatro vistas
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          base=Path("experimentos/voltito-360-fiel-20261117")
+          for key in ("frente","izquierda","espalda","derecha"):
+              p=base/f"voltito-{key}.png"
+              with Image.open(p) as im:
+                  im.load()
+                  assert im.format=="PNG" and im.mode=="RGBA" and im.size==(1200,1550)
+                  assert im.getchannel("A").getextrema()==(0,255)
+                  print(key,im.size,"PNG RGBA verificado")
+          for key in ("espalda","izquierda"):
+              p=base/f"referencia-{key}-original.png"
+              with Image.open(p) as im:
+                  assert im.mode=="RGBA" and min(im.size)>=800
+          with Image.open(base/"voltito-giro-360.gif") as im:
+              assert im.n_frames==40
+          print("Fuentes originales, 4 vistas y GIF correctos")
+          PY
+      - name: Probar visor con Chrome en formato Android móvil
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
+          from threading import Thread
+          from playwright.sync_api import sync_playwright
+          root=Path.cwd()
+          class Quiet(SimpleHTTPRequestHandler):
+              def log_message(self,*args):pass
+          server=ThreadingHTTPServer(("127.0.0.1",8786),lambda *args,**kwargs:Quiet(*args,directory=str(root),**kwargs))
+          Thread(target=server.serve_forever,daemon=True).start()
+          folder=root/"experimentos/voltito-360-fiel-20261117"
+          errors=[]
+          try:
+              with sync_playwright() as pw:
+                  browser=pw.chromium.launch(headless=True,args=["--no-sandbox"])
+                  page=browser.new_page(viewport={"width":393,"height":851},
+                                         device_scale_factor=1,is_mobile=True,has_touch=True)
+                  page.on("pageerror",lambda e:errors.append(str(e)))
+                  page.goto("http://127.0.0.1:8786/experimentos/voltito-360-fiel-20261117/index.html",
+                            wait_until="domcontentloaded",timeout=45000)
+                  page.wait_for_function("document.getElementById('loading').style.display==='none'",timeout=45000)
+                  assert not errors,errors
+                  assert page.locator("#status").inner_text().startswith("Frente"),"No se cargó la imagen frontal"
+                  page.locator("#view").screenshot(path=str(folder/"previa-movil.png"))
+                  page.locator("#range").evaluate("(el)=>{el.value='180';el.dispatchEvent(new Event('input',{bubbles:true}))}")
+                  assert page.locator("#degrees").inner_text()=="180°","No funciona deslizador"
+                  assert "Espalda" in page.locator("#status").inner_text(),"No cargó vista trasera"
+                  page.locator("#view").screenshot(path=str(folder/"previa-movil-espalda.png"))
+                  page.locator("#reset").click()
+                  assert page.locator("#degrees").inner_text()=="0°"
+                  page.locator("#spin").click()
+                  assert "Pausar" in page.locator("#spin").inner_text()
+                  browser.close()
+              with Image.open(folder/"previa-movil.png") as image:
+                  pix=list(image.convert("RGB").resize((90,120)).getdata())
+                  n=sum(1 for r,g,b in pix if r>145 and g>84 and r>g*1.09 and b<165)
+                  print("Cobertura dorada de Voltito en celular:",n)
+                  assert n>300,"Voltito no se ve suficientemente en pantalla móvil"
+              print("Prueba móvil completada: personaje visible; frente y espalda; controles funcionan")
+          finally:
+              server.shutdown()
+          PY
+      - name: Guardar solo recursos del nuevo visor en nuestro puente
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add -- experimentos/voltito-360-fiel-20261117/*.png
+          git add -- experimentos/voltito-360-fiel-20261117/*.gif
+          if git diff --cached --quiet; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Voltito original: vistas PNG, GIF y previsualizacion tactil 360'
+          git pull --rebase origin main
+          git push origin HEAD:main
+      - uses: actions/upload-artifact@v4
+        with:
+          name: voltito-360-original-png-y-gif
+          path: |
+            experimentos/voltito-360-fiel-20261117/voltito-*.png
+            experimentos/voltito-360-fiel-20261117/voltito-giro-360.gif
+            experimentos/voltito-360-fiel-20261117/previa-movil*.png
+          retention-days: 7
