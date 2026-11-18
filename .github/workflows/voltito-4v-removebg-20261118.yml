@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/voltito-4v-removebg-20261118.yml'
+      - 'experimentos/voltito-hunyuan-4v-20261118/procesar.py'
   workflow_dispatch:
 permissions:
   contents: write
