@@ -1,0 +1,72 @@
+name: Voltito 3D con vistas Remove.bg - revision segura
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/voltito-3d-removebg-20261117.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: voltito-3d-removebg-20261117
+  cancel-in-progress: false
+
+jobs:
+  recortar-y-validar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Instalar recorte gratuito con navegador
+        shell: bash
+        run: |
+          python -m pip install --disable-pip-version-check pillow playwright
+          python -m playwright install --with-deps chromium
+      - name: Preparar tres vistas originales
+        run: python experimentos/voltito-3d-removebg-20261117/vistas.py preparar
+      - name: Usar el mismo Remove.bg web aprobado para cada vista
+        shell: bash
+        run: |
+          set -euo pipefail
+          for vista in izquierda derecha espalda; do
+            IMAGE_PATH="experimentos/voltito-3d-removebg-20261117/origen-${vista}.png" \
+            OUTPUT_PATH="experimentos/voltito-3d-removebg-20261117/removebg-${vista}.png" \
+            python herramientas/removebg-web/remover.py
+          done
+      - name: Conservar detalles y validar PNG transparente
+        run: python experimentos/voltito-3d-removebg-20261117/vistas.py finalizar
+      - name: Confirmar que el visor 3D apunta a Three.js local existente
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s experimentos/voltito-3d-alta-calidad-20261117/three.module.js
+          grep -q '../voltito-3d-alta-calidad-20261117/three.module.js' experimentos/voltito-3d-removebg-20261117/index.html
+          test -s experimentos/voltito-png-original-20261117/voltito-original-transparente.png
+      - name: Publicar solo PNG nuevos sin sobrescribir archivos anteriores
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add -- experimentos/voltito-3d-removebg-20261117/*.png
+          if git diff --cached --quiet; then
+            echo "Los PNG ya estaban publicados"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Voltito: 3 vistas PNG Remove.bg para visor 3D aislado"
+          git pull --rebase origin main
+          git push origin HEAD:main
+      - name: Adjuntar vistas PNG nuevas
+        uses: actions/upload-artifact@v4
+        with:
+          name: voltito-vistas-removebg-3d
+          path: experimentos/voltito-3d-removebg-20261117/voltito-*-removebg.png
+          if-no-files-found: error
+          retention-days: 7
