@@ -24,7 +24,7 @@ jobs:
         run: |
           python -m pip install --disable-pip-version-check playwright pillow
           python -m playwright install --with-deps chromium
-      - name: Verificar giro 3D libre de la malla TRELLIS en celular
+      - name: Verificar malla TRELLIS publicada con giro libre en Chrome movil
         run: python experimentos/voltito-trellis-prueba-20261118/validar_trellis.py
       - name: Conservar capturas incluso si falla el examen de color
         if: always()
