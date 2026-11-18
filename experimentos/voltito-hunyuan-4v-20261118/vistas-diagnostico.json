@@ -1,0 +1,50 @@
+{
+  "frente": {
+    "input_size": [
+      346,
+      511
+    ],
+    "canvas_size": [
+      768,
+      1024
+    ],
+    "alpha_coverage": 0.45,
+    "bytes": 386193
+  },
+  "espalda": {
+    "input_size": [
+      346,
+      511
+    ],
+    "canvas_size": [
+      768,
+      1024
+    ],
+    "alpha_coverage": 0.397,
+    "bytes": 344972
+  },
+  "izquierda": {
+    "input_size": [
+      346,
+      511
+    ],
+    "canvas_size": [
+      768,
+      1024
+    ],
+    "alpha_coverage": 0.334,
+    "bytes": 278583
+  },
+  "derecha": {
+    "input_size": [
+      346,
+      511
+    ],
+    "canvas_size": [
+      768,
+      1024
+    ],
+    "alpha_coverage": 0.346,
+    "bytes": 274748
+  }
+}
