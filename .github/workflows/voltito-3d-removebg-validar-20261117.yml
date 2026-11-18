@@ -1,0 +1,94 @@
+name: Voltito 3D Remove.bg - prueba movil y capturas
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/voltito-3d-removebg-validar-20261117.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+concurrency:
+  group: voltito-3d-removebg-validar-20261117
+  cancel-in-progress: false
+
+jobs:
+  probar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Preparar navegador de prueba
+        run: |
+          python -m pip install --disable-pip-version-check playwright pillow
+          python -m playwright install --with-deps chromium
+      - name: Verificar modelo 3D, giro y PNG transparentes en movil
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from http.server import SimpleHTTPRequestHandler,ThreadingHTTPServer
+          from threading import Thread
+          from PIL import Image
+          from playwright.sync_api import sync_playwright
+          root=Path.cwd()
+          folder=root/"experimentos/voltito-3d-removebg-20261117"
+          class Quiet(SimpleHTTPRequestHandler):
+              def log_message(self,*a): pass
+          server=ThreadingHTTPServer(("127.0.0.1",8877),lambda *a,**kw:Quiet(*a,directory=str(root),**kw))
+          Thread(target=server.serve_forever,daemon=True).start()
+          try:
+              for name in ("izquierda","derecha","espalda"):
+                  with Image.open(folder/f"voltito-{name}-removebg.png") as im:
+                      im.load()
+                      assert im.format=="PNG" and im.mode=="RGBA" and im.size==(700,920)
+                      assert im.getchannel("A").getextrema()==(0,255)
+              with sync_playwright() as pw:
+                  browser=pw.chromium.launch(headless=True,args=["--no-sandbox","--enable-webgl","--use-gl=angle","--use-angle=swiftshader","--enable-unsafe-swiftshader"])
+                  page=browser.new_page(viewport={"width":390,"height":844},device_scale_factor=1,is_mobile=True,has_touch=True)
+                  errors=[]
+                  page.on("pageerror",lambda e:errors.append(str(e)))
+                  page.goto("http://127.0.0.1:8877/experimentos/voltito-3d-removebg-20261117/index.html",wait_until="domcontentloaded",timeout=60000)
+                  page.wait_for_function("document.getElementById('message').style.display === 'none'",timeout=40000)
+                  assert not errors,f"Errores JS: {errors}"
+                  assert page.locator("#viewport canvas").count()==1,"No se creó modelo 3D"
+                  assert page.locator(".refrow img").count()==4
+                  for img in page.locator(".refrow img").all():
+                      assert img.evaluate("(e)=>e.complete && e.naturalWidth>0"),"Una referencia no carga"
+                  page.wait_for_timeout(550)
+                  page.locator("#viewport").screenshot(path=str(folder/"preview-3d-frente.png"))
+                  for n,name in [(90,"izquierda"),(180,"espalda"),(270,"derecha")]:
+                      page.locator("#angle").evaluate("(el,n)=>{el.value=n;el.dispatchEvent(new Event('input',{bubbles:true}))}",n)
+                      assert page.locator("#degree").inner_text()==f"{n}°"
+                      page.wait_for_timeout(120)
+                      page.locator("#viewport").screenshot(path=str(folder/f"preview-3d-{name}.png"))
+                  page.locator("#reset").click()
+                  assert page.locator("#degree").inner_text()=="0°"
+                  browser.close()
+              print("EXITO: 3D WebGL, controles 360, imágenes RGBA y móvil verificados")
+          finally:
+              server.shutdown()
+          PY
+      - name: Guardar únicamente capturas nuevas verificadas
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add -- experimentos/voltito-3d-removebg-20261117/preview-3d-*.png
+          if git diff --cached --quiet; then exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Voltito: capturas de pruebas WebGL tactil y 360 verificadas"
+          git pull --rebase origin main
+          git push origin HEAD:main
+      - name: Capturas de validacion
+        uses: actions/upload-artifact@v4
+        with:
+          name: voltito-3d-vistas-movil
+          path: experimentos/voltito-3d-removebg-20261117/preview-3d-*.png
+          if-no-files-found: error
+          retention-days: 7
