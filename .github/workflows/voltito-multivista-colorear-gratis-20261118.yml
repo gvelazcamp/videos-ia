@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/voltito-multivista-colorear-gratis-20261118.yml'
+      - 'experimentos/voltito-3d-multivista-prueba-20261118/colorear_malla.py'
   workflow_dispatch:
 permissions:
   contents: write
