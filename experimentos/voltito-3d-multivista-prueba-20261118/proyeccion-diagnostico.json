@@ -1,0 +1,33 @@
+{
+  "status": "candidato_proyeccion_rgba_no_aprobado",
+  "vertices": 135174,
+  "faces": 488736,
+  "color_range": [
+    0,
+    0,
+    0
+  ],
+  "input_views": {
+    "frente": {
+      "pixels": 667076,
+      "mean_weight": 0.14160453028712075,
+      "active_vertices": 48905
+    },
+    "izquierda": {
+      "pixels": 577808,
+      "mean_weight": 0.11765920953511039,
+      "active_vertices": 39559
+    },
+    "espalda": {
+      "pixels": 738924,
+      "mean_weight": 0.13698209231532696,
+      "active_vertices": 44875
+    },
+    "derecha": {
+      "pixels": 539482,
+      "mean_weight": 0.11112343083459335,
+      "active_vertices": 39086
+    }
+  },
+  "bytes": 9651520
+}
