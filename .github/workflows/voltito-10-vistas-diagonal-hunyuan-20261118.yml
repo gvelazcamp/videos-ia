@@ -1,0 +1,68 @@
+name: Voltito - segunda malla Hunyuan desde diagonales
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'experimentos/voltito-3d-10-vistas-20261118/voltito-*.png'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: voltito-hunyuan-diagonal-10
+  cancel-in-progress: false
+jobs:
+  modelar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 28
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: true}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: Instalar cliente gratuito de Hunyuan, color y navegador
+        shell: bash
+        run: |
+          python -m pip install --disable-pip-version-check 'gradio_client>=1.6,<3' 'numpy<3' scipy pillow trimesh playwright
+          python -m playwright install --with-deps chromium
+      - name: Revisar que sean 4 imágenes diagonales reales, completas y RGBA
+        run: |
+          python - <<'PY'
+          from PIL import Image
+          from pathlib import Path
+          p=Path("experimentos/voltito-3d-10-vistas-20261118")
+          for name in ("045","135","225","315","superior","inferior"):
+            with Image.open(p/f"voltito-{name}.png") as im:
+              im.load()
+              assert im.mode=="RGBA" and im.size==(768,1024)
+              assert im.getchannel("A").getextrema()==(0,255)
+          print("Seis nuevas referencias verificadas")
+          PY
+      - name: Crear NUEVA malla 3D Hunyuan desde 45 135 225 315 grados
+        run: python experimentos/voltito-3d-10-vistas-20261118/generar_diagonal.py
+      - name: Reorientar 45 grados y proyectar color de 10 vistas reales
+        run: python experimentos/voltito-3d-10-vistas-20261118/colorear_diagonal.py
+      - name: Verificar el GLB 3D candidato en Chrome móvil
+        run: python experimentos/voltito-3d-10-vistas-20261118/validar_diagonal.py
+      - name: Publicar sólo segundo candidato, sin reemplazar lo existente
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add -- experimentos/voltito-3d-10-vistas-20261118/voltito-diagonal-*.glb
+          git add -- experimentos/voltito-3d-10-vistas-20261118/diagnostico-10-vistas-diagonal.json
+          git add -- experimentos/voltito-3d-10-vistas-20261118/prueba-diagonal-*.png
+          git add -- experimentos/voltito-3d-10-vistas-20261118/estado.json
+          if git diff --cached --quiet; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Voltito: nueva malla Hunyuan de las diagonales, colores y 360 verificados'
+          git pull --rebase origin main
+          git push origin HEAD:main
+      - name: Respaldar el nuevo candidato GLB
+        uses: actions/upload-artifact@v4
+        with:
+          name: voltito-diagonal-glb-experimental
+          path: |
+            experimentos/voltito-3d-10-vistas-20261118/voltito-diagonal-*.glb
+            experimentos/voltito-3d-10-vistas-20261118/prueba-diagonal-*.png
+          if-no-files-found: error
+          retention-days: 7
