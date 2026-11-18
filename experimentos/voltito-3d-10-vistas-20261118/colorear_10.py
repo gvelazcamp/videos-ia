@@ -19,16 +19,16 @@ BASE=ROOT/"experimentos/voltito-hunyuan-4v-20261118"
 INPUT=BASE/"voltito-4v-colores.glb"
 OUTPUT=HERE/"voltito-10-vistas-mejorado.glb"
 VIEWS=[
-    ("frente",0,BASE,0.95),
-    ("045",45,HERE,1.10),
-    ("derecha",90,BASE,0.95),
-    ("135",135,HERE,1.10),
-    ("espalda",180,BASE,0.95),
-    ("225",225,HERE,1.10),
-    ("izquierda",270,BASE,0.95),
-    ("315",315,HERE,1.10),
-    ("superior",None,HERE,0.20),
-    ("inferior",None,HERE,0.13),
+    ("frente",0,BASE,0.0),
+    ("045",45,HERE,1.0),
+    ("derecha",90,BASE,0.0),
+    ("135",135,HERE,1.0),
+    ("espalda",180,BASE,0.0),
+    ("225",225,HERE,1.0),
+    ("izquierda",270,BASE,0.0),
+    ("315",315,HERE,1.0),
+    ("superior",None,HERE,0.11),
+    ("inferior",None,HERE,0.08),
 ]
 if not INPUT.is_file():raise RuntimeError("No existe el GLB 3D real anterior")
 loaded=trimesh.load(str(INPUT),force="scene",process=False)
@@ -42,8 +42,10 @@ vertex_old=np.asarray(mesh.visual.vertex_colors)
 if len(vertex_old)!=len(verts):raise RuntimeError("La malla fuente no tiene colores válidos")
 # Colores de glTF vienen como bytes lineales, por eso se combinan linealmente.
 base_rgb=np.asarray(vertex_old[:,:3],dtype=np.float64)/255.
-color_sum=np.zeros_like(base_rgb)
-weights=np.zeros((len(verts),),dtype=np.float64)
+# Mantener colores aprobados de las cardinales; usar las diagonales sólo
+# para detalles de superficies que miran de frente a esas cámaras.
+best_color=base_rgb.copy()
+best_weight=np.zeros((len(verts),),dtype=np.float64)
 ymin,ymax=float(verts[:,1].min()),float(verts[:,1].max())
 report={}
 for name,angle,folder,importance in VIEWS:
@@ -67,9 +69,9 @@ for name,angle,folder,importance in VIEWS:
         # Inferior: boca hacia arriba y cola abajo (+Z -> arriba)
         vertproj=verts[:,2] if name=="superior" else -verts[:,2]
         side=(normals@d).clip(0,1)
-        direction_weight=np.maximum(side,0)**10
-        direction_weight[side<.87]=0
-        importance=min(importance,.16)
+        direction_weight=np.clip((side-.94)/.06,0,1)**2
+        direction_weight[side<.94]=0
+        importance=min(importance,.11)
     else:
         a=np.deg2rad(angle)
         d=np.array([np.sin(a),0.,np.cos(a)])
@@ -77,8 +79,8 @@ for name,angle,folder,importance in VIEWS:
         horiz=verts@horizontal
         vertproj=verts[:,1]
         side=(normals@d).clip(0,1)
-        direction_weight=side**7
-        direction_weight[side<.12]=0
+        direction_weight=np.clip((side-.85)/.15,0,1)**3
+        direction_weight[side<.85]=0
     ulo,uhi=np.percentile(horiz,[.05,99.95])
     vlo,vhi=np.percentile(vertproj,[.05,99.95])
     u=xlo+np.clip((horiz-ulo)/max(uhi-ulo,1e-7),0,1)*(xhi-xlo)
@@ -97,11 +99,15 @@ for name,angle,folder,importance in VIEWS:
     ],axis=1)/255.
     # Convert actual PNG sRGB to glTF linear-space vertex colors.
     linear=np.where(rgb_sample<=.04045,rgb_sample/12.92,((rgb_sample+.055)/1.055)**2.4)
-    confidence=importance*direction_weight*np.maximum(alpha_sample,0)**3
-    # No color contribution from outside the actual silhouette.
-    confidence[alpha_sample<.38]=0
-    color_sum+=linear*confidence[:,None]
-    weights+=confidence
+    # No pintar ojos falsos, cola falsa ni marcas duplicadas sobre el frente.
+    # La similitud con el GLB aprobado actúa como una máscara de seguridad.
+    difference=np.linalg.norm(linear-base_rgb,axis=1)
+    compatibility=np.clip((.58-difference)/.43,0,1)**2
+    confidence=importance*direction_weight*np.maximum(alpha_sample,0)**4*compatibility
+    confidence[alpha_sample<.68]=0
+    replace=confidence>best_weight
+    best_weight[replace]=confidence[replace]
+    best_color[replace]=linear[replace]
     report[name]={
         "angle":angle if angle is not None else name,
         "image":str(path.relative_to(ROOT)),
@@ -110,9 +116,10 @@ for name,angle,folder,importance in VIEWS:
         "weight_mean":round(float(confidence.mean()),5)
     }
     print("PROYECTADA VISTA",name,"vértices",report[name]["affected_vertices"],flush=True)
-# Retener un 35% de color previo para evitar zonas sin información/mezclas falsas.
-new_rgb=(base_rgb*.36+color_sum)/(weights[:,None]+.36)
-new_rgb=np.clip(new_rgb,0,1)
+# Nunca mezclar simultáneamente ojos/caras de varias vistas: seleccionar
+# la cámara más alineada y conservar >=72% de los colores anteriores.
+blend=np.minimum(best_weight*.28,.28)
+new_rgb=np.clip(base_rgb*(1-blend[:,None])+best_color*blend[:,None],0,1)
 new_rgba=np.c_[np.uint8(np.round(new_rgb*255)),np.full(len(verts),255,dtype=np.uint8)]
 mesh.visual=trimesh.visual.ColorVisuals(mesh=mesh,vertex_colors=new_rgba)
 mesh.export(str(OUTPUT),file_type="glb")
@@ -124,6 +131,8 @@ report_data={"estado":"candidato experimental (sin aprobación visual)",
  "geometria":"Malla Hunyuan3D-2mv de las 4 vistas cardinales previamente reconstruidas",
  "mejora":"Proyección de colores sobre la geometría real desde 8 azimuts y superior/inferior",
  "no_es":"NO reconstrucción nativa de diez imágenes en el generador Hunyuan",
- "verts":len(verts),"faces":len(mesh.faces),"size_bytes":len(raw),"views":report}
+ "proteccion_fidelidad":"Cardinales existentes se mantienen como color dominante; diagonales y verticales maximo 28% en superficies alineadas y color compatible",
+ "verts":len(verts),"faces":len(mesh.faces),"size_bytes":len(raw),"vertices_mejorados":int(np.count_nonzero(blend>.005)),
+ "intensidad_media":float(blend.mean()),"views":report}
 (HERE/"diagnostico-10-vistas.json").write_text(json.dumps(report_data,indent=2,ensure_ascii=False))
 print("GLB REAL MEJORADO CON DIEZ VISTAS",OUTPUT,len(raw),"bytes",flush=True)
