@@ -1,0 +1,51 @@
+name: Voltito - TRELLIS.2 generar GLB real prueba gratuita
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/voltito-trellis2-generar-20261118.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: voltito-trellis2-prueba-20261118
+  cancel-in-progress: false
+jobs:
+  generar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 19
+    steps:
+      - uses: actions/checkout@v4
+        with: {persist-credentials: true}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - name: Instalar cliente gratuito y validador de malla
+        run: python -m pip install --disable-pip-version-check 'gradio_client>=1.6,<3' pillow trimesh
+      - name: Crear candidato 3D desde una vista de Voltito en TRELLIS.2
+        run: python experimentos/voltito-trellis2-20261118/generar_trellis2.py
+      - name: Guardar diagnóstico y candidato GLB únicamente si es auténtico
+        shell: bash
+        run: |
+          set -euo pipefail
+          dir='experimentos/voltito-trellis2-20261118'
+          test -s "$dir/resultado.json"
+          git add -- "$dir/resultado.json" "$dir/entrada-voltito-45.png"
+          if test -s "$dir/voltito-trellis2-candidato.glb"; then
+            git add -- "$dir/voltito-trellis2-candidato.glb"
+            echo "Modelo GLB auténtico generado."
+          else
+            echo "Sin GLB: se publica solo diagnóstico, no un modelo simulado."
+          fi
+          if git diff --cached --quiet; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Voltito TRELLIS.2: candidato real o diagnóstico verificado'
+          git pull --rebase origin main
+          git push origin HEAD:main
+      - name: Respaldo opcional del modelo resultante
+        uses: actions/upload-artifact@v4
+        with:
+          name: voltito-trellis2-candidato
+          path: experimentos/voltito-trellis2-20261118/voltito-trellis2-candidato.glb
+          if-no-files-found: ignore
+          retention-days: 7
