@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/voltito-multivista-real-gratis-20261118.yml'
+      - 'experimentos/voltito-3d-multivista-prueba-20261118/generar_modelo.py'
   workflow_dispatch:
 permissions:
   contents: write
