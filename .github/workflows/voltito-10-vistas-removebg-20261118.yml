@@ -1,4 +1,4 @@
-name: Voltito 3D 10 vistas - preparar PNG transparentes
+name: Voltito 3D 10 vistas - recorte transparente gratuito
 on:
   push:
     branches: [main]
@@ -20,21 +20,12 @@ jobs:
           persist-credentials: true
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
-      - name: Preparar Remove.bg web gratuito
-        run: |
-          python -m pip install --disable-pip-version-check numpy pillow playwright
-          python -m playwright install --with-deps chromium
+      - name: Instalar recorte gratuito local
+        run: python -m pip install --disable-pip-version-check numpy pillow opencv-python-headless
       - name: Descargar los dos collages adjuntados por el usuario y separar seis vistas
         run: python experimentos/voltito-3d-10-vistas-20261118/preparar_10.py preparar
-      - name: Remove.bg en seis vistas, preservando RGB original
-        shell: bash
-        run: |
-          set -euo pipefail
-          for vista in 045 135 225 315 superior inferior; do
-            IMAGE_PATH="experimentos/voltito-3d-10-vistas-20261118/origen-${vista}.png" \
-            OUTPUT_PATH="experimentos/voltito-3d-10-vistas-20261118/removebg-${vista}.png" \
-            python herramientas/removebg-web/remover.py
-          done
+      - name: Recorte local de seis vistas con transparencia real (Remove.bg web no disponible)
+        run: python experimentos/voltito-3d-10-vistas-20261118/recorte_local.py
       - name: Verificar seis PNG RGBA y mantener cuatro existentes sin cambios
         run: python experimentos/voltito-3d-10-vistas-20261118/preparar_10.py finalizar
       - name: Subir únicamente recursos de la carpeta nueva
