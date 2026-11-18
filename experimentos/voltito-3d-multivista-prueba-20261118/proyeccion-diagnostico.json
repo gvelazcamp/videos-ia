@@ -10,22 +10,22 @@
   "input_views": {
     "frente": {
       "pixels": 667076,
-      "mean_weight": 0.14160453028712075,
+      "mean_weight": 0.1416045302907042,
       "active_vertices": 48905
     },
     "izquierda": {
       "pixels": 577808,
-      "mean_weight": 0.11765920953511039,
+      "mean_weight": 0.11765920949674072,
       "active_vertices": 39559
     },
     "espalda": {
       "pixels": 738924,
-      "mean_weight": 0.13698209231532696,
+      "mean_weight": 0.1369820923347286,
       "active_vertices": 44875
     },
     "derecha": {
       "pixels": 539482,
-      "mean_weight": 0.11112343083459335,
+      "mean_weight": 0.1111234307547857,
       "active_vertices": 39086
     }
   },
