@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#12323e">
-<title>Voltito - candidato 3D multivista para revisión</title>
+<title>Voltito - candidato 3D coloreado desde imágenes originales</title>
 <style>
 *{box-sizing:border-box}html,body{margin:0;background:#081c29;color:#e5fcf6;font-family:system-ui,sans-serif}
 main{width:min(100%,880px);margin:auto;min-height:100dvh;background:#102f3d}
@@ -29,16 +29,16 @@ section.info p{margin:0 0 10px}
 </style>
 </head><body>
 <main>
-<header><div><h1>VOLTITO 3D</h1><p>Candidato real desde 4 vistas · sin aprobación de apariencia</p></div><span class="badge">Geometría sin textura</span></header>
+<header><div><h1>VOLTITO 3D</h1><p>Candidato 3D auténtico con colores proyectados desde 4 vistas · para revisión</p></div><span class="badge">Colores en prueba</span></header>
 <div id="canvas"><div id="loading">Cargando malla tridimensional real…</div><div id="hint">Deslizá para girar el modelo sin saltos</div></div>
 <div class="controls">
 <input type="range" id="angle" min="0" max="360" value="0" step="1" aria-label="Ángulo de giro"/>
 <span id="degree">0°</span>
 <button id="spin">▶ Girar</button><button id="reset">Frente</button>
-<a class="action" href="./candidato-voltito-sin-texturas.glb" download>GLB</a>
+<a class="action" href="./candidato-voltito-proyeccion-color.glb" download>GLB</a>
 </div>
 <section class="info">
-<p><strong>Esta es una malla 3D auténtica generada con Hunyuan3D-2mv desde los cuatro PNG.</strong> No se usan fotografías planas. Se puede girar de forma continua en cualquier ángulo. La forma y los detalles todavía deben compararse con Voltito; los colores amarillos de esta vista son sólo material provisional.</p>
+<p><strong>Esta es una malla 3D auténtica generada con Hunyuan3D-2mv desde los cuatro PNG.</strong> No se usan fotografías planas. Se puede girar de forma continua en cualquier ángulo. La forma y los detalles todavía deben compararse con Voltito. Los colores se transfirieron de sus cuatro PNG sobre la superficie 3D, pero no están verificados visualmente.</p>
 <p>Las referencias que utilizó la IA no se modificaron:</p>
 <div class="refs">
 <a href="../voltito-360-fiel-nuevas-vistas-20261118/voltito-frente.png"><img src="../voltito-360-fiel-nuevas-vistas-20261118/voltito-frente.png">Frente</a>
@@ -79,11 +79,11 @@ el.addEventListener("pointerdown",e=>{drag=true;setAuto(false);lastX=e.clientX;l
 el.addEventListener("pointermove",e=>{if(!drag)return;const dx=e.clientX-lastX,dy=e.clientY-lastY;lastX=e.clientX;lastY=e.clientY;setAngle(yaw+dx*.012);tilt=THREE.MathUtils.clamp(tilt+dy*.006,-.42,.42);modelRoot.rotation.x=tilt});
 for(const name of ["pointerup","pointercancel","lostpointercapture"])el.addEventListener(name,()=>drag=false);
 el.addEventListener("wheel",e=>{e.preventDefault();cam.position.z=THREE.MathUtils.clamp(cam.position.z+e.deltaY*.008,2,20)},{passive:false});
-new GLTFLoader().load('./candidato-voltito-sin-texturas.glb',gltf=>{
+new GLTFLoader().load('./candidato-voltito-proyeccion-color.glb',gltf=>{
  const mesh=gltf.scene;
  mesh.traverse(child=>{
    if(child.isMesh){
-     child.material=new THREE.MeshStandardMaterial({color:0xffd86c,roughness:.89,metalness:0,side:THREE.DoubleSide});
+     child.material=new THREE.MeshBasicMaterial({vertexColors:true,side:THREE.DoubleSide});
      child.frustumCulled=false;
    }
  });
