@@ -60,6 +60,20 @@ const EYE=new T.MeshPhysicalMaterial({color:0x1263a0,roughness:.10,metalness:.12
 const IRIS=new T.MeshPhysicalMaterial({color:0x159bc6,roughness:.14,clearcoat:.92});
 const PUPIL=new T.MeshPhysicalMaterial({color:0x061f38,roughness:.06,clearcoat:1});
 const WHITE=new T.MeshBasicMaterial({color:0xffffff});
+// Mapa de pelaje extraído, píxel por píxel, de la fotografía de perfil del usuario.
+// No es un patrón de color inventado y se aplica sobre superficies volumétricas.
+const furTexture=new T.TextureLoader().load("./referencias/pelaje-oro.jpg",()=>{
+ HEAD.map=furTexture;
+ HEAD.color.setHex(0xfff5df);
+ HEAD.needsUpdate=true;
+ FUR.map=furTexture;
+ FUR.color.setHex(0xffefe0);
+ FUR.needsUpdate=true;
+});
+furTexture.colorSpace=T.SRGBColorSpace;
+furTexture.wrapS=T.RepeatWrapping;
+furTexture.wrapT=T.MirroredRepeatWrapping;
+furTexture.repeat.set(2.3,1.4);
 
 const model=new T.Group();
 scene.add(model);
@@ -317,6 +331,8 @@ info.style.display="none";
 turn(0);requestAnimationFrame(tick);
 // Diagnostic hook used only to validate true 3D in automated Chrome screenshots.
 window.__VOLTITO_RECONSTRUCCION__={
+ model,
+ scene,
  getMeshCount:()=>model.children.filter(c=>c.isMesh||c.isInstancedMesh).length,
  getRotation:()=>model.rotation.y,
  geometryInfo:()=>({group:1,meshCount:model.children.length,head:model.getObjectByName("cabeza principal")?.isMesh,
