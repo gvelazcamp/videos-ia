@@ -1,0 +1,71 @@
+{
+  "personaje": "Voltito",
+  "metodo": "4 vistas cardinales existentes + 6 nuevos recortes con Remove.bg",
+  "vistas": {
+    "045": {
+      "size": [
+        768,
+        1024
+      ],
+      "alpha_coverage": 0.35,
+      "bytes": 333679
+    },
+    "135": {
+      "size": [
+        768,
+        1024
+      ],
+      "alpha_coverage": 0.341,
+      "bytes": 320066
+    },
+    "225": {
+      "size": [
+        768,
+        1024
+      ],
+      "alpha_coverage": 0.355,
+      "bytes": 302231
+    },
+    "315": {
+      "size": [
+        768,
+        1024
+      ],
+      "alpha_coverage": 0.339,
+      "bytes": 326089
+    },
+    "superior": {
+      "size": [
+        768,
+        1024
+      ],
+      "alpha_coverage": 0.222,
+      "bytes": 106099
+    },
+    "inferior": {
+      "size": [
+        768,
+        1024
+      ],
+      "alpha_coverage": 0.21,
+      "bytes": 93150
+    },
+    "frente": {
+      "source": "experimentos/voltito-hunyuan-4v-20261118/voltito-frente.png",
+      "no_modificado": true
+    },
+    "derecha": {
+      "source": "experimentos/voltito-hunyuan-4v-20261118/voltito-derecha.png",
+      "no_modificado": true
+    },
+    "espalda": {
+      "source": "experimentos/voltito-hunyuan-4v-20261118/voltito-espalda.png",
+      "no_modificado": true
+    },
+    "izquierda": {
+      "source": "experimentos/voltito-hunyuan-4v-20261118/voltito-izquierda.png",
+      "no_modificado": true
+    }
+  },
+  "nota": "Hunyuan3D-2mv admite cuatro entradas de forma por ejecución; las diagonales y verticales aportan referencias para proyección de color y evaluación, no son seis entradas directas al modelo."
+}
