@@ -50,12 +50,14 @@ def finalizar():
         a=a.resize(original.size,Image.Resampling.LANCZOS)
         extra=Image.new("L",original.size,0)
         ed=ImageDraw.Draw(extra)
-        ed.polygon([(0,168),(156,168),(186,193),(195,222),
-                    (190,249),(175,275),(158,296),(0,304)],fill=255)
+        ed.polygon([(0,168),(190,168),(206,195),(210,223),
+                    (210,249),(215,272),(191,305),(0,319)],fill=255)
         a=ImageChops.subtract(a,extra.filter(ImageFilter.GaussianBlur(1.2)))
     # Mantener los píxeles de la imagen original, no la vista previa comprimida.
     restored=original.convert("RGBA")
     restored.putalpha(a)
+    # Borrar colores residuales de los píxeles totalmente transparentes.
+    restored=Image.alpha_composite(Image.new("RGBA",restored.size,(0,0,0,0)),restored)
     bbox=a.getbbox()
     if not bbox:raise ValueError("Remove.bg dejó la máscara vacía")
     padding=18
