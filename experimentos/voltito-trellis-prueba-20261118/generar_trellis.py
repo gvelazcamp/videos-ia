@@ -97,7 +97,7 @@ def main():
                 print("SESSION",endpoint,str(value)[:100],flush=True)
             except Exception as e:
                 print("SESSION_ENDPOINT_NOT_READY",endpoint,type(e).__name__,str(e)[:300],flush=True)
-        gallery=[(handle_file(str(p)),None) for p in paths]
+        gallery=[{"image":handle_file(str(p)),"caption":None} for p in paths]
         print("ENVIANDO 8 VISTAS, no texto ni fotografías en carrusel",flush=True)
         job=client.submit(
             image=None,
