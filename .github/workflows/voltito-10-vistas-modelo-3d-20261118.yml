@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/voltito-10-vistas-modelo-3d-20261118.yml'
+      - 'experimentos/voltito-3d-10-vistas-20261118/colorear_10.py'
       - 'experimentos/voltito-3d-10-vistas-20261118/voltito-*.png'
   workflow_dispatch:
 permissions:
