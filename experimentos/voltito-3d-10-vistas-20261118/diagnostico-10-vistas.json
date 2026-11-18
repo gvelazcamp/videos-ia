@@ -3,79 +3,82 @@
   "geometria": "Malla Hunyuan3D-2mv de las 4 vistas cardinales previamente reconstruidas",
   "mejora": "Proyección de colores sobre la geometría real desde 8 azimuts y superior/inferior",
   "no_es": "NO reconstrucción nativa de diez imágenes en el generador Hunyuan",
+  "proteccion_fidelidad": "Cardinales existentes se mantienen como color dominante; diagonales y verticales maximo 28% en superficies alineadas y color compatible",
   "verts": 200148,
   "faces": 740548,
   "size_bytes": 14492536,
+  "vertices_mejorados": 42944,
+  "intensidad_media": 0.015426943106701476,
   "views": {
     "frente": {
       "angle": 0,
       "image": "experimentos/voltito-hunyuan-4v-20261118/voltito-frente.png",
       "pixels": 246058,
-      "affected_vertices": 54387,
-      "weight_mean": 0.07331
+      "affected_vertices": 0,
+      "weight_mean": 0.0
     },
     "045": {
       "angle": 45,
       "image": "experimentos/voltito-3d-10-vistas-20261118/voltito-045.png",
       "pixels": 238200,
-      "affected_vertices": 45844,
-      "weight_mean": 0.07548
+      "affected_vertices": 9557,
+      "weight_mean": 0.01107
     },
     "derecha": {
       "angle": 90,
       "image": "experimentos/voltito-hunyuan-4v-20261118/voltito-derecha.png",
       "pixels": 197435,
-      "affected_vertices": 37855,
-      "weight_mean": 0.05156
+      "affected_vertices": 0,
+      "weight_mean": 0.0
     },
     "135": {
       "angle": 135,
       "image": "experimentos/voltito-3d-10-vistas-20261118/voltito-135.png",
       "pixels": 231774,
-      "affected_vertices": 45957,
-      "weight_mean": 0.07871
+      "affected_vertices": 12242,
+      "weight_mean": 0.01726
     },
     "espalda": {
       "angle": 180,
       "image": "experimentos/voltito-hunyuan-4v-20261118/voltito-espalda.png",
       "pixels": 218217,
-      "affected_vertices": 49422,
-      "weight_mean": 0.07052
+      "affected_vertices": 0,
+      "weight_mean": 0.0
     },
     "225": {
       "angle": 225,
       "image": "experimentos/voltito-3d-10-vistas-20261118/voltito-225.png",
       "pixels": 241063,
-      "affected_vertices": 43547,
-      "weight_mean": 0.07874
+      "affected_vertices": 11221,
+      "weight_mean": 0.01469
     },
     "izquierda": {
       "angle": 270,
       "image": "experimentos/voltito-hunyuan-4v-20261118/voltito-izquierda.png",
       "pixels": 190477,
-      "affected_vertices": 39058,
-      "weight_mean": 0.05248
+      "affected_vertices": 0,
+      "weight_mean": 0.0
     },
     "315": {
       "angle": 315,
       "image": "experimentos/voltito-3d-10-vistas-20261118/voltito-315.png",
       "pixels": 230266,
-      "affected_vertices": 44032,
-      "weight_mean": 0.07394
+      "affected_vertices": 9312,
+      "weight_mean": 0.01147
     },
     "superior": {
       "angle": "superior",
       "image": "experimentos/voltito-3d-10-vistas-20261118/voltito-superior.png",
       "pixels": 60414,
-      "affected_vertices": 5605,
-      "weight_mean": 0.00215
+      "affected_vertices": 452,
+      "weight_mean": 9e-05
     },
     "inferior": {
       "angle": "inferior",
       "image": "experimentos/voltito-3d-10-vistas-20261118/voltito-inferior.png",
       "pixels": 58399,
-      "affected_vertices": 7204,
-      "weight_mean": 0.00338
+      "affected_vertices": 2842,
+      "weight_mean": 0.00052
     }
   }
 }
