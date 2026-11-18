@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#102d38">
+<title>Voltito original — giro 360°</title>
+<style>
+:root{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#e8f8f5;background:#061d28}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:#061d28}
+body{display:flex;justify-content:center}
+main{max-width:860px;width:100%;min-height:100dvh;background:radial-gradient(ellipse 90% 70% at 50% 40%,#367b83 0%,#17505e 40%,#0c3543 70%,#092832 100%);position:relative;overflow:hidden}
+header{height:91px;padding:17px 19px 8px;display:flex;align-items:center;justify-content:space-between;gap:9px}
+h1{font-size:clamp(26px,7vw,36px);line-height:1;margin:0;color:#fff1b7;font-weight:900;letter-spacing:.12em;text-shadow:0 2px 13px #06242c85}
+.subtitle{margin:7px 0 0;font-size:12px;color:#d4f0e9;max-width:370px}
+.chip{border:1px solid #8ddbd577;color:#e7fff2;background:#1b837744;border-radius:24px;padding:8px 12px;font-size:11px;line-height:1.4;text-align:center;white-space:nowrap}
+#view{width:100%;height:min(68dvh,690px);min-height:370px;touch-action:none;cursor:grab;overflow:hidden;position:relative}
+#view:active{cursor:grabbing}
+#turntable{width:100%;height:100%;display:block;touch-action:none}
+#touchHint{position:absolute;bottom:19px;left:50%;transform:translateX(-50%);white-space:nowrap;background:#082e3dbb;color:#e6fafa;padding:9px 16px;border:1px solid #b3dfdf55;border-radius:40px;pointer-events:none;font-size:12px}
+#loading{display:flex;align-items:center;justify-content:center;position:absolute;inset:0;background:#113944;color:#e6fcf7;text-align:center;padding:25px;font-size:14px}
+.controls{border-top:1px solid #ffffff28;background:#062934dd;padding:14px 15px;display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center}
+.line{display:flex;gap:11px;align-items:center;min-width:0}
+input[type=range]{width:100%;min-width:90px;accent-color:#48dec3;cursor:pointer}
+#degrees{font-size:15px;font-weight:800;font-variant-numeric:tabular-nums;min-width:49px;text-align:right;color:#fff0b3}
+.buttons{display:flex;gap:7px}
+button{border:1px solid #80d6c366;border-radius:10px;padding:10px 13px;color:#eefdfa;background:#20616c;font-size:13px;font-weight:760;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:2px solid #fff4af;outline-offset:2px}
+#status{margin:0;text-align:center;font-size:12px;padding:1px 12px 15px;background:#062934dd;color:#bbded7}
+.info{max-width:700px;margin:0 auto;padding:14px 21px 20px;text-align:center;color:#b6d4d4;font-size:12px;line-height:1.5}
+.links{display:flex;justify-content:center;gap:15px;flex-wrap:wrap;margin-top:8px}
+a{color:#b3f7e6;text-decoration:underline;text-underline-offset:3px}
+@media(max-width:550px){
+ header{height:79px;padding:16px 12px 3px}
+ h1{font-size:27px}
+ .subtitle{font-size:10px;max-width:240px}
+ .chip{padding:6px 9px;font-size:10px}
+ #view{height:64dvh;min-height:365px}
+ .controls{grid-template-columns:1fr;gap:12px;padding:13px}
+ .buttons{justify-content:center}
+ #touchHint{font-size:11px}
+}
+</style>
+</head>
+<body><main>
+<header>
+<div><h1>VOLTITO</h1><p class="subtitle">Las imágenes originales · giro completo con el dedo</p></div>
+<span class="chip">360°<br>Interactivo</span>
+</header>
+<section id="view" aria-label="Visor 360 grados de Voltito a partir de vistas PNG originales">
+<canvas id="turntable" aria-label="Arrastrar para girar a Voltito"></canvas>
+<div id="loading">Cargando el Voltito original…</div>
+<div id="touchHint">↔ Deslizá para girarlo</div>
+</section>
+<div class="controls">
+<div class="line"><input id="range" type="range" min="0" max="360" step="1" value="0" aria-label="Rotación de Voltito"/><span id="degrees">0°</span></div>
+<div class="buttons"><button id="spin" type="button">▶ Girar</button><button id="reset" type="button">Frente</button><button id="fullscreen" type="button">Pantalla completa</button></div>
+</div>
+<p id="status" aria-live="polite">Frente · Voltito original</p>
+<div class="info">Este visor preserva las imágenes aprobadas. El giro interpola cuatro vistas PNG transparentes de alta resolución; <strong>no es una malla 3D reconstruida</strong>. El perfil derecho se refleja desde la vista izquierda hasta contar con su fotografía propia.
+<div class="links">
+<a href="./vista-previa-4-vistas.png" target="_blank" rel="noopener">Cuatro vistas</a>
+<a href="./voltito-giro-360.gif" target="_blank" rel="noopener">GIF de giro</a>
+<a href="./voltito-frente.png" target="_blank" rel="noopener">Frontal PNG</a>
+</div></div>
+</main>
+<script>
+(()=>{
+"use strict";
+const canvas=document.getElementById('turntable'),container=document.getElementById('view'),
+range=document.getElementById('range'),degrees=document.getElementById('degrees'),
+spin=document.getElementById('spin'),reset=document.getElementById('reset'),
+fullscreen=document.getElementById('fullscreen'),status=document.getElementById('status'),
+loading=document.getElementById('loading'),ctx=canvas.getContext('2d',{alpha:false});
+const names=['Frente','Perfil izquierdo','Espalda','Perfil derecho'];
+const paths=['voltito-frente.png','voltito-izquierda.png','voltito-espalda.png','voltito-derecha.png'];
+let pictures=[],angle=0,playing=false,lastTime=null,dragging=false,lastX=0,visible=false;
+function setAuto(next){playing=next;spin.textContent=playing?'Ⅱ Pausar':'▶ Girar'}
+function angleUpdate(a){
+ angle=((a%360)+360)%360;
+ const shown=Math.round(angle)%360;range.value=shown;degrees.textContent=shown+'°';
+ status.textContent=names[Math.round(angle/90)%4]+' · Voltito original';
+ draw();
+}
+function resize(){
+ if(!ctx)return;
+ const ratio=Math.min(window.devicePixelRatio||1,2);
+ const w=Math.round(canvas.clientWidth*ratio),h=Math.round(canvas.clientHeight*ratio);
+ if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h}
+ ctx.setTransform(ratio,0,0,ratio,0,0);draw();
+}
+function drawImageAt(img,x,y,width,height,opacity,scaleX){
+ if(!img||!img.naturalWidth||opacity<=0)return;
+ ctx.save();
+ ctx.globalAlpha=opacity;
+ ctx.translate(x,y);
+ ctx.scale(scaleX,1);
+ ctx.drawImage(img,-width/2,-height,width,height);
+ ctx.restore();
+}
+function draw(){
+ if(!ctx)return;
+ const w=canvas.clientWidth,h=canvas.clientHeight;
+ if(w<=0||h<=0)return;
+ ctx.save();ctx.setTransform(Math.min(window.devicePixelRatio||1,2),0,0,Math.min(window.devicePixelRatio||1,2),0,0);
+ ctx.clearRect(0,0,w,h);
+ let bg=ctx.createRadialGradient(w*.50,h*.42,10,w*.50,h*.46,Math.max(w,h)*.62);
+ bg.addColorStop(0,'#377d83');bg.addColorStop(.6,'#1b515d');bg.addColorStop(1,'#0a3441');
+ ctx.fillStyle=bg;ctx.fillRect(0,0,w,h);
+ const centerX=w/2,feetY=h*.90;
+ const shadow=ctx.createRadialGradient(centerX,feetY+1,2,centerX,feetY+1,w*.35);
+ shadow.addColorStop(0,'#031b24bb');shadow.addColorStop(.5,'#021b2455');shadow.addColorStop(1,'#021b2400');
+ ctx.save();ctx.translate(centerX,feetY+8);ctx.scale(1,.12);ctx.fillStyle=shadow;ctx.beginPath();ctx.arc(0,0,w*.35,0,2*Math.PI);ctx.fill();ctx.restore();
+ if(visible){
+  const hSprite=Math.min(h*.9,w*1.48),wSprite=hSprite*(1200/1550);
+  const slot=angle/90,idx=Math.floor(slot)%4,f=slot-Math.floor(slot);
+  let fade=Math.max(0,Math.min(1,(f-.36)/.28));fade=fade*fade*(3-2*fade);
+  // Minor perspective compression between 90-degree source views; never stretch the faces or texture.
+  const squash=1-.04*Math.sin(Math.PI*f);
+  drawImageAt(pictures[idx],centerX,feetY,wSprite,hSprite,1-fade,squash);
+  drawImageAt(pictures[(idx+1)%4],centerX,feetY,wSprite,hSprite,fade,squash);
+ }
+ ctx.restore();
+}
+range.addEventListener('input',()=>{setAuto(false);angleUpdate(Number(range.value))});
+spin.addEventListener('click',()=>setAuto(!playing));
+reset.addEventListener('click',()=>{setAuto(false);angleUpdate(0)});
+fullscreen.addEventListener('click',()=>{
+ if(document.fullscreenElement){document.exitFullscreen?.();return}
+ document.querySelector('main').requestFullscreen?.().catch(()=>{});
+});
+container.addEventListener('pointerdown',e=>{dragging=true;setAuto(false);lastX=e.clientX;container.setPointerCapture?.(e.pointerId)});
+container.addEventListener('pointermove',e=>{if(!dragging)return;angleUpdate(angle+(e.clientX-lastX)*.78);lastX=e.clientX});
+container.addEventListener('pointerup',()=>dragging=false);
+container.addEventListener('pointercancel',()=>dragging=false);
+window.addEventListener('resize',resize,{passive:true});
+function raf(t){if(lastTime!==null&&playing)angleUpdate(angle+Math.min(t-lastTime,60)*.032);lastTime=t;requestAnimationFrame(raf)}
+const tasks=paths.map(p=>new Promise(resolve=>{
+ const image=new Image();
+ image.decoding='async';
+ image.onload=()=>resolve(image);
+ image.onerror=()=>resolve(null);
+ image.src='./'+p;
+}));
+Promise.all(tasks).then(all=>{
+ pictures=all;
+ loading.style.display='none';
+ const missing=all.filter(x=>!x).length;
+ if(missing){
+  status.textContent='Faltan '+missing+' PNG. Abrí el visor desde GitHub cuando estén publicados.';
+  console.warn('Imágenes ausentes: ',paths.filter((x,i)=>!all[i]));
+ }
+ visible=all.some(Boolean);
+ resize();angleUpdate(0);requestAnimationFrame(raf);
+});
+})();
+</script>
+</body></html>
