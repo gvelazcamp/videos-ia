@@ -118,7 +118,7 @@ for(let y=y0;y<y1;y++)for(let x=x0;x<x1;x++)drawTile(x,y,terrain[y][x],Math.roun
 guildDraw(Math.round(guild.x*T-camx),Math.round(guild.y*T-camy));
 shopDraw(Math.round(shop.x*T-camx),Math.round(shop.y*T-camy));
 const entities=[];
-for(const p of trees)if(p.x>=x0&&p.x<x1&&p.y>=y0&&p.y<y1&&!([27,28,29,30,31].includes(p.x)&&p.y>=7&&p.y<=13))entities.push({y:p.y,draw(){tree(Math.round(p.x*T-camx),Math.round(p.y*T-camy),p.x,p.y)}});
+for(const p of trees)if(p.x>=x0&&p.x<x1&&p.y>=y0&&p.y<y1&&terrain[p.y][p.x]===0&&obstacles.has(key(p.x,p.y))&&!([27,28,29,30,31].includes(p.x)&&p.y>=7&&p.y<=13))entities.push({y:p.y,draw(){tree(Math.round(p.x*T-camx),Math.round(p.y*T-camy),p.x,p.y)}});
 for(const n of npc)entities.push({y:n.y,draw(){npcDraw(Math.round(n.x*T-camx+16),Math.round(n.y*T-camy+14),n)}});
 for(const m of mob)if(!m.dead)entities.push({y:m.y,draw(){creature(Math.round(m.x*T-camx+16),Math.round(m.y*T-camy+14),m)}});
 for(let i=0;i<orbs.length;i++)if(!balls.includes(i)){const b=orbs[i];entities.push({y:b.y,draw(){orb(Math.round(b.x*T-camx+16),Math.round(b.y*T-camy+14))}})}
