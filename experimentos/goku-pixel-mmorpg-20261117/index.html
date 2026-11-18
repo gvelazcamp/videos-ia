@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="theme-color" content="#132d32">
+<title>DragonRealm · Goku Pixel RPG</title>
+<style>
+:root{--cream:#f9efcb;--navy:#173b43;--gold:#ffd267;--line:#1a3436}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#193a32;color:#fff;font-family:system-ui,sans-serif;touch-action:none;user-select:none}
+canvas#game{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;touch-action:none}
+.bar{position:absolute;left:10px;right:10px;top:max(9px,env(safe-area-inset-top));display:flex;justify-content:space-between;gap:8px;pointer-events:none}
+.panel{background:var(--cream);border:3px solid #393e2f;border-radius:12px;box-shadow:0 3px 0 #777f53,0 5px 8px #10271a66;color:#292c28;padding:8px 10px;min-width:0;pointer-events:auto}
+.stats{flex:1;max-width:300px}.stats strong{font-weight:1000;font-size:14px}.stats small{font-size:11px}.hp{height:11px;background:#7a8c76;border:2px solid #2d4c36;border-radius:9px;overflow:hidden;margin-top:4px}.hp span{display:block;height:100%;width:100%;background:linear-gradient(#affd6b,#32b64e);transition:width .2s}
+.side{min-width:106px;text-align:center}.side strong{font-size:13px}.side p{font-size:12px;margin:4px 0 0}
+.bottom{position:absolute;left:0;right:0;bottom:0;padding:14px 12px max(14px,env(safe-area-inset-bottom));background:linear-gradient(transparent,#101c21aa 18%,#111d24e8 100%);pointer-events:none}
+.controls{display:flex;align-items:end;justify-content:space-between;gap:12px;pointer-events:auto}
+.dpad{width:152px;height:142px;position:relative;flex:none}.control{border:2px solid #c3d6bc;background:#223e48e8;color:#fff;font-size:23px;font-weight:900;border-radius:13px;box-shadow:0 4px 0 #111d26;touch-action:none;cursor:pointer}
+.control:active,.control.active{background:#4f7d78;transform:translateY(3px);box-shadow:0 1px 0 #111d26}
+.dpad .control{position:absolute;width:49px;height:44px}.up{top:0;left:51px}.left{top:49px;left:0}.right{top:49px;left:102px}.down{top:98px;left:51px}
+.actions{display:flex;gap:11px;align-items:center;padding-bottom:15px}.round{width:66px;height:66px;border-radius:50%;background:#ce793f;border-color:#f9e5a3;font-size:25px}.round.b{background:#477b99}
+.legend{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#e0e7d7;margin-bottom:9px;text-shadow:1px 1px #172d2b}
+.hudbtn{border:1px solid #a8d4cf;background:#183c42d9;color:white;font-weight:700;border-radius:8px;padding:6px 10px;pointer-events:auto;cursor:pointer}
+.topbuttons{display:flex;gap:6px;position:absolute;top:max(98px,calc(env(safe-area-inset-top) + 101px));left:12px;right:12px;justify-content:space-between;pointer-events:none}
+.topbuttons>*{pointer-events:auto}
+.toast{position:absolute;top:33%;left:50%;transform:translateX(-50%);width:min(90%,480px);border:3px solid #c8bd81;background:#fffae8ef;color:#2a372e;box-shadow:0 8px 0 #1b3b3565;border-radius:12px;padding:13px 16px;display:none;pointer-events:auto;text-align:left}
+.toast.visible{display:block}.toast h3{margin:0 0 7px;font-size:17px}.toast p{margin:0;font-size:14px;line-height:1.45}.toast .buttons{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
+.toast button{border:2px solid #153d40;border-radius:8px;background:#376b66;color:white;padding:7px 14px;font-weight:800}
+#mini{position:absolute;right:12px;bottom:211px;border:3px solid #f6e8be;border-radius:9px;background:#142f2cbb;width:103px;height:103px;image-rendering:pixelated}
+.footer{position:absolute;left:12px;bottom:211px;background:#142a2cbf;border-radius:8px;padding:6px 9px;font-size:11px;color:#fff}
+@media(max-width:380px){.panel{padding:7px}.side{min-width:95px}.round{width:60px;height:60px}.dpad{transform:scale(.9);transform-origin:bottom left;width:139px}.actions{gap:7px}#mini{width:88px;height:88px}}
+</style></head>
+<body>
+<canvas id="game" aria-label="Mapa interactivo de aventuras"></canvas>
+<div class="bar"><div class="panel stats"><strong>GOKU <span id="level">Nv. 1</span></strong><small id="xp"> · XP 0/100</small><div class="hp"><span id="hp"></span></div><small id="hptext">HP 100/100</small></div>
+<div class="panel side"><strong>DRAGONREALM</strong><p>⭐ <span id="balls">0</span>/7 esferas</p><small>Demo local</small></div></div>
+<div class="topbuttons"><button class="hudbtn" id="quest">Misiones</button><button class="hudbtn" id="reset">Reiniciar</button></div>
+<canvas id="mini" width="103" height="103"></canvas><div class="footer" id="area">Bosque del Dragón</div>
+<div class="bottom"><div class="legend"><span>WASD / flechas · E hablar · Espacio atacar</span><span id="notice">Explorá el mapa</span></div><div class="controls">
+<div class="dpad"><button class="control up" data-dir="up" aria-label="Arriba">▲</button><button class="control left" data-dir="left" aria-label="Izquierda">◀</button><button class="control right" data-dir="right" aria-label="Derecha">▶</button><button class="control down" data-dir="down" aria-label="Abajo">▼</button></div>
+<div class="actions"><button class="control round b" id="attack" aria-label="Atacar">B</button><button class="control round" id="interact" aria-label="Interactuar">A</button></div></div></div>
+<div class="toast" id="dialog" role="dialog" aria-live="polite"><h3 id="dialogtitle"></h3><p id="dialogbody"></p><div class="buttons"><button id="close">Seguir jugando</button></div></div>
+<script>
+(function(){
+'use strict';
+const cvs=document.getElementById('game'),c=cvs.getContext('2d',{alpha:false}),mm=document.getElementById('mini'),mc=mm.getContext('2d');
+const T=32,W=42,H=48;
+let width=innerWidth,height=innerHeight,dpr=1,last=0,stepTime=0,frame=0,held='',busy=false,noticeUntil=0;
+const storage='dragonrealm-goku-v1';
+let level=1,xp=0,hp=100,balls=[],px=20,py=23,dir='down',kills=0;
+try {const s=JSON.parse(localStorage.getItem(storage)||'null');if(s){level=s.level||1;xp=s.xp||0;hp=s.hp??100;balls=s.balls||[];px=s.px??20;py=s.py??23;kills=s.kills||0;}}catch(e){}
+const terrain=Array.from({length:H},()=>Array(W).fill(0));
+const trees=[],obstacles=new Set();
+const key=(x,y)=>x+','+y;
+function rng(x,y,s=1){let n=Math.sin((x+s*7)*127.1+(y+s*13)*311.7)*43758.5453;return n-Math.floor(n);}
+for(let y=0;y<H;y++)for(let x=0;x<W;x++){
+ if(x<2||y<2||x>=W-2||y>=H-2||rng(x,y,40)<.1){trees.push({x,y});obstacles.add(key(x,y));}
+}
+function paintPath(points,wide=2){for(let i=0;i<points.length-1;i++){let [ax,ay]=points[i],[bx,by]=points[i+1];const n=Math.max(Math.abs(ax-bx),Math.abs(ay-by))*3;for(let j=0;j<=n;j++){let x=Math.round(ax+(bx-ax)*j/n),y=Math.round(ay+(by-ay)*j/n);for(let dy=-wide;dy<=wide;dy++)for(let dx=-wide;dx<=wide;dx++)if(Math.abs(dx)+Math.abs(dy)<=wide+1 && x+dx>=0&&x+dx<W&&y+dy>=0&&y+dy<H){terrain[y+dy][x+dx]=1;obstacles.delete(key(x+dx,y+dy));}}}}
+paintPath([[20,23],[20,16],[26,16],[27,8],[34,8]],2);
+paintPath([[20,23],[12,25],[9,35],[20,38],[32,33]],2);
+paintPath([[20,23],[15,16],[12,8]],2);
+paintPath([[20,23],[26,27],[35,23],[36,40]],2);
+for(let y=5;y<=12;y++)for(let x=4;x<=12;x++)if(((x-8)/5)**2+((y-8)/4)**2<1.1){terrain[y][x]=2;obstacles.add(key(x,y));}
+for(let y=12;y<=22;y++)for(let x=7;x<=9;x++){terrain[y][x]=2;obstacles.add(key(x,y));}
+for(let x=7;x<=9;x++){terrain[17][x]=3;obstacles.delete(key(x,17));}
+paintPath([[9,17],[16,17]],1);
+const guild={x:29,y:9},shop={x:34,y:20};
+for(let y=7;y<=11;y++)for(let x=27;x<=31;x++)obstacles.add(key(x,y));obstacles.delete(key(29,12));
+for(let y=19;y<=21;y++)for(let x=33;x<=36;x++)obstacles.add(key(x,y));obstacles.delete(key(34,22));
+const npc=[
+ {x:28,y:13,name:'Maestro del gremio',type:'guild',color:'#e9a25d'},
+ {x:34,y:22,name:'Vendedora',type:'shop',color:'#46ace4'},
+ {x:16,y:24,name:'Explorador',type:'guide',color:'#f6cf5c'},
+ {x:24,y:37,name:'Guardián',type:'guide',color:'#c7b5fa'}
+];
+const mob=[{x:17,y:28,hp:3,max:3,t:'jabalí',dead:false},{x:25,y:24,hp:3,max:3,t:'dragón azul',dead:false},{x:33,y:33,hp:5,max:5,t:'champiñón',dead:false},{x:16,y:40,hp:4,max:4,t:'mono',dead:false}];
+const orbs=[{x:11,y:8},{x:26,y:17},{x:12,y:29},{x:35,y:27},{x:9,y:39},{x:27,y:41},{x:20,y:12}];
+function valid(x,y){return x>=2&&y>=2&&x<W-2&&y<H-2&&!obstacles.has(key(x,y))&&!npc.some(n=>n.x===x&&n.y===y);}
+if(!valid(px,py)){px=20;py=23}
+const sprites={
+hair:['....##...##.....','...####.####....','...#########....','..############..','.##############.','..############..','...##########...','....########....'],
+face:['....ssssssss....','...ssssssssss...','...sKKssssKKs...','...ssssssssss...','....ssssssss....'],
+body:['.....bbbbbb.....','....oooooooo....','...oooooooooo...','...oboooooobo...','...oooooooooo...','....bbbbbbbb....','....oooooooo....','....oooooooo....','....oo....oo....','....oo....oo....','....bb....bb....','....yy....yy....']};
+const palette={'#':'#0c1920','K':'#131c21','s':'#f5ba8b','b':'#123ba1','o':'#f57922','y':'#f8e459'};
+function drawPixels(rows,x,y,sz=2,map=palette){rows.forEach((line,j)=>{for(let i=0;i<line.length;i++){const color=map[line[i]];if(color){c.fillStyle=color;c.fillRect(Math.round(x+i*sz),Math.round(y+j*sz),sz,sz)}}})}
+function goku(sx,sy){c.fillStyle='#21362d55';c.beginPath();c.ellipse(sx+16,sy+44,14,4,0,0,Math.PI*2);c.fill();drawPixels(sprites.hair,sx,sy,2);drawPixels(sprites.face,sx,sy+13,2);drawPixels(sprites.body,sx,sy+23,2);if(dir==='up'){c.fillStyle='#161b29';c.fillRect(sx+10,sy+18,12,5)}if(frame%22<11&&held){c.fillStyle='#fff3';c.fillRect(sx+8,sy+42,7,2)}}
+function drawTile(x,y,t,sx,sy){
+ const grd=t===1?'#e7d58e':t===2?'#40c6dd':t===3?'#a97646':'#69c887';
+ c.fillStyle=grd;c.fillRect(sx,sy,T,T);
+ const r=rng(x,y,2),r2=rng(x,y,4);
+ if(t===0){c.fillStyle=r>.5?'#5db77a':'#7dd897';c.fillRect(sx+r*24,sy+r2*24,4,3);if(r>.86){c.fillStyle='#f1d0dc';c.fillRect(sx+13,sy+11,4,4);c.fillStyle='#e86685';c.fillRect(sx+15,sy+9,4,4)}}
+ if(t===1){c.fillStyle='#d7bc74';c.fillRect(sx+3+r*10,sy+5+r2*13,6,3);c.fillRect(sx+21,sy+26,3,3)}
+ if(t===2){c.fillStyle='#7ce4e9';c.fillRect(sx+Math.floor(r*18),sy+Math.floor(r2*24),9,3);c.fillStyle='#2b98cd';c.fillRect(sx+7,sy+22,12,3)}
+ if(t===3){c.fillStyle='#c99663';for(let a=4;a<32;a+=8)c.fillRect(sx,sy+a,32,3)}
+}
+function tree(sx,sy,x,y){c.fillStyle='#254c32';c.fillRect(sx+11,sy+18,10,19);c.fillStyle='#27684b';c.fillRect(sx+2,sy+9,28,19);c.fillStyle='#3b9c61';c.fillRect(sx+4,sy+4,24,20);c.fillStyle='#92d66d';c.fillRect(sx+9,sy,15,13);c.fillStyle='#b1ee83';c.fillRect(sx+11,sy+3,9,4);c.fillStyle='#1b563a';c.fillRect(sx+3,sy+22,26,5)}
+function guildDraw(sx,sy){c.fillStyle='#5f4037';c.fillRect(sx-62,sy-36,151,106);c.fillStyle='#f2e3bd';c.fillRect(sx-59,sy-40,143,83);c.fillStyle='#dbd5bd';c.beginPath();c.ellipse(sx+14,sy-39,73,43,0,Math.PI,2*Math.PI);c.fill();c.fillStyle='#ae4f49';c.fillRect(sx-57,sy-44,141,6);c.fillStyle='#754e3c';c.fillRect(sx,sy+17,33,43);c.fillStyle='#b4775f';c.fillRect(sx+4,sy+20,11,32);c.fillRect(sx+19,sy+20,11,32);c.fillStyle='#f9f0d1';c.fillRect(sx+34,sy-19,20,21);c.fillStyle='#b7e6ff';c.fillRect(sx+37,sy-16,14,15);c.fillStyle='#d9eaf1';c.fillRect(sx-45,sy-19,17,20);c.fillStyle='#ad4335';c.fillRect(sx-50,sy-55,5,61);c.fillStyle='#d54b47';c.fillRect(sx-45,sy-54,27,31);c.fillStyle='#fff';c.font='bold 13px sans-serif';c.fillText('武',sx-41,sy-34)}
+function shopDraw(sx,sy){c.fillStyle='#885a36';c.fillRect(sx-20,sy,112,79);c.fillStyle='#d8a273';c.fillRect(sx-24,sy+6,118,10);for(let i=0;i<6;i++){c.fillStyle=i%2?'#f7e5bf':'#db8057';c.fillRect(sx-23+i*19,sy-18,19,27)}c.fillStyle='#553622';c.fillRect(sx-4,sy+44,12,38);c.fillRect(sx+64,sy+44,12,38);c.fillStyle='#ffd057';c.fillRect(sx+20,sy+26,21,18)}
+function orb(sx,sy){const k=1+.13*Math.sin(frame*.12);c.fillStyle='#fff38555';c.beginPath();c.arc(sx,sy,17*k,0,Math.PI*2);c.fill();c.fillStyle='#faac25';c.beginPath();c.arc(sx,sy,11,0,Math.PI*2);c.fill();c.strokeStyle='#fff2b3';c.lineWidth=2;c.stroke();c.fillStyle='#a64213';for(let i=0;i<4;i++){const a=(i%4)*Math.PI/2;c.fillRect(sx+Math.cos(a)*4-1,sy+Math.sin(a)*4-1,3,3)}}
+function creature(sx,sy,m){const col=m.t==='dragón azul'?'#57acd9':m.t==='champiñón'?'#ca6253':m.t==='jabalí'?'#b98563':'#c7a15b';c.fillStyle='#13291e55';c.fillRect(sx-11,sy+13,25,5);c.fillStyle=col;c.fillRect(sx-10,sy-7,22,20);c.fillRect(sx-6,sy-13,15,8);c.fillStyle='#182933';c.fillRect(sx-4,sy-2,3,3);c.fillRect(sx+6,sy-2,3,3);c.fillStyle='#f3e4be';c.fillRect(sx-12,sy+9,8,5);c.fillRect(sx+8,sy+9,8,5);if(m.hp<m.max){c.fillStyle='#542d2e';c.fillRect(sx-11,sy-21,24,4);c.fillStyle='#e3da7b';c.fillRect(sx-11,sy-21,Math.round(24*m.hp/m.max),4)}}
+function npcDraw(sx,sy,n){c.fillStyle=n.color;c.fillRect(sx-8,sy-10,17,20);c.fillStyle='#f4c397';c.fillRect(sx-7,sy-15,15,10);c.fillStyle='#23333c';c.fillRect(sx-4,sy-11,3,3);c.fillRect(sx+4,sy-11,3,3);c.fillStyle='#142843';c.fillRect(sx-6,sy+10,5,8);c.fillRect(sx+3,sy+10,5,8)}
+function save(){try{localStorage.setItem(storage,JSON.stringify({level,xp,hp,balls,px,py,kills}))}catch(e){}}
+function updateHud(){document.getElementById('hp').style.width=hp+'%';document.getElementById('hptext').textContent='HP '+hp+'/100';document.getElementById('level').textContent='Nv. '+level;document.getElementById('xp').textContent=' · XP '+xp+'/100';document.getElementById('balls').textContent=balls.length;document.getElementById('area').textContent=py<14?'Villa del Gremio':py>33?'Bosque del Sur':'Bosque del Dragón'}
+function msg(t){document.getElementById('notice').textContent=t;noticeUntil=performance.now()+2100}
+function dialog(title,body){busy=true;held='';document.getElementById('dialogtitle').textContent=title;document.getElementById('dialogbody').textContent=body;document.getElementById('dialog').classList.add('visible')}
+function close(){busy=false;document.getElementById('dialog').classList.remove('visible')}
+function gain(points){xp+=points;if(xp>=100){xp-=100;level++;hp=100;dialog('¡Subiste de nivel!','Ahora sos nivel '+level+'. Recuperaste toda tu vida.')}updateHud()}
+function move(d){if(busy||hp<=0)return;dir=d;const [dx,dy]={up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]}[d];let nx=px+dx,ny=py+dy;if(!valid(nx,ny)){return}const monster=mob.find(m=>!m.dead&&m.x===nx&&m.y===ny);if(monster){msg('¡Enemigo! Usá B o Espacio para atacar');return}px=nx;py=ny;for(let i=0;i<orbs.length;i++)if(orbs[i].x===px&&orbs[i].y===py&&!balls.includes(i)){balls.push(i);gain(25);msg('¡Esfera '+balls.length+'/7 encontrada!');if(balls.length===7)dialog('¡Las 7 esferas!','¡Misión principal completada! Podés seguir explorando, hablar con los personajes y combatir monstruos.')}save();updateHud()}
+function near(a,b){return Math.abs(a.x-b.x)+Math.abs(a.y-b.y)<=2}
+function interact(){if(busy){close();return}const n=npc.find(n=>near(n,{x:px,y:py}));if(n){if(n.type==='guild')dialog(n.name,'Misión: reuní las siete esferas del dragón. Tenés '+balls.length+'/7. Recorre los caminos y acercate a los brillos dorados.');else if(n.type==='shop'){hp=Math.min(100,hp+35);updateHud();save();dialog(n.name,'¡Te recuperaste 35 HP! Por ahora los objetos son gratuitos en esta demo.')}else dialog(n.name,'¡Hola, Goku! Movete con las flechas o el pad de la pantalla. Tocá B para luchar contra criaturas cercanas.');return}
+const m=mob.find(m=>!m.dead&&near(m,{x:px,y:py}));if(m){dialog('Criatura salvaje','¡Es un '+m.t+'! Acercate y usá B para atacar.');return}
+dialog('Aventura en marcha','Buscá siete esferas doradas y explorá el mapa. Visitá la tienda para curarte o hablá con el Maestro del Gremio.')}
+function attack(){if(busy||hp<=0)return;const m=mob.find(m=>!m.dead&&near(m,{x:px,y:py}));if(!m){msg('No hay enemigos cerca');return}m.hp--;if(m.hp<=0){m.dead=true;kills++;gain(40);msg('¡Ganaste 40 XP!')}else{hp=Math.max(0,hp-5);msg('Golpeaste al '+m.t+' · -5 HP')}save();updateHud();if(hp<=0)dialog('Te quedaste sin HP','Visitá la tienda o reiniciá para empezar de nuevo.')}
+function reset(){if(!confirm('¿Reiniciar la partida desde el principio?'))return;localStorage.removeItem(storage);location.reload()}
+function resize(){width=innerWidth;height=innerHeight;cvs.width=width;cvs.height=height;c.imageSmoothingEnabled=false;mm.width=103;mm.height=103;mc.imageSmoothingEnabled=false}
+function render(t){requestAnimationFrame(render);frame++;const camx=px*T-width/2+T/2,camy=py*T-height/2+T/2;
+c.fillStyle='#66c785';c.fillRect(0,0,width,height);
+const x0=Math.max(0,Math.floor(camx/T)-1),x1=Math.min(W,Math.ceil((camx+width)/T)+1);
+const y0=Math.max(0,Math.floor(camy/T)-1),y1=Math.min(H,Math.ceil((camy+height)/T)+1);
+for(let y=y0;y<y1;y++)for(let x=x0;x<x1;x++)drawTile(x,y,terrain[y][x],Math.round(x*T-camx),Math.round(y*T-camy));
+guildDraw(Math.round(guild.x*T-camx),Math.round(guild.y*T-camy));
+shopDraw(Math.round(shop.x*T-camx),Math.round(shop.y*T-camy));
+const entities=[];
+for(const p of trees)if(p.x>=x0&&p.x<x1&&p.y>=y0&&p.y<y1&&!([27,28,29,30,31].includes(p.x)&&p.y>=7&&p.y<=13))entities.push({y:p.y,draw(){tree(Math.round(p.x*T-camx),Math.round(p.y*T-camy),p.x,p.y)}});
+for(const n of npc)entities.push({y:n.y,draw(){npcDraw(Math.round(n.x*T-camx+16),Math.round(n.y*T-camy+14),n)}});
+for(const m of mob)if(!m.dead)entities.push({y:m.y,draw(){creature(Math.round(m.x*T-camx+16),Math.round(m.y*T-camy+14),m)}});
+for(let i=0;i<orbs.length;i++)if(!balls.includes(i)){const b=orbs[i];entities.push({y:b.y,draw(){orb(Math.round(b.x*T-camx+16),Math.round(b.y*T-camy+14))}})}
+entities.push({y:py,draw(){goku(Math.round(px*T-camx),Math.round(py*T-camy-18))}});
+entities.sort((a,b)=>a.y-b.y);entities.forEach(e=>e.draw());
+mc.fillStyle='#346c53';mc.fillRect(0,0,103,103);for(let y=0;y<H;y++)for(let x=0;x<W;x++){if(terrain[y][x]!==0){mc.fillStyle=['#63c58e','#e9d692','#4aafe0','#9c674e'][terrain[y][x]];mc.fillRect(Math.floor(x*2.4),Math.floor(y*2.1),3,3)}}mc.fillStyle='#faca49';mc.fillRect(Math.floor(px*2.4)-2,Math.floor(py*2.1)-2,6,6);
+if(held&&!busy&&t-stepTime>145){stepTime=t;move(held)}
+if(noticeUntil&&t>noticeUntil){noticeUntil=0;document.getElementById('notice').textContent='Explorá el mapa'}
+}
+const mapp={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',w:'up',s:'down',a:'left',d:'right',W:'up',S:'down',A:'left',D:'right'};
+document.addEventListener('keydown',e=>{if(mapp[e.key]){e.preventDefault();held=mapp[e.key];if(performance.now()-stepTime>100){move(held);stepTime=performance.now()}}else if(e.key==='e'||e.key==='E'||e.key==='Enter'){e.preventDefault();interact()}else if(e.code==='Space'){e.preventDefault();attack()}else if(e.key==='Escape'){close()}});
+document.addEventListener('keyup',e=>{if(mapp[e.key]===held)held=''});
+window.addEventListener('blur',()=>held='');
+document.querySelectorAll('[data-dir]').forEach(b=>{b.addEventListener('pointerdown',e=>{e.preventDefault();held=b.dataset.dir;b.classList.add('active');move(held);stepTime=performance.now();try{b.setPointerCapture(e.pointerId)}catch(x){}});for(const ev of ['pointerup','pointercancel','lostpointercapture'])b.addEventListener(ev,()=>{held='';b.classList.remove('active')})});
+document.getElementById('attack').addEventListener('click',attack);
+document.getElementById('interact').addEventListener('click',interact);
+document.getElementById('close').addEventListener('click',close);
+document.getElementById('quest').addEventListener('click',()=>dialog('Misiones · Prototipo','Principal: encontrá 7 esferas ('+balls.length+'/7). Combates ganados: '+kills+'. Nivel actual: '+level+'. Progreso guardado en este navegador.'));
+document.getElementById('reset').addEventListener('click',reset);
+window.addEventListener('resize',resize);resize();updateHud();requestAnimationFrame(render);
+setTimeout(()=>{if(!localStorage.getItem('dragonrealm-tutorial-v1')){dialog('¡Bienvenido a DragonRealm!','¡Goku ya se puede mover! Usá la cruceta del celular o WASD/flechas. A permite hablar; B permite atacar. Tu misión es encontrar 7 esferas doradas. Esta es una demo local, todavía no multijugador.');localStorage.setItem('dragonrealm-tutorial-v1','1')}},600);
+})();
+</script></body></html>
