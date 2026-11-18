@@ -77,6 +77,11 @@ for name,direction,axis,sign in viewinfo:
 base=np.array([247.,192.,66.])
 rgbout=np.where(total[:,None]>.0001,weighted/np.maximum(total[:,None],1e-4),base)
 rgbout=np.uint8(np.clip(rgbout,0,255))
+# glTF vertex colors are LINEAR, while the PNG reference pixels are sRGB.
+# Writing sRGB bytes directly would double-apply gamma and wash out Voltito.
+srgb=rgbout.astype(np.float32)/255.0
+linear=np.where(srgb<=0.04045,srgb/12.92,((srgb+0.055)/1.055)**2.4)
+rgbout=np.uint8(np.clip(np.round(linear*255.0),0,255))
 # Explicit RGBA vertex color for portable glTF 2.0.
 mesh.visual=trimesh.visual.ColorVisuals(mesh=mesh,vertex_colors=np.c_[rgbout,np.full(len(v),255,dtype=np.uint8)])
 mesh.export(str(OUTPUT),file_type="glb")
