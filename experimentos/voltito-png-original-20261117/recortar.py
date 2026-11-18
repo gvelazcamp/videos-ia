@@ -6,7 +6,7 @@ from pathlib import Path
 import sys
 import cv2
 import numpy as np
-from PIL import Image, ImageFilter
+from PIL import Image, ImageFilter, ImageDraw, ImageChops
 
 ROOT=Path(__file__).resolve().parents[2]
 DIR=Path(__file__).resolve().parent
@@ -45,7 +45,14 @@ def finalizar():
             raise ValueError("Remove.bg no entregó transparencia completa")
         if abs((rgba.width/rgba.height)-(original.width/original.height))>.045:
             raise ValueError("Remove.bg alteró demasiado la proporción de la imagen")
+# Quitar únicamente la mancha triangular nacida al borrar el texto
+        # de la lámina. No forma parte del Voltito original.
         a=a.resize(original.size,Image.Resampling.LANCZOS)
+        extra=Image.new("L",original.size,0)
+        ed=ImageDraw.Draw(extra)
+        ed.polygon([(0,168),(156,168),(186,193),(195,222),
+                    (190,249),(175,275),(158,296),(0,304)],fill=255)
+        a=ImageChops.subtract(a,extra.filter(ImageFilter.GaussianBlur(1.2)))
     # Mantener los píxeles de la imagen original, no la vista previa comprimida.
     restored=original.convert("RGBA")
     restored.putalpha(a)
@@ -58,9 +65,11 @@ def finalizar():
     cropped.save(NATIVE,"PNG",optimize=True)
     # Versión mayor para juegos y móviles: remuestrea fielmente el original.
     canvas=Image.new("RGBA",(1152,1728),(0,0,0,0))
-    larger=cropped.copy()
-    larger.thumbnail((1070,1630),Image.Resampling.LANCZOS)
-    larger=larger.filter(ImageFilter.UnsharpMask(radius=.9,percent=68,threshold=3))
+    # thumbnail() solo reduce y no agranda: usar resize() a tamaño real de entrega.
+    factor=min(1070/cropped.width,1630/cropped.height)
+    size=(round(cropped.width*factor),round(cropped.height*factor))
+    larger=cropped.resize(size,Image.Resampling.LANCZOS)
+    larger=larger.filter(ImageFilter.UnsharpMask(radius=.6,percent=48,threshold=3))
     canvas.alpha_composite(larger,((1152-larger.width)//2,(1728-larger.height)//2))
     canvas.save(FINAL,"PNG",optimize=True)
     with Image.open(FINAL) as chk:
