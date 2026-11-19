@@ -1,0 +1,66 @@
+name: Claude 3D - prueba de carrera con piernas y brazos articulados
+
+on:
+  push:
+    paths:
+      - 'experimentos/claude-trellis-20261119/rigging/claude_rig_run.py'
+      - '.github/workflows/claude-rig-run-20261119.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: claude-rig-carrera-20261119
+  cancel-in-progress: false
+
+jobs:
+  crear-candidato-animado:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Instalar Blender gratuito
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y blender
+      - name: Crear rig y clip real de 5 segundos sin reemplazar originales
+        run: |
+          blender -b -t 2 \
+            --python experimentos/claude-trellis-20261119/rigging/claude_rig_run.py \
+            -- \
+            experimentos/claude-trellis-20261119/claude-trellis-nombre-corregido.glb \
+            experimentos/claude-trellis-20261119/rigging/resultado
+      - name: Verificar que el GLB tiene esqueleto y animacion
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import struct,json
+          p=Path('experimentos/claude-trellis-20261119/rigging/resultado/claude-corriendo-articulado.glb')
+          raw=p.read_bytes()
+          assert raw[:4]==b'glTF', 'No es GLB'
+          js=json.loads(raw[20:20+struct.unpack_from('<I',raw,12)[0]])
+          assert len(js.get('skins',[]))>=1, 'Sin skin ni esqueleto'
+          assert len(js.get('animations',[]))>=1, 'Sin animacion'
+          assert sum(len(a['channels']) for a in js['animations'])>=10,'No hay suficientes canales'
+          print('Rig verificado:', len(js['skins']), 'skins,',len(js['animations']),'animaciones')
+          PY
+      - name: Publicar solo los archivos del candidato nuevo
+        run: |
+          set -euo pipefail
+          git add -- experimentos/claude-trellis-20261119/rigging/resultado/
+          git diff --cached --quiet && { echo 'No se generó ningún candidato'; exit 1; }
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Claude: candidato riggeado y carrera articulada (sin reemplazar original)'
+          git pull --rebase origin main
+          git push origin HEAD:main
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: claude-rig-carrera-candidato-${{ github.run_id }}
+          path: experimentos/claude-trellis-20261119/rigging/resultado/
+          retention-days: 7
+          if-no-files-found: warn
