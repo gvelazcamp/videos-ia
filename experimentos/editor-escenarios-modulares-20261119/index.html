@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#11241b">
+<title>Editor 3D de escenarios | Girá y Adiviná</title>
+<style>
+:root {color-scheme:dark;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;--bg:#0b1812;--panel:#162c20;--edge:#3e6547;--accent:#a6ec9e;--ink:#edf9ed;--muted:#b2ccb5}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink)}
+button,input{font:inherit}
+button{cursor:pointer;touch-action:manipulation;color:var(--ink);background:#294d34;border:1px solid #537e58;border-radius:10px;padding:10px 12px;font-weight:600;font-size:13px;min-height:40px}
+button:disabled{opacity:.4;cursor:not-allowed}
+button.active{background:#b7edaa;color:#14311d;border-color:#d4ffca}
+button:focus-visible,a:focus-visible{outline:3px solid #fdde7e;outline-offset:2px}
+header{max-width:1420px;padding:16px 18px 11px;margin:auto}
+h1{font-size:clamp(20px,3vw,27px);margin:0 0 6px;color:#e4fbe0}
+header p{font-size:13px;color:var(--muted);line-height:1.5;margin:0}
+.layout{max-width:1420px;margin:auto;padding:0 12px 22px;display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:12px}
+.workspace{min-width:0;display:flex;flex-direction:column;gap:10px}
+#stage{height:min(71vh,730px);min-height:390px;background:radial-gradient(ellipse at 48% 33%,#395746,#1e372a 64%,#102118);position:relative;overflow:hidden;border:1px solid var(--edge);border-radius:14px;touch-action:none}
+#stage canvas{display:block;width:100%;height:100%;touch-action:none}
+#toast{position:absolute;bottom:14px;left:14px;max-width:calc(100% - 28px);background:#10231cdd;border:1px solid #506e57;color:#e6f7e3;padding:9px 12px;border-radius:10px;font-size:12px;pointer-events:none;line-height:1.4}
+#miniGuide{position:absolute;top:12px;left:12px;max-width:240px;background:#10251cc9;padding:10px 12px;border:1px solid #476e52;border-radius:9px;font-size:12px;line-height:1.5;pointer-events:none}
+.tools{background:var(--panel);border:1px solid var(--edge);border-radius:12px;padding:11px;display:flex;flex-direction:column;gap:8px}
+.toolrow{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.toolrow button{flex:1}
+.toolrow .nav{flex:0 1 auto}
+.panel{border:1px solid var(--edge);border-radius:12px;background:var(--panel);padding:12px}
+.panel h2{font-size:15px;margin:0 0 9px;color:#d9fad7}
+.panel p,.panel small{font-size:12px;color:var(--muted);line-height:1.45;margin:6px 0}
+fieldset{border:0;margin:0;padding:0;display:flex;flex-direction:column;gap:7px}
+.side{display:flex;flex-direction:column;gap:10px}
+.group{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.group button{width:100%;padding:10px 4px;font-size:12px}
+#selected{background:#0e2016;border-radius:8px;padding:9px 10px;font-size:12px;color:#d9f4d7;line-height:1.5;margin-top:9px}
+.miniwrap{overflow:auto;margin-top:7px}
+#minimap{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:3px;width:100%;max-width:278px;margin:auto}
+.cell{border-radius:5px;border:1px solid #42644a;background:#28402c;min-height:26px;min-width:0;padding:0;aspect-ratio:1;position:relative;font-size:13px;line-height:1}
+.cell:focus-visible{outline:2px solid #ffffff;outline-offset:0}
+.cell.free{background:#26362c;color:#749880}
+.cell.grass{background:#a9da65;color:#274117}
+.cell.trees{background:#488d49;color:white}
+.cell.selected{box-shadow:inset 0 0 0 2px #ffe899,0 0 0 1px #ffe899}
+.cell.ghost{background:#b2e49c;color:#13341a}
+.maplabels{display:flex;justify-content:space-between;margin:3px 2px 7px;color:#b8dab6;font-size:11px}
+.direction{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;max-width:260px;margin:8px auto 0}
+.direction button{font-size:12px;min-height:37px;padding:6px 1px}
+.direction .up{grid-column:2}.direction .left{grid-column:1}.direction .down{grid-column:2}.direction .right{grid-column:3}
+#inputFile{display:none}
+.links{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 0}
+.links a{color:#d4f3ce;font-size:12px}
+footer{padding:12px 18px 25px;max-width:1420px;margin:auto;color:#a6c3ad;font-size:12px;line-height:1.5}
+@media(max-width:920px){.layout{grid-template-columns:1fr}.side{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.side .panel:last-child{grid-column:1/-1}#stage{height:56svh;min-height:360px}}
+@media(max-width:540px){header{padding:12px}.layout{padding:0 7px 12px}.side{display:flex}#stage{height:52svh;min-height:320px}#miniGuide{font-size:11px;max-width:190px}button{font-size:12px;padding:9px 7px}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Editor de escenarios 3D · Copiar y colocar</h1>
+  <p>Combiná los dos terrenos reales creados con Blender. Cada cuadrado mide <strong>18 × 18 metros</strong> y encastra exactamente con los demás. Los modelos originales no se modifican.</p>
+</header>
+<main class="layout">
+  <section class="workspace" aria-label="Editor 3D">
+    <div class="tools">
+      <div class="toolrow">
+        <button id="moveMode" class="active" type="button">Mover / seleccionar</button>
+        <button id="placeMode" type="button">Colocar cuadrados</button>
+        <button id="orbitMode" type="button">Girar cámara</button>
+      </div>
+      <div class="toolrow">
+        <button id="frontView" type="button">Vista 3D</button>
+        <button id="topView" type="button">Vista superior</button>
+        <button id="fitView" type="button">Ajustar vista</button>
+        <button id="zoomIn" type="button">+ Zoom</button>
+        <button id="zoomOut" type="button">− Zoom</button>
+      </div>
+    </div>
+    <div id="stage" aria-label="Vista 3D editable" role="application">
+      <div id="miniGuide">Clic en un terreno para seleccionarlo.<br>Arrastralo para moverlo.<br>Usá <strong>Copiar</strong> y tocá dónde colocarlo.</div>
+      <div id="toast" role="status" aria-live="polite">Cargando los dos terrenos 3D…</div>
+    </div>
+    <div class="tools">
+      <div class="toolrow">
+        <button type="button" id="undo">Deshacer</button>
+        <button type="button" id="save">Descargar mapa JSON</button>
+        <button type="button" id="load">Cargar mapa JSON</button>
+        <button type="button" id="reset">Empezar de nuevo</button>
+        <input type="file" id="inputFile" accept="application/json,.json">
+      </div>
+      <small>El diseño se conserva automáticamente en este navegador. El archivo JSON sirve para guardar las posiciones y retomarlas después; los terrenos GLB originales siguen separados.</small>
+    </div>
+  </section>
+  <aside class="side">
+    <section class="panel">
+      <h2>1. Elegí qué cuadrado colocar</h2>
+      <fieldset id="palette" disabled>
+        <div class="group">
+          <button id="grassBrush" type="button">Pasto liso</button>
+          <button id="treesBrush" type="button">Árboles + montañitas</button>
+        </div>
+      </fieldset>
+      <p>Elegí un terreno y tocá cualquier casilla vacía del escenario o del plano de arriba.</p>
+      <div id="selected">Seleccionado: cargando…</div>
+      <div class="group" style="margin-top:9px">
+        <button id="copy" type="button" disabled>Copiar seleccionado</button>
+        <button id="remove" type="button" disabled>Eliminar seleccionado</button>
+      </div>
+    </section>
+    <section class="panel">
+      <h2>2. Agregá otro al lado</h2>
+      <p>Estos botones duplican el terreno elegido directamente en una casilla contigua.</p>
+      <div class="direction">
+        <button class="up" type="button" data-dir="up" disabled>↑ Atrás</button>
+        <button class="left" type="button" data-dir="left" disabled>← Izquierda</button>
+        <button class="right" type="button" data-dir="right" disabled>Derecha →</button>
+        <button class="down" type="button" data-dir="down" disabled>↓ Adelante</button>
+      </div>
+    </section>
+    <section class="panel">
+      <h2>3. Plano desde arriba</h2>
+      <p>Tocá una casilla para colocar el terreno que elegiste. En modo Mover, tocá una casilla vacía para trasladar el cuadrado seleccionado.</p>
+      <div class="maplabels"><span>Izquierda</span><span>Atrás ↑</span><span>Derecha</span></div>
+      <div id="minimap" role="group" aria-label="Cuadrícula de colocación desde arriba"></div>
+      <div class="maplabels"><span>← X negativo</span><span>Adelante ↓</span><span>X positivo →</span></div>
+      <p id="count">1 cuadrado colocado</p>
+      <div class="links">
+        <a href="../escenario-pasto-liso-20261119/index.html">Ver terreno liso original</a>
+        <a href="../escenario-pasto-arboles-montanitas-20261119/index.html">Ver terreno con árboles original</a>
+      </div>
+    </section>
+  </aside>
+</main>
+<footer>Editor experimental independiente en GitHub. No se sobrescriben los archivos <code>.glb</code> ni los proyectos Blender anteriores. El JSON guarda el tipo y la coordenada de cada módulo para volver a construir el mapa.</footer>
+<script type="module">
+import * as THREE from '../voltito-3d-alta-calidad-20261117/three.module.js';
+import {GLTFLoader} from '../voltito-3d-multivista-prueba-20261118/GLTFLoader.js';
+
+const SOURCES = {
+  grass:'../escenario-pasto-liso-20261119/resultado/escenario_pasto_liso_elevado.glb',
+  trees:'../escenario-pasto-arboles-montanitas-20261119/resultado/escenario_pasto_arboles_montanitas.glb'
+};
+const LABELS = {grass:'Pasto liso',trees:'Árboles + montañitas'};
+const TILE = 18, LIMIT = 4, MAX_TILES = 40, STORAGE_KEY = 'puente-editor-escenarios-v1';
+const el = id => document.getElementById(id);
+const stage = el('stage'), toast = el('toast');
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(43,1,0.1,2500);
+const renderer = new THREE.WebGLRenderer({antialias:true,alpha:true});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+stage.insertBefore(renderer.domElement,stage.firstChild);
+scene.add(new THREE.HemisphereLight(0xffffff,0x779276,2.4));
+const sun = new THREE.DirectionalLight(0xffffff,2.5);
+sun.position.set(-45,80,32); scene.add(sun);
+const rim = new THREE.DirectionalLight(0xa2dca9,0.85);
+rim.position.set(40,45,-35);scene.add(rim);
+
+// La cuadrícula es independiente de la geometría importada: los cuadrados se tocan sin editar sus GLB.
+const grid = new THREE.GridHelper(TILE * (2*LIMIT+1),2*LIMIT+1,0x729273,0x436047);
+grid.position.y = .018;scene.add(grid);
+const axisGround = new THREE.Mesh(new THREE.PlaneGeometry(TILE*(2*LIMIT+1),TILE*(2*LIMIT+1)),new THREE.MeshBasicMaterial({color:0x344b38,transparent:true,opacity:0.11,side:THREE.DoubleSide,depthWrite:false}));
+axisGround.rotation.x=-Math.PI/2;axisGround.position.y=.009;scene.add(axisGround);
+const selectedLine = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(TILE+.12,.035,TILE+.12)),new THREE.LineBasicMaterial({color:0xffe57d,depthTest:false}));
+selectedLine.renderOrder=100;selectedLine.visible=false;scene.add(selectedLine);
+const hoverPlane = new THREE.Mesh(new THREE.PlaneGeometry(TILE-.18,TILE-.18),new THREE.MeshBasicMaterial({color:0xa8edaf,transparent:true,opacity:.22,side:THREE.DoubleSide,depthWrite:false,depthTest:false}));
+hoverPlane.rotation.x=-Math.PI/2;hoverPlane.position.y=1.32;hoverPlane.visible=false;hoverPlane.renderOrder=99;scene.add(hoverPlane);
+
+const templates={},objects=new Map();
+let tiles=[{x:0,z:0,type:'trees'}],selectedKey='0,0',mode='move',brush='grass',ready=false;
+let theta=Math.PI/4,phi=1.04,distance=76,center=new THREE.Vector3(0,1,0);
+let pointer=null,history=[];
+const ray = new THREE.Raycaster(),mouse = new THREE.Vector2();
+const placementPlane = new THREE.Plane(new THREE.Vector3(0,1,0),-1.28);
+const direction={up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]};
+
+function key(x,z){return x+','+z;}
+function within(x,z){return Number.isInteger(x)&&Number.isInteger(z)&&Math.abs(x)<=LIMIT&&Math.abs(z)<=LIMIT;}
+function findTile(x,z){return tiles.find(t=>t.x===x&&t.z===z);}
+function getSelected(){return tiles.find(t=>key(t.x,t.z)===selectedKey)||null;}
+function say(message){toast.textContent=message;}
+function saveLocal(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify({version:1,size:TILE,tiles}))}catch(e){/* Almacenamiento opcional */}}
+function snapshot(){history.push(JSON.stringify(tiles));if(history.length>30)history.shift();}
+function validateMap(input){
+  if(!input||input.version!==1||!Array.isArray(input.tiles)||input.tiles.length>MAX_TILES||input.tiles.length<1)throw Error('Mapa inválido o demasiado grande');
+  const seen=new Set();
+  return input.tiles.map(t=>{
+    if(!within(t.x,t.z)||!Object.hasOwn(SOURCES,t.type))throw Error('Terreno o posición no admitidos');
+    const k=key(t.x,t.z);if(seen.has(k))throw Error('Hay cuadrados superpuestos');seen.add(k);
+    return {x:t.x,z:t.z,type:t.type};
+  });
+}
+function restoreLocal(){try{const saved=localStorage.getItem(STORAGE_KEY);if(saved){tiles=validateMap(JSON.parse(saved));selectedKey=key(tiles[0].x,tiles[0].z)}}catch(e){tiles=[{x:0,z:0,type:'trees'}];selectedKey='0,0'}}
+function setMode(next){mode=next;updateUI();if(next==='place')say('Modo colocar: tocá una casilla libre para poner '+LABELS[brush]+'.');else if(next==='orbit')say('Modo cámara: arrastrá para girar, rueda o botones para zoom.');else say('Modo mover: arrastrá un cuadrado o tocá una casilla libre del plano para moverlo.');}
+function getWorldPoint(event){
+  const bounds=stage.getBoundingClientRect();
+  mouse.x=((event.clientX-bounds.left)/bounds.width)*2-1;
+  mouse.y=-((event.clientY-bounds.top)/bounds.height)*2+1;
+  ray.setFromCamera(mouse,camera);
+  const hit=new THREE.Vector3();
+  return ray.ray.intersectPlane(placementPlane,hit)?hit:null;
+}
+function getCellFromPointer(event){const w=getWorldPoint(event);if(!w)return null;const x=Math.round(w.x/TILE),z=Math.round(w.z/TILE);return within(x,z)?{x,z}:null;}
+function tileUnderPointer(event){
+  const bounds=stage.getBoundingClientRect();
+  mouse.x=((event.clientX-bounds.left)/bounds.width)*2-1;
+  mouse.y=-((event.clientY-bounds.top)/bounds.height)*2+1;
+  ray.setFromCamera(mouse,camera);
+  const hits=ray.intersectObjects([...objects.values()],true);
+  for(const hit of hits){let current=hit.object;while(current){if(current.userData.tileKey)return tiles.find(t=>key(t.x,t.z)===current.userData.tileKey)||null;current=current.parent}}
+  return null;
+}
+function makeTile(t){
+  const root=templates[t.type].clone(true);
+  root.position.set(t.x*TILE,0,t.z*TILE);
+  const id=key(t.x,t.z);
+  root.traverse(o=>{o.userData.tileKey=id; if(o.isMesh){o.castShadow=false;o.receiveShadow=true;}});
+  scene.add(root); objects.set(id,root);
+}
+function eraseObjects(){for(const o of objects.values())scene.remove(o);objects.clear();}
+function rebuild(){if(!ready)return;eraseObjects();for(const t of tiles)makeTile(t);updateUI();}
+function placeTile(type,x,z){
+  if(!ready){say('Todavía se están cargando los terrenos 3D.');return false}
+  if(!within(x,z)){say('Fuera del mapa; usá una casilla del plano.');return false}
+  if(findTile(x,z)){say('Esa casilla ya tiene un terreno. Elegí otra.');return false}
+  if(tiles.length>=MAX_TILES){say('Límite de '+MAX_TILES+' cuadrados para mantener el visor fluido.');return false}
+  snapshot();tiles.push({x,z,type});selectedKey=key(x,z);makeTile(tiles[tiles.length-1]);saveLocal();updateUI();say('Agregado '+LABELS[type]+' en ('+x+', '+z+'). Podés seguir colocando.');return true;
+}
+function moveTile(oldX,oldZ,newX,newZ){
+  const t=findTile(oldX,oldZ);
+  if(!t||!within(newX,newZ)||findTile(newX,newZ)){
+    say('No se puede mover: destino ocupado o fuera del plano.');return false;
+  }
+  snapshot();
+  const oldKey=key(t.x,t.z),root=objects.get(oldKey);
+  objects.delete(oldKey);
+  t.x=newX;t.z=newZ;const newKey=key(newX,newZ);
+  root.position.set(newX*TILE,0,newZ*TILE);
+  root.traverse(o=>o.userData.tileKey=newKey);
+  objects.set(newKey,root);selectedKey=newKey;
+  saveLocal();updateUI();say('Movido a ('+newX+', '+newZ+').');return true;
+}
+function selectTile(t){selectedKey=key(t.x,t.z);updateUI();say('Seleccionado: '+LABELS[t.type]+'. Tocá Copiar o movelo.');}
+function clickCell(x,z){
+  const existing=findTile(x,z);
+  if(mode==='place'){
+    if(existing){selectTile(existing);say('Casilla ocupada. Tocá una libre para colocar '+LABELS[brush]+'.');}
+    else placeTile(brush,x,z);
+  }else if(mode==='move'){
+    if(existing)selectTile(existing);
+    else if(getSelected())moveTile(getSelected().x,getSelected().z,x,z);
+  }else if(existing)selectTile(existing);
+}
+function copySelected(){const t=getSelected();if(!t)return;snapshotSelectionOnly();brush=t.type;mode='place';updateUI();say('Copiar '+LABELS[t.type]+': elegí dónde colocarlo tocando un espacio vacío.');}
+function snapshotSelectionOnly(){/* Cambiar de herramienta no modifica el mapa. */}
+function duplicateDir(dir){
+  const t=getSelected();if(!t)return;
+  const [dx,dz]=direction[dir];
+  placeTile(t.type,t.x+dx,t.z+dz);
+}
+function deleteSelected(){const t=getSelected();if(!t)return;if(tiles.length===1){say('Conservamos un terreno inicial. Para reiniciar, usá Empezar de nuevo.');return;}
+  snapshot();tiles=tiles.filter(a=>a!==t);const obj=objects.get(selectedKey);if(obj)scene.remove(obj);objects.delete(selectedKey);
+  selectedKey=key(tiles[0].x,tiles[0].z);saveLocal();updateUI();say('Terreno eliminado.');
+}
+function undo(){if(!history.length){say('No hay cambios anteriores.');return}tiles=JSON.parse(history.pop());selectedKey=key(tiles[0].x,tiles[0].z);rebuild();saveLocal();say('Se deshizo el último cambio.');}
+
+const minimap=el('minimap');
+for(let z=-LIMIT;z<=LIMIT;z++)for(let x=-LIMIT;x<=LIMIT;x++){
+  const cell=document.createElement('button');cell.type='button';cell.className='cell free';cell.dataset.x=String(x);cell.dataset.z=String(z);
+  cell.addEventListener('click',()=>clickCell(x,z));minimap.appendChild(cell);
+}
+function updateUI(){
+  for(const id of ['moveMode','placeMode','orbitMode'])el(id).classList.toggle('active',id===mode+'Mode');
+  el('grassBrush').classList.toggle('active',brush==='grass');el('treesBrush').classList.toggle('active',brush==='trees');
+  const t=getSelected();
+  el('selected').textContent=t?'Seleccionado: '+LABELS[t.type]+' · cuadrado ('+t.x+', '+t.z+')':'Sin selección';
+  el('count').textContent=tiles.length+' cuadrado'+(tiles.length===1?'':'s')+' colocado'+(tiles.length===1?'':'s')+' · cuadrícula 9 × 9';
+  el('copy').disabled=!ready||!t;el('remove').disabled=!ready||!t||tiles.length===1;
+  el('palette').disabled=!ready;
+  for(const b of document.querySelectorAll('[data-dir]'))b.disabled=!ready||!t;
+  el('undo').disabled=!ready||history.length===0;
+  el('placeMode').disabled=!ready;
+  selectedLine.visible=Boolean(t&&ready);
+  if(t)selectedLine.position.set(t.x*TILE,1.32,t.z*TILE);
+  for(const cell of minimap.children){
+    const x=Number(cell.dataset.x),z=Number(cell.dataset.z),terrain=findTile(x,z),selected=key(x,z)===selectedKey;
+    cell.className='cell '+(terrain?terrain.type:'free')+(selected?' selected':'');
+    cell.textContent=terrain?(terrain.type==='trees'?'♣':'■'):'·';
+    cell.title='('+x+', '+z+') — '+(terrain?LABELS[terrain.type]:'Libre');
+    cell.setAttribute('aria-label',cell.title);
+    cell.disabled=!ready;
+  }
+}
+function showHover(cell){
+  hoverPlane.visible=!!cell&&!findTile(cell.x,cell.z)&&mode!=='orbit';
+  if(hoverPlane.visible)hoverPlane.position.set(cell.x*TILE,1.32,cell.z*TILE);
+}
+function changeCamera(){
+  phi=THREE.MathUtils.clamp(phi,.02,Math.PI-.02);
+  const s=Math.sin(phi);
+  camera.position.set(center.x+distance*s*Math.sin(theta),center.y+distance*Math.cos(phi),center.z+distance*s*Math.cos(theta));
+  camera.lookAt(center);
+}
+function fitView(){
+  if(!tiles.length)return;
+  let minx=Infinity,minz=Infinity,maxx=-Infinity,maxz=-Infinity;
+  for(const t of tiles){minx=Math.min(minx,t.x);minz=Math.min(minz,t.z);maxx=Math.max(maxx,t.x);maxz=Math.max(maxz,t.z);}
+  center.set((minx+maxx)*TILE/2,1.2,(minz+maxz)*TILE/2);
+  const spread=Math.max((maxx-minx+1)*TILE,(maxz-minz+1)*TILE);
+  distance=Math.max(52,spread*2.0);
+  changeCamera();
+}
+function resize(){const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}
+new ResizeObserver(resize).observe(stage);window.addEventListener('resize',resize);resize();changeCamera();
+
+// Interacción 3D: arrastrar traslada un terreno completo, sin deformar árboles o montañas.
+stage.addEventListener('pointerdown',e=>{
+  if(e.button!==0)return;
+  const hit=(mode!=='orbit')?tileUnderPointer(e):null;
+  pointer={id:e.pointerId,startX:e.clientX,startY:e.clientY,lastX:e.clientX,lastY:e.clientY,hit,origin:hit?{x:hit.x,z:hit.z}:null,moved:false};
+  try{stage.setPointerCapture(e.pointerId)}catch(_){}
+});
+stage.addEventListener('pointermove',e=>{
+  if(!pointer){showHover(getCellFromPointer(e));return;}
+  if(pointer.id!==e.pointerId)return;
+  const dx=e.clientX-pointer.lastX,dy=e.clientY-pointer.lastY;
+  pointer.lastX=e.clientX;pointer.lastY=e.clientY;
+  if(Math.hypot(e.clientX-pointer.startX,e.clientY-pointer.startY)>7)pointer.moved=true;
+  if(mode==='orbit'&&pointer.moved){theta-=dx*.008;phi-=dy*.008;changeCamera();return;}
+  if(mode==='move'&&pointer.hit&&pointer.moved){showHover(getCellFromPointer(e));return;}
+  if(mode==='place'&&!pointer.hit&&pointer.moved){showHover(getCellFromPointer(e));}
+});
+stage.addEventListener('pointerup',e=>{
+  if(!pointer||pointer.id!==e.pointerId)return;
+  const current=pointer;pointer=null;
+  const cell=getCellFromPointer(e);
+  showHover(null);
+  if(mode==='orbit')return;
+  if(mode==='move'&&current.hit){
+    if(current.moved&&cell){
+      if(key(cell.x,cell.z)!==key(current.origin.x,current.origin.z))moveTile(current.origin.x,current.origin.z,cell.x,cell.z);
+      else selectTile(current.hit);
+    }else if(!current.moved)selectTile(current.hit);
+    return;
+  }
+  if(current.moved)return;
+  if(cell)clickCell(cell.x,cell.z);
+});
+stage.addEventListener('pointercancel',()=>{pointer=null;showHover(null)});
+stage.addEventListener('lostpointercapture',()=>{pointer=null;showHover(null)});
+stage.addEventListener('wheel',e=>{e.preventDefault();distance=THREE.MathUtils.clamp(distance+e.deltaY*.12,16,750);changeCamera()},{passive:false});
+
+el('moveMode').onclick=()=>setMode('move');el('placeMode').onclick=()=>setMode('place');el('orbitMode').onclick=()=>setMode('orbit');
+el('grassBrush').onclick=()=>{brush='grass';setMode('place')};
+el('treesBrush').onclick=()=>{brush='trees';setMode('place')};
+el('copy').onclick=copySelected;
+el('remove').onclick=deleteSelected;el('undo').onclick=undo;
+for(const b of document.querySelectorAll('[data-dir]'))b.addEventListener('click',()=>duplicateDir(b.dataset.dir));
+el('frontView').onclick=()=>{theta=Math.PI/4;phi=1.04;changeCamera()};
+el('topView').onclick=()=>{theta=0;phi=.02;changeCamera()};
+el('fitView').onclick=fitView;
+el('zoomIn').onclick=()=>{distance=Math.max(16,distance*.82);changeCamera()};
+el('zoomOut').onclick=()=>{distance=Math.min(750,distance*1.22);changeCamera()};
+el('save').onclick=()=>{
+  const file={version:1,size:TILE,description:'Mapa modular de terrenos Blender: pasto liso / arboles y montanitas',tiles};
+  const blob=new Blob([JSON.stringify(file,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download='mi_mapa_escenarios.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  say('Archivo JSON descargado con '+tiles.length+' cuadrados.');
+};
+el('load').onclick=()=>el('inputFile').click();
+el('inputFile').addEventListener('change',async e=>{
+  const file=e.target.files?.[0];if(!file)return;
+  try{const next=validateMap(JSON.parse(await file.text()));snapshot();tiles=next;selectedKey=key(tiles[0].x,tiles[0].z);rebuild();saveLocal();fitView();say('Mapa importado: '+tiles.length+' terrenos.');}
+  catch(error){say('No se pudo cargar el mapa: '+error.message)}finally{e.target.value=''}
+});
+el('reset').onclick=()=>{
+  if(!confirm('¿Borrar el mapa actual y dejar un único terreno con árboles en el centro?'))return;
+  snapshot();tiles=[{x:0,z:0,type:'trees'}];selectedKey='0,0';rebuild();saveLocal();fitView();say('Mapa reiniciado.');
+};
+
+const loader=new GLTFLoader();
+async function loadTemplate(type,url){return new Promise((resolve,reject)=>loader.load(url,g=>{if(!g?.scene)reject(Error('No se pudo abrir '+type));else resolve(g.scene)},undefined,reject));}
+Promise.all(Object.entries(SOURCES).map(async ([type,url])=>{templates[type]=await loadTemplate(type,url)}))
+.then(()=>{
+  ready=true;restoreLocal();rebuild();fitView();
+  say('Listo: '+tiles.length+' cuadrados. Elegí un tipo, tocá Copiar o usá las flechas para extender el escenario.');
+}).catch(error=>{say('Error al cargar los modelos GLB: '+error.message);console.error(error)});
+function animate(){requestAnimationFrame(animate);renderer.render(scene,camera)}animate();
+</script>
+</body>
+</html>
