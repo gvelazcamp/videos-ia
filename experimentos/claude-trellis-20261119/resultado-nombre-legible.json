@@ -1,0 +1,26 @@
+{
+  "estado": "correccion_placa_3d_de_claude_generada",
+  "fuente": "claude-trellis-candidato.glb",
+  "salida": "claude-trellis-nombre-legible.glb",
+  "cambio": "Placa sólida blanca y letras negras Claude como triángulos 3D, sin texturas UV",
+  "texto_exacto": "Claude",
+  "orientacion": "letras en +X (izquierda a derecha)",
+  "posicion": {
+    "x": -0.0011096000671386719,
+    "y": -0.17308447110652925
+  },
+  "tamano_placa": [
+    0.23757727420330046,
+    0.09582948875427247
+  ],
+  "cobertura_placa": 1.0,
+  "cobertura_letras": 1.0,
+  "contornos_texto": 9,
+  "caras_originales": 8042,
+  "caras_nuevo_total": 9411,
+  "geometrias_originales": 1,
+  "geometrias_finales": 3,
+  "sha256_original": "f4ed80a091665a8a3f1856d066e6561e38187af4f0027a7c05b96afd9d2fc3a6",
+  "sha256_corregido": "0b7a275b65b725667bfe76d3e755fc9ce286485e86a7a0eeaee2c56dff01cedb",
+  "bytes": 1358596
+}
