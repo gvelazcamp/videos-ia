@@ -1,0 +1,61 @@
+name: Claude saludo - prueba independiente rapida
+
+on:
+  push:
+    paths:
+      - '.github/workflows/claude-saludo-verificacion-rapida-20261119.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: claude-saludo-validacion-rapida-20261119
+  cancel-in-progress: false
+
+jobs:
+  probar:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - name: Blender desde listas apt preinstaladas
+        shell: bash
+        run: |
+          export DEBIAN_FRONTEND=noninteractive
+          timeout 240 sudo apt-get install -y --no-install-recommends blender python3-numpy
+      - name: Generar y verificar el saludo levantando el brazo
+        shell: bash
+        run: |
+          set -euo pipefail
+          blender -b -t 2 --python-exit-code 1 \
+            --python experimentos/claude-movimientos-20261119/generar_biblioteca.py \
+            -- experimentos/claude-limpio-corriendo-20261119/resultado/Claude_3D_CARRERA_REAL.glb \
+               experimentos/claude-movimientos-20261119/resultado-saludo-verificado
+      - name: Validar el GLB y dos imágenes
+        run: |
+          python3 - <<'PY'
+          import json,struct
+          from pathlib import Path
+          root=Path('experimentos/claude-movimientos-20261119/resultado-saludo-verificado')
+          glb=(root/'Claude_Biblioteca_12_Movimientos.glb').read_bytes()
+          assert glb[:4]==b'glTF'
+          assert struct.unpack_from('<I',glb,8)[0]==len(glb)
+          data=json.loads(glb[20:20+struct.unpack_from('<I',glb,12)[0]])
+          assert len(data['skins'][0]['joints'])>=15
+          assert len(data['animations'])>=12
+          assert (root/'saludo_frontal.png').is_file()
+          assert (root/'saludo_45_grados.png').is_file()
+          print('SALUDO_CORREGIDO_VALIDADO',len(data['animations']))
+          PY
+      - name: Publicar solo la prueba nueva
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add -- experimentos/claude-movimientos-20261119/resultado-saludo-verificado/
+          if git diff --cached --quiet; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Claude: prueba visual del saludo corregido y GLB independiente'
+          git pull --rebase origin main
+          git push origin HEAD:main
