@@ -1,0 +1,72 @@
+name: Gemini 3D - carrera articulada cinco segundos
+
+on:
+  push:
+    paths:
+      - 'experimentos/gemini-azul-articulado-corriendo-20261119/generar.py'
+      - '.github/workflows/gemini-azul-articulado-corriendo-20261119.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gemini-azul-articulado-carrera-20261119
+  cancel-in-progress: false
+
+jobs:
+  crear-gemini-3d:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Instalar Blender y Numpy
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y blender python3-numpy
+      - name: Generar Gemini GLB articulado y poses de prueba
+        run: |
+          blender -b -t 2 --python-exit-code 1 \
+            --python experimentos/gemini-azul-articulado-corriendo-20261119/generar.py \
+            -- experimentos/gemini-azul-articulado-corriendo-20261119/resultado
+      - name: Auditar GLB y animación
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import struct,json
+          root=Path('experimentos/gemini-azul-articulado-corriendo-20261119/resultado')
+          p=root/'Gemini_3D_Corriendo_Articulado.glb'
+          raw=p.read_bytes()
+          assert raw[:4]==b'glTF'
+          assert struct.unpack_from('<I',raw,8)[0]==len(raw), 'Longitud GLB no coincide'
+          js=json.loads(raw[20:20+struct.unpack_from('<I',raw,12)[0]])
+          assert js.get('skins') and len(js['skins'][0]['joints'])>=15
+          assert js.get('animations') and sum(len(a['channels']) for a in js['animations'])>=40
+          from zipfile import ZipFile
+          with ZipFile(root/'Gemini_10_imagenes_separadas.zip') as z:
+            assert len(z.namelist())==10, 'Debe haber diez imágenes separadas'
+            assert all(n.endswith('.png') for n in z.namelist())
+          vistas=list((root/'vistas').glob('gemini_*.png'))
+          assert len(vistas)==10, 'Faltan vistas independientes'
+          for i in (1,4,7,10):
+            assert (root/f'carrera_{i:02d}.png').is_file(),'No se renderizó una pose de carrera'
+          print('Modelo articulado generado, rig y clips verificados.')
+          PY
+      - name: Publicar solamente el resultado Gemini nuevo
+        run: |
+          set -euo pipefail
+          git add -- experimentos/gemini-azul-articulado-corriendo-20261119/resultado/
+          if git diff --cached --quiet; then echo 'Sin cambios: se evita duplicar'; exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Gemini: modelo 3D azul articulado, carrera y diez vistas PNG separadas'
+          git pull --rebase origin main
+          git push origin HEAD:main
+      - name: Guardar candidato como artefacto
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gemini-azul-3d-articulado-${{ github.run_id }}
+          path: experimentos/gemini-azul-articulado-corriendo-20261119/resultado/
+          retention-days: 7
+          if-no-files-found: warn
