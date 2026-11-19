@@ -1,6 +1,6 @@
 # Islitas de las IA: pieza fija para todos los videos (Gonzalo, 16/11/2026)
 
-Estilo tomado de las referencias de Gonzalo (`referencias/recibidas/01-chatgpt-hq.webp`):
+Estilo tomado de las referencias de Gonzalo (`islitas/isla-chatgpt.png`):
 - Plataforma violeta redondeada.
 - Aro de neón del color de cada IA, con resplandor.
 - Bandera con el nombre en un mástil plateado.
