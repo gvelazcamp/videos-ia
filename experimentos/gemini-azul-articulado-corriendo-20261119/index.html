@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="es">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gemini 3D — robot articulado corriendo</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#081f29;color:#eafff6;font:15px system-ui,Arial}main{max-width:900px;margin:auto;background:#0d3441;min-height:100dvh}
+header{padding:15px}h1{font-size:21px;margin:0 0 5px;color:#ffe0a3}p{margin:7px 0;font-size:12px;color:#c6e5e2}
+#stage{height:67dvh;min-height:360px;position:relative;background:radial-gradient(ellipse at 50% 40%,#3e7d8f,#0b2e3f 75%);touch-action:none}
+#stage canvas{display:block;width:100%;height:100%;touch-action:none}
+#status{position:absolute;bottom:10px;left:8px;right:8px;text-align:center;background:#071f2cd9;padding:8px;border-radius:8px;font-size:12px}
+.controls{display:flex;gap:10px;padding:12px;flex-wrap:wrap;background:#0a2a38}
+button,a{color:#f1fff3;border:1px solid #6ce4bc66;background:#1d665a;padding:11px 14px;border-radius:9px;font-weight:700;font-size:13px;text-decoration:none}
+button:disabled{opacity:.45}small{display:block;padding:12px;color:#c7e5dc;line-height:1.55}
+</style></head>
+<body><main>
+<header><h1>Gemini · carrera 3D articulada</h1><p>El Gemini corregido de tu imagen: cabeza blanca, cuerpo y antena azules, insignia de dos estrellas y placa Gemini. Carrera 3D articulada de 5 segundos.</p></header>
+<div id="stage"><div id="status" role="status">Cargando Gemini articulado 3D…</div></div>
+<div class="controls">
+<button id="play" disabled>▶ Correr hacia mí · 5 s</button>
+<button id="stop" disabled>Detener</button>
+<button id="front">Centrar Gemini</button>
+<button id="zoomOut" aria-label="Alejar cámara">− Alejar</button>
+<button id="zoomIn" aria-label="Acercar cámara">+ Acercar</button>
+<a href="./resultado/Gemini_3D_Corriendo_Articulado.glb" download>Descargar GLB articulado</a>
+<a href="./resultado/Gemini_10_imagenes_separadas.zip" download>10 PNG separados (ZIP)</a>
+<a href="../claude-limpio-corriendo-20261119/index.html">Ver Claude articulado</a>
+</div>
+<small>Visor corregido: encuadre calculado sobre la geometría real del robot con su esqueleto, botones de zoom y centrado. Cada PNG es un archivo propio, no un collage. Este candidato está separado de todos los modelos anteriores y está pendiente de aprobación visual. La animación solo se considera válida si el archivo incluye huesos y un clip reproducible. Revisar que los miembros se articulen sin torcer el cuerpo ni las texturas.</small>
+<script type="module">
+import * as THREE from '../voltito-3d-alta-calidad-20261117/three.module.js';
+import {GLTFLoader} from '../voltito-3d-multivista-prueba-20261118/GLTFLoader.js';
+const host=document.getElementById('stage'),status=document.getElementById('status');
+const play=document.getElementById('play'),stop=document.getElementById('stop');
+const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(35,1,.01,300);
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+renderer.setPixelRatio(Math.min(2,devicePixelRatio||1));renderer.outputColorSpace=THREE.SRGBColorSpace;
+host.insertBefore(renderer.domElement,status);
+scene.add(new THREE.AmbientLight(0xffffff,2.3));
+const light=new THREE.DirectionalLight(0xffffff,2);light.position.set(5,8,7);scene.add(light);
+let model=null,mixer=null,action=null,last=performance.now(),yaw=0,dragging=false,px=0;
+let viewCenter=new THREE.Vector3(),fitDistance=10,modelReady=false;
+function size(){
+ const w=host.clientWidth,h=host.clientHeight;
+ renderer.setSize(w,h,false);
+ // CLAVE: el canvas tiene buffer de alta resolución pero tamaño CSS del contenedor.
+ renderer.domElement.style.width=w+'px';
+ renderer.domElement.style.height=h+'px';
+ camera.aspect=w/h;camera.updateProjectionMatrix();
+ if(modelReady)fitModel();
+}
+size();new ResizeObserver(size).observe(host);
+host.addEventListener('pointerdown',e=>{dragging=true;px=e.clientX;host.setPointerCapture(e.pointerId)});
+host.addEventListener('pointermove',e=>{if(dragging&&model){yaw+=(e.clientX-px)*.009;model.rotation.y=yaw;px=e.clientX}});
+for(const e of ['pointerup','pointercancel','lostpointercapture'])host.addEventListener(e,()=>dragging=false);
+// Mide la geometría DEFORMADA POR EL ESQUELETO, no el boundingBox
+// sin skinning. Este era el motivo de que se viera una cabeza gigante
+// desplazada a la derecha. La posición del robot se mantiene intacta.
+function getVisibleBounds(){
+ scene.updateMatrixWorld(true);
+ const box=new THREE.Box3(),v=new THREE.Vector3();
+ if(!model)return box;
+ model.traverse(o=>{
+  if(!o.isMesh||!o.geometry?.attributes?.position)return;
+  if(o.isSkinnedMesh && o.skeleton) o.skeleton.update();
+  const attr=o.geometry.attributes.position;
+  // Muestreo de toda la geometría visible, incluida la placa Gemini.
+  const stride=Math.max(1,Math.floor(attr.count/6000));
+  for(let i=0;i<attr.count;i+=stride){
+   v.fromBufferAttribute(attr,i);
+   if(o.isSkinnedMesh && typeof o.applyBoneTransform==='function')o.applyBoneTransform(i,v);
+   v.applyMatrix4(o.matrixWorld);
+   if(Number.isFinite(v.x)&&Number.isFinite(v.y)&&Number.isFinite(v.z))box.expandByPoint(v);
+  }
+ });
+ return box;
+}
+function fitModel(){
+ if(!model)return;
+ const box=getVisibleBounds();
+ if(box.isEmpty())return;
+ const dim=new THREE.Vector3();
+ box.getCenter(viewCenter);box.getSize(dim);
+ const vfov=THREE.MathUtils.degToRad(camera.fov);
+ const hfov=2*Math.atan(Math.tan(vfov/2)*camera.aspect);
+ // Recuadro íntegro en pantallas verticales; margen para correr hacia cámara.
+ const dY=dim.y/(2*Math.tan(vfov/2));
+ const dX=dim.x/(2*Math.tan(hfov/2));
+ fitDistance=Math.max(dY,dX,dim.z)*1.5 + dim.y*1.1 + dim.z*.7;
+ camera.position.set(viewCenter.x,viewCenter.y,viewCenter.z+fitDistance);
+ camera.near=Math.max(.001,fitDistance/1000);
+ camera.far=Math.max(300,fitDistance*20);
+ camera.updateProjectionMatrix();camera.lookAt(viewCenter);
+}
+function zoom(factor){
+ if(!model)return;
+ const distance=(camera.position.z-viewCenter.z)*factor;
+ const minimum=Math.max(.05,fitDistance*.30);
+ const maximum=fitDistance*4.5;
+ camera.position.z=viewCenter.z+THREE.MathUtils.clamp(distance,minimum,maximum);
+ camera.lookAt(viewCenter);
+}
+document.getElementById('zoomOut').addEventListener('click',()=>zoom(1.3));
+document.getElementById('zoomIn').addEventListener('click',()=>zoom(.78));
+new GLTFLoader().load('./resultado/Gemini_3D_Corriendo_Articulado.glb',gltf=>{
+ if(!gltf.animations?.length)throw Error('Este archivo no tiene clip de animación');
+ model=gltf.scene;scene.add(model);
+ model.traverse(o=>{if(o.isMesh){o.frustumCulled=false;if(o.material)o.material.side=THREE.DoubleSide}});
+ mixer=new THREE.AnimationMixer(model);action=mixer.clipAction(gltf.animations[0]);
+ action.setLoop(THREE.LoopOnce,1);action.clampWhenFinished=true;
+ action.play();mixer.setTime(0);action.paused=true;
+ // El objeto no se traslada artificialmente: apuntar la cámara al centro
+ // real del cuerpo después de que Three actualizó huesos y skinning.
+ modelReady=true;fitModel();
+ play.disabled=false;stop.disabled=false;
+ status.textContent='Gemini completo y centrado. Tocá Correr para animar brazos y piernas.';
+ mixer.addEventListener('finished',()=>{status.textContent='Terminó la carrera articulada de Gemini.';play.disabled=false});
+},undefined,err=>{
+ status.textContent='El nuevo GLB todavía no está disponible o se produjo un error. Revisar el proceso de generación.';
+ console.error(err);
+});
+play.addEventListener('click',()=>{
+ if(!action)return;
+ action.reset();action.paused=false;action.play();play.disabled=true;
+ status.textContent='Gemini corre hacia la cámara con brazos y piernas articulados…';
+});
+stop.addEventListener('click',()=>{
+ if(action){action.stop();action.reset();action.play();mixer.setTime(0);action.paused=true;play.disabled=false;fitModel();status.textContent='Animación detenida. Claude volvió a la posición inicial.';}
+});
+document.getElementById('front').addEventListener('click',()=>{yaw=0;if(model){model.rotation.y=0;fitModel();}});
+function frame(t){const dt=Math.min(.08,(t-last)/1000);last=t;if(mixer)mixer.update(dt);renderer.render(scene,camera);requestAnimationFrame(frame)}
+requestAnimationFrame(frame);
+</script></main></body></html>
