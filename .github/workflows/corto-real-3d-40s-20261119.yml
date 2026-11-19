@@ -1,0 +1,117 @@
+name: Corto real 3D 40 segundos - cuatro robots y camaras
+
+on:
+  push:
+    paths:
+      - '.github/workflows/corto-real-3d-40s-20261119.yml'
+      - 'experimentos/corto-3d-40s-20261119/generar_corto.py'
+      - 'experimentos/corto-3d-40s-20261119/subtitulos.ass'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: corto-3d-real-40s-20261119
+  cancel-in-progress: false
+
+jobs:
+  renderizar:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: Instalar Blender y FFmpeg
+        shell: bash
+        run: |
+          set -euo pipefail
+          export DEBIAN_FRONTEND=noninteractive
+          timeout 180 sudo apt-get update -qq -o Acquire::Retries=2 -o Acquire::http::Timeout=15
+          timeout 340 sudo apt-get install -y --no-install-recommends blender python3-numpy ffmpeg fonts-dejavu-core
+          blender --version | head -n 2
+          ffmpeg -version | head -n 1
+      - name: Render cinematografico en Blender de los cuatro GLB originales
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p experimentos/corto-3d-40s-20261119/resultado
+          blender -b -t 2 --python-exit-code 1 \
+            --python experimentos/corto-3d-40s-20261119/generar_corto.py \
+            -- . experimentos/corto-3d-40s-20261119/resultado
+      - name: Validar fotogramas 3D antes del montaje
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('experimentos/corto-3d-40s-20261119/resultado')
+          frames=sorted(root.glob('frame_*.png'))
+          assert len(frames)==320,('Cantidad incorrecta de fotogramas',len(frames))
+          assert all(x.read_bytes().startswith(b'\x89PNG\r\n\x1a\n') for x in frames[::30])
+          report=json.loads((root/'informe_produccion.json').read_text())
+          assert set(report['robots'])=={'ChatGPT','Claude','Gemini','Grok'}
+          assert report['camaras_cinematograficas']==8
+          print('BLENDER_3D_VALIDADO',len(frames),'fotogramas, 4 robots, 8 camaras')
+          PY
+      - name: Montar pelicula MP4 40 segundos - banda sonora original sin voz Charon
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd experimentos/corto-3d-40s-20261119
+          ffmpeg -hide_banner -loglevel error -y \
+            -framerate 8 -start_number 1 -i 'resultado/frame_%04d.png' \
+            -f lavfi -i 'sine=frequency=82:sample_rate=48000:duration=40' \
+            -f lavfi -i 'sine=frequency=123:sample_rate=48000:duration=40' \
+            -filter_complex '[1:a]volume=0.055[a];[2:a]volume=0.018[b];[a][b]amix=inputs=2:duration=first,afade=t=in:st=0:d=1,afade=t=out:st=37:d=3[amb]' \
+            -map 0:v -map '[amb]' \
+            -vf 'fps=24,scale=1080:1920:flags=lanczos,subtitles=subtitulos.ass' \
+            -c:v libx264 -crf 25 -preset veryfast -pix_fmt yuv420p \
+            -c:a aac -b:a 128k -movflags +faststart -t 40 \
+            resultado/El_Ultimo_Pulso_3D_40s.mp4
+          ffmpeg -hide_banner -loglevel error -y -ss 20 -i resultado/El_Ultimo_Pulso_3D_40s.mp4 -frames:v 1 -q:v 3 resultado/fotograma_vista_previa.jpg
+      - name: Auditoria de MP4 - duración video audio y resolución
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import json,subprocess
+          from pathlib import Path
+          root=Path('experimentos/corto-3d-40s-20261119/resultado')
+          mp4=root/'El_Ultimo_Pulso_3D_40s.mp4'
+          assert mp4.stat().st_size>200000,mp4.stat().st_size
+          p=subprocess.run(['ffprobe','-v','error','-show_format','-show_streams','-of','json',str(mp4)],capture_output=True,text=True,check=True)
+          meta=json.loads(p.stdout)
+          video=next(s for s in meta['streams'] if s.get('codec_type')=='video')
+          audio=next(s for s in meta['streams'] if s.get('codec_type')=='audio')
+          duration=float(meta['format']['duration'])
+          assert 39.8<=duration<=40.2,duration
+          assert (video['width'],video['height'])==(1080,1920)
+          assert video['codec_name']=='h264' and audio['codec_name']=='aac'
+          report=json.loads((root/'informe_produccion.json').read_text())
+          report.update({'estado':'MP4 3D verificado técnicamente','mp4':mp4.name,
+             'duracion_real_segundos':duration,'resolucion_final':[1080,1920],
+             'codec_video':video['codec_name'],'codec_audio':audio['codec_name'],
+             'audio_incluido':'Ambiente original sin narracion Charon','bytes':mp4.stat().st_size,
+             'comprobaciones':'Archivo existe, duración 40s, codecs, cuatro robots importados y 8 tomas renderizadas'})
+          (root/'informe_produccion.json').write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
+          print('MP4_3D_VALIDADO',mp4.stat().st_size,'bytes',duration,'segundos')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Corto-3D-40seg-4robots
+          path: |
+            experimentos/corto-3d-40s-20261119/resultado/El_Ultimo_Pulso_3D_40s.mp4
+            experimentos/corto-3d-40s-20261119/resultado/fotograma_vista_previa.jpg
+            experimentos/corto-3d-40s-20261119/resultado/informe_produccion.json
+          retention-days: 30
+      - name: Guardar MP4 y evidencias solamente en la carpeta nueva
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add -- experimentos/corto-3d-40s-20261119/resultado/El_Ultimo_Pulso_3D_40s.mp4 \
+            experimentos/corto-3d-40s-20261119/resultado/fotograma_vista_previa.jpg \
+            experimentos/corto-3d-40s-20261119/resultado/informe_produccion.json
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Corto 3D real: 4 robots, 8 camaras y 40 segundos MP4' || exit 0
+          git pull --rebase origin main
+          git push origin HEAD:main
