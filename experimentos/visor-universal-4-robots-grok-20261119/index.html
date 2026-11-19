@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Visor universal 3D · ChatGPT, Claude, Gemini y Grok</title>
+<style>
+:root{color-scheme:dark;font-family:system-ui,-apple-system,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:#081925;color:#f4f8fa}
+main{max-width:1024px;margin:0 auto;min-height:100vh}
+header{padding:15px 16px 10px}
+h1{margin:0;font-size:21px;font-weight:750;color:#ffdaac}
+p{font-size:13px;color:#bdced6;line-height:1.4;margin:6px 0}
+#stage{position:relative;height:51svh;min-height:310px;max-height:620px;overflow:hidden;touch-action:none;background:radial-gradient(ellipse at 50% 33%,#43616f 0,#172e3b 63%,#0a1c29 100%)}
+#stage canvas{display:block;width:100%;height:100%;touch-action:none}
+#status{position:absolute;bottom:10px;left:10px;right:10px;background:#07151edd;color:#f4f8fa;border-radius:9px;padding:8px 10px;font-size:12px;line-height:1.4}
+.panels{display:grid;grid-template-columns:1fr 230px;gap:14px;padding:14px}
+h2{font-size:15px;margin:0 0 10px;color:#f9dbb7}
+.panel{border:1px solid #395367;border-radius:12px;padding:13px;background:#102734}
+.actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+button,a.download{font:inherit;color:#eef9ff;border:1px solid #517184;background:#1b4352;border-radius:8px;padding:11px 8px;cursor:pointer;font-size:13px;text-align:center;touch-action:manipulation}
+button.active{background:#bb7136;border-color:#f4b372;color:white}
+button:disabled{opacity:.45;cursor:not-allowed}
+button:focus-visible,a:focus-visible{outline:2px solid #ffe4a9;outline-offset:2px}
+.motion{min-height:43px}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:10px auto;max-width:220px}
+.pad button{min-height:46px;font-size:21px;user-select:none;-webkit-user-select:none}
+.pad .up{grid-column:2}.pad .left{grid-column:1}.pad .down{grid-column:2}.pad .right{grid-column:3}
+.smallrow{display:flex;gap:8px;flex-wrap:wrap}.smallrow>*{flex:1}
+label{display:flex;justify-content:space-between;font-size:13px;color:#d5e2e8;gap:10px;margin-top:10px}
+input[type=range]{width:100%;accent-color:#df9a60}
+a.download{display:block;text-decoration:none;margin-top:9px;background:#264d3a;border-color:#598b6b}
+aside p{margin:8px 0}
+footer{padding:0 14px 18px;color:#a7bdc7;font-size:12px}
+.selector{display:flex;align-items:center;gap:12px;margin:12px 0 0;flex-wrap:wrap}.selector label{display:block;margin:0;font-weight:700;color:#ffe0b0}.selector select{background:#1b4352;color:#fff;border:1px solid #678da2;border-radius:9px;padding:10px 16px;font:inherit;font-size:15px;min-width:190px;cursor:pointer}
+@media(max-width:650px){.panels{grid-template-columns:1fr;padding:10px;gap:10px}.actions{grid-template-columns:repeat(3,minmax(0,1fr))}#stage{height:48svh}}
+</style>
+</head>
+<body><main>
+<header><h1>Visor 3D universal · ChatGPT, Claude, Gemini y Grok</h1>
+<p>Versión pública con 4 robots: Grok gris seleccionado de inicio.</p>
+<p>Elegí un robot articulado y usá los mismos 12 movimientos en los cuatro. Caminá, corré, saludá hacia adelante, girá y agarrá objetos. Arrastrá la cámara para verlo en 360°.</p>
+<div class="selector"><label for="robotSelect">Personaje 3D</label><select id="robotSelect" aria-label="Elegir robot"><option value="chatgpt">ChatGPT</option><option value="claude">Claude</option><option value="gemini">Gemini</option><option value="grok" selected>Grok</option></select></div></header>
+<div id="stage" aria-label="Visor 3D universal articulado">
+ <div id="status" role="status" aria-live="polite">Cargando Grok con 12 animaciones…</div>
+</div>
+<div class="panels">
+ <section class="panel"><h2>Movimientos</h2>
+  <div class="actions" id="actions">
+   <button class="motion" data-mode="idle" disabled>Quieto</button>
+   <button class="motion" data-mode="walk" disabled>Caminar lento</button>
+   <button class="motion" data-mode="run" disabled>Correr</button>
+   <button class="motion" data-mode="wave" disabled>Saludar</button>
+   <button class="motion" data-mode="turnLeft" disabled>Girar izquierda</button>
+   <button class="motion" data-mode="turnRight" disabled>Girar derecha</button>
+   <button class="motion" data-mode="stop" disabled>Frenar</button>
+   <button class="motion" data-mode="jump" disabled>Saltar</button>
+   <button class="motion" data-mode="grab" disabled>Agarrar objeto</button>
+   <button class="motion" data-mode="release" disabled>Soltar objeto</button>
+   <button class="motion" data-mode="sit" disabled>Sentarse</button>
+   <button class="motion" data-mode="stand" disabled>Levantarse</button>
+  </div>
+ </section>
+ <aside class="panel"><h2>Dirigir al robot</h2>
+  <p>Elegí Caminar o Correr para que avance. Mantené pulsadas las flechas para conducirlo.</p>
+  <div class="pad">
+    <button class="up" data-drive="forward" aria-label="Avanzar">↑</button>
+    <button class="left" data-drive="left" aria-label="Girar izquierda">←</button>
+    <button class="down" data-drive="backward" aria-label="Retroceder">↓</button>
+    <button class="right" data-drive="right" aria-label="Girar derecha">→</button>
+  </div>
+  <label for="speed">Velocidad <output id="speedValue">1,0×</output></label>
+  <input id="speed" type="range" min=".4" max="2" step=".1" value="1">
+  <div class="smallrow" style="margin-top:11px">
+   <button id="front" type="button">Vista frontal</button>
+   <button id="reset" type="button">Reiniciar</button>
+  </div>
+  <div class="smallrow" style="margin-top:8px">
+   <button id="zoomOut">− Alejar</button><button id="zoomIn">+ Acercar</button>
+  </div>
+  <a id="glbDownload" class="download" href="../chatgpt-movimientos-universal-20261119/resultado/ChatGPT_Biblioteca_12_Movimientos.glb" download>Descargar GLB del robot seleccionado</a>
+ </aside>
+</div>
+<footer>Visor universal independiente: no se modifican los modelos originales de Claude, ChatGPT, Gemini ni Grok. Los cuatro GLB tienen 12 clips, incluidos caminar lento y el saludo hacia adelante. Las flechas mueven al personaje; arrastrar gira solo la cámara.</footer>
+<script type="module">
+import * as THREE from '../voltito-3d-alta-calidad-20261117/three.module.js';
+import {GLTFLoader} from '../voltito-3d-multivista-prueba-20261118/GLTFLoader.js';
+const MODELS={
+  chatgpt:{name:'ChatGPT',glb:'../chatgpt-movimientos-universal-20261119/resultado/ChatGPT_Biblioteca_12_Movimientos.glb'},
+  claude:{name:'Claude',glb:'../claude-movimientos-20261119/resultado-saludo-verificado/Claude_Biblioteca_12_Movimientos.glb?v=saludo-adelante-20261119'},
+  gemini:{name:'Gemini',glb:'../gemini-movimientos-universal-20261119/resultado/Gemini_Biblioteca_12_Movimientos.glb'},
+  grok:{name:'Grok',glb:'../grok-gris-movimientos-universal-20261119/resultado/Grok_Biblioteca_12_Movimientos.glb'}
+};
+const host=document.getElementById('stage'),status=document.getElementById('status');
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(38,1,.01,150);
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));
+renderer.outputColorSpace=THREE.SRGBColorSpace;
+renderer.shadowMap.enabled=true;
+host.insertBefore(renderer.domElement,status);
+const ambient=new THREE.AmbientLight(0xffffff,1.9);scene.add(ambient);
+const keyLight=new THREE.DirectionalLight(0xffffff,1.7);
+keyLight.position.set(4,7,6);keyLight.castShadow=true;
+keyLight.shadow.mapSize.set(1024,1024);scene.add(keyLight);
+const floor=new THREE.Mesh(new THREE.PlaneGeometry(90,90),new THREE.MeshStandardMaterial({color:0x193842,roughness:.85,metalness:0}));
+floor.rotation.x=-Math.PI/2;floor.receiveShadow=true;scene.add(floor);
+const grid=new THREE.GridHelper(90,90,0x557887,0x315362);
+grid.position.y=.006;scene.add(grid);
+const worldRoot=new THREE.Group();scene.add(worldRoot);
+const ball=new THREE.Mesh(new THREE.SphereGeometry(.16,20,12),new THREE.MeshStandardMaterial({color:0xffd465,metalness:.25,roughness:.35}));
+ball.castShadow=true;scene.add(ball);
+let actor=null,mixer=null,current=null,mode='idle',yaw=0,held=false,hand=null;
+let modelName='ChatGPT',loadToken=0;
+let distance=8,azimuth=0,elevation=.16,height=2.5;
+let activeButtons=new Set(),dragging=false,px=0,py=0,last=performance.now(),duration=0,ready=false,focus=new THREE.Vector3(0,1.3,0);
+const speeds={walk:.65,run:1.65},modes={
+ idle:'01_Reposo',walk:'02_Caminar_lento',run:'03_Correr',wave:'04_Saludar',
+ turnLeft:'05_Girar_izquierda_90',turnRight:'06_Girar_derecha_90',
+ stop:'07_Frenar',jump:'08_Saltar',grab:'09_Agarrar_objeto',release:'10_Soltar_objeto',
+ sit:'11_Sentarse',stand:'12_Levantarse'
+};
+const loops=new Set(['idle','walk','run']);
+let clips=new Map();
+const actionButtons=[...document.querySelectorAll('#actions [data-mode]')];
+const setStatus=t=>{status.textContent=t};
+const activeStyle=()=>actionButtons.forEach(b=>b.classList.toggle('active',b.dataset.mode===mode));
+const resetBall=()=>{held=false;scene.attach(ball);ball.position.set(.80,.17,.55)};
+function resize(){
+ const w=host.clientWidth,h=host.clientHeight;
+ renderer.setSize(w,h,false);
+ renderer.domElement.style.width=w+'px';renderer.domElement.style.height=h+'px';
+ camera.aspect=w/h;camera.updateProjectionMatrix();
+}
+new ResizeObserver(resize).observe(host);resize();
+function fit(){
+ if(!actor)return;
+ scene.updateMatrixWorld(true);
+ let b=new THREE.Box3().setFromObject(actor);
+ if(b.isEmpty())return;
+ const sz=new THREE.Vector3();b.getSize(sz);
+ height=Math.max(.2,sz.y);
+ distance=Math.max(4.4,height*2.6);
+ focus.set(0,height*.53,0);
+}
+function updateCamera(){
+ const target=new THREE.Vector3(worldRoot.position.x,height*.51,worldRoot.position.z);
+ focus.lerp(target,.12);
+ const c=Math.cos(elevation);
+ camera.position.set(focus.x+distance*Math.sin(azimuth)*c,focus.y+distance*Math.sin(elevation),focus.z+distance*Math.cos(azimuth)*c);
+ camera.lookAt(focus);
+}
+function setClip(next){
+ if(!ready)return;
+ const selected=clips.get(next);
+ if(!selected){setStatus('El GLB no contiene el movimiento '+next);return}
+ if(current)current.stop();
+ mixer.stopAllAction();
+ current=mixer.clipAction(selected);
+ current.reset();current.enabled=true;current.setEffectiveWeight(1);
+ current.setLoop(loops.has(next)?THREE.LoopRepeat:THREE.LoopOnce,loops.has(next)?Infinity:1);
+ current.clampWhenFinished=!loops.has(next);current.play();
+ mode=next;duration=selected.duration;activeStyle();
+ const texts={idle:'Claude quieto',walk:'Claude camina lento. Usá ← → para girarlo.',run:'Claude corre. Usá las flechas para dirigirlo.',wave:'Claude está saludando.',turnLeft:'Claude gira 90° hacia su izquierda.',turnRight:'Claude gira 90° hacia su derecha.',stop:'Claude está frenando.',jump:'Claude está saltando.',grab:'Claude está agarrando la esfera.',release:'Claude está soltando la esfera.',sit:'Claude está sentándose.',stand:'Claude se levanta.'};
+ setStatus((texts[next]||next).replaceAll('Claude',modelName));
+}
+function grabBall(){
+ if(!hand||held)return;
+ held=true;hand.attach(ball);ball.position.set(0,.02,0);
+}
+function releaseBall(){
+ if(!held)return;
+ scene.attach(ball);held=false;
+ ball.position.set(worldRoot.position.x+.75,.17,worldRoot.position.z+.6);
+}
+const playbackEnd=(event)=>{
+ if(!current||event.action!==current)return;
+ if(mode==='turnLeft')yaw+=Math.PI/2;
+ else if(mode==='turnRight')yaw-=Math.PI/2;
+ else if(mode==='grab')grabBall();
+ else if(mode==='release')releaseBall();
+ else if(mode==='sit'){setStatus(modelName+' está sentado. Tocá Levantarse para seguir.');return;}
+ const previous=mode;
+ if(previous==='stand'||previous==='stop'||previous==='wave'||previous==='jump'||previous==='grab'||previous==='release'||previous.startsWith('turn')){
+  setClip('idle');
+ }
+};
+function loadModel(key){
+ const config=MODELS[key];
+ if(!config)return;
+ const loadId=++loadToken;
+ ready=false;
+ actionButtons.forEach(b=>{b.disabled=true;b.classList.remove('active')});
+ activeButtons.clear();
+ resetBall();
+ if(mixer){mixer.stopAllAction();if(actor)mixer.uncacheRoot(actor)}
+ if(actor)worldRoot.remove(actor);
+ actor=null;mixer=null;current=null;hand=null;
+ modelName=config.name;mode='idle';yaw=0;azimuth=0;elevation=.16;
+ worldRoot.position.set(0,0,0);worldRoot.rotation.set(0,0,0);
+ document.getElementById('glbDownload').href=config.glb;
+ setStatus('Cargando '+modelName+' con sus 12 animaciones…');
+ new GLTFLoader().load(config.glb,gltf=>{
+  if(loadId!==loadToken)return;
+  actor=gltf.scene;worldRoot.add(actor);
+  actor.traverse(o=>{if(o.isMesh){o.frustumCulled=false;o.castShadow=true;if(o.material)o.material.side=THREE.DoubleSide;}});
+  const b=new THREE.Box3().setFromObject(actor),c=new THREE.Vector3();b.getCenter(c);
+  actor.position.x-=c.x;actor.position.z-=c.z;actor.position.y-=b.min.y;
+  scene.updateMatrixWorld(true);fit();
+  resetBall();
+  hand=actor.getObjectByName('mano_R')||actor.getObjectByName('mano_R.001');
+  mixer=new THREE.AnimationMixer(actor);
+  clips=new Map();
+  for(const key of Object.keys(modes)){
+   const cl=gltf.animations.find(animation=>animation.name.includes(modes[key]));
+   if(cl)clips.set(key,cl);
+  }
+  ready=true;
+  actionButtons.forEach(button=>button.disabled=!clips.has(button.dataset.mode));
+  mixer.addEventListener('finished',playbackEnd);
+  setClip('idle');
+  if(clips.size<12){
+    setStatus(modelName+' cargado: '+clips.size+'/12 movimientos. Revisar la biblioteca GLB.');
+  } else {
+    setStatus(modelName+' listo con 12 movimientos. Elegí Caminar lento o Saludar.');
+  }
+ },undefined,error=>{
+  if(loadId!==loadToken)return;
+  console.error(error);
+  setStatus('No se pudo cargar el GLB de '+modelName+'. Revisá el enlace y la generación en GitHub.');
+ });
+}
+document.getElementById('robotSelect').addEventListener('change',event=>loadModel(event.target.value));
+loadModel(document.getElementById('robotSelect').value);
+actionButtons.forEach(b=>b.addEventListener('click',()=>setClip(b.dataset.mode)));
+document.getElementById('front').addEventListener('click',()=>{azimuth=0;elevation=.16;setStatus('Cámara frontal. Arrastrá el visor para mirar 360°.')});
+document.getElementById('reset').addEventListener('click',()=>{
+ worldRoot.position.set(0,0,0);yaw=0;azimuth=0;elevation=.16;resetBall();setClip('idle');
+ setStatus(modelName+' volvió al inicio.');
+});
+document.getElementById('zoomIn').addEventListener('click',()=>{distance=Math.max(height*1.2,distance*.8)});
+document.getElementById('zoomOut').addEventListener('click',()=>{distance=Math.min(30,distance*1.25)});
+const speed=document.getElementById('speed'),speedValue=document.getElementById('speedValue');
+speed.addEventListener('input',()=>speedValue.textContent=Number(speed.value).toFixed(1).replace('.',',')+'×');
+const driveButtons=[...document.querySelectorAll('[data-drive]')];
+for(const b of driveButtons){
+ const key=b.dataset.drive;
+ b.addEventListener('pointerdown',e=>{e.preventDefault();b.setPointerCapture(e.pointerId);activeButtons.add(key);b.classList.add('active')});
+ const end=()=>{activeButtons.delete(key);b.classList.remove('active')};
+ b.addEventListener('pointerup',end);b.addEventListener('pointercancel',end);b.addEventListener('lostpointercapture',end);
+}
+const keyMap={ArrowUp:'forward',KeyW:'forward',ArrowDown:'backward',KeyS:'backward',ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right'};
+document.addEventListener('keydown',e=>{if(keyMap[e.code]){activeButtons.add(keyMap[e.code]);e.preventDefault()}});
+document.addEventListener('keyup',e=>{if(keyMap[e.code]){activeButtons.delete(keyMap[e.code]);e.preventDefault()}});
+host.addEventListener('pointerdown',e=>{dragging=true;px=e.clientX;py=e.clientY;host.setPointerCapture(e.pointerId)});
+host.addEventListener('pointermove',e=>{
+ if(!dragging)return;
+ azimuth+=(e.clientX-px)*.008;
+ elevation=THREE.MathUtils.clamp(elevation+(py-e.clientY)*.006,-.22,1.12);
+ px=e.clientX;py=e.clientY;
+});
+for(const evt of ['pointerup','pointercancel','lostpointercapture'])host.addEventListener(evt,()=>dragging=false);
+host.addEventListener('wheel',e=>{e.preventDefault();distance=THREE.MathUtils.clamp(distance*Math.exp(e.deltaY*.001),height*1.2,30)},{passive:false});
+function tick(t){
+ const dt=Math.min(.04,(t-last)/1000);last=t;
+ if(ready){
+  let s=Number(speed.value);
+  if(mixer)mixer.update(dt*s);
+  if(activeButtons.has('left'))yaw+=1.50*dt*s;
+  if(activeButtons.has('right'))yaw-=1.50*dt*s;
+  const locomotion=(mode==='walk'||mode==='run');
+  if(locomotion){
+   let direction=activeButtons.has('backward')?-1:1;
+   if(activeButtons.has('forward'))direction=1;
+   if(activeButtons.has('backward')&&activeButtons.has('forward'))direction=0;
+   const velocity=speeds[mode]*s*direction*dt;
+   worldRoot.position.x+=velocity*Math.sin(yaw);
+   worldRoot.position.z+=velocity*Math.cos(yaw);
+   worldRoot.position.x=THREE.MathUtils.clamp(worldRoot.position.x,-25,25);
+   worldRoot.position.z=THREE.MathUtils.clamp(worldRoot.position.z,-25,25);
+  }
+  worldRoot.rotation.y=yaw;
+ }
+ updateCamera();
+ renderer.render(scene,camera);
+ requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+</script></main></body></html>
