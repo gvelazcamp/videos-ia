@@ -37,7 +37,7 @@ jobs:
           set -euo pipefail
           export DEBIAN_FRONTEND=noninteractive
           timeout 180 sudo apt-get update -qq -o Acquire::Retries=2 -o Acquire::http::Timeout=15
-          timeout 340 sudo apt-get install -y --no-install-recommends blender python3-numpy ffmpeg fonts-dejavu-core
+          timeout 340 sudo apt-get install -y --no-install-recommends blender python3-numpy ffmpeg fonts-dejavu-core xvfb libgl1-mesa-dri
           blender --version | head -n 2
           ffmpeg -version | head -n 1
       - name: Render cinematografico en Blender de los cuatro GLB originales
@@ -45,7 +45,9 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p experimentos/corto-3d-40s-20261119/resultado
-          blender -b -t 2 --python-exit-code 1 \
+          export LIBGL_ALWAYS_SOFTWARE=1
+          xvfb-run -a -s "-screen 0 1280x720x24 +extension GLX" \
+            blender -b -t 2 --python-exit-code 1 \
             --python experimentos/corto-3d-40s-20261119/generar_corto.py \
             -- . experimentos/corto-3d-40s-20261119/resultado
       - name: Validar fotogramas 3D antes del montaje
