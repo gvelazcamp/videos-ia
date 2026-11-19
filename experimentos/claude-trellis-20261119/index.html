@@ -103,6 +103,58 @@ new GLTFLoader().load('./claude-trellis-candidato.glb',gltf=>{
    switches.forEach(({child,lit,clear})=>child.material=shadows?lit:clear);
    lightButton.textContent=shadows?"Color claro":"Sombras";
  });
+ // ÚNICA CORRECCIÓN: texto legible en una placa que forma parte del objeto 3D.
+ // La malla y texturas originales de TRELLIS se conservan intactas.
+ function corregirNombreClaude(robot){
+   const bounds=new THREE.Box3().setFromObject(robot);
+   const dimensions=new THREE.Vector3();bounds.getSize(dimensions);
+   const x=(bounds.min.x+bounds.max.x)/2;
+   const y=bounds.min.y+dimensions.y*0.335;
+   const ancho=dimensions.y*0.205,alto=dimensions.y*0.075;
+   const canvas=document.createElement('canvas');
+   canvas.width=1024;canvas.height=360;
+   const ctx=canvas.getContext('2d');
+   ctx.clearRect(0,0,1024,360);
+   const r=92,l=8,t=7,w=1008,h=346;
+   ctx.beginPath();
+   ctx.moveTo(l+r,t);ctx.lineTo(l+w-r,t);ctx.quadraticCurveTo(l+w,t,l+w,t+r);
+   ctx.lineTo(l+w,t+h-r);ctx.quadraticCurveTo(l+w,t+h,l+w-r,t+h);
+   ctx.lineTo(l+r,t+h);ctx.quadraticCurveTo(l,t+h,l,t+h-r);
+   ctx.lineTo(l,t+r);ctx.quadraticCurveTo(l,t,l+r,t);ctx.closePath();
+   ctx.fillStyle='#fbfafc';ctx.fill();
+   ctx.lineWidth=10;ctx.strokeStyle='#dbd9dd';ctx.stroke();
+   ctx.font='bold 255px Arial, sans-serif';
+   ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#101014';
+   ctx.fillText('Claude',512,187,910);
+   const tex=new THREE.CanvasTexture(canvas);tex.colorSpace=THREE.SRGBColorSpace;
+   const geom=new THREE.PlaneGeometry(ancho,alto,28,10);
+   const points=geom.getAttribute('position');
+   const ray=new THREE.Raycaster();
+   const originZ=bounds.max.z+dimensions.z+1;
+   let centroZ=bounds.max.z;
+   ray.set(new THREE.Vector3(x,y,originZ),new THREE.Vector3(0,0,-1));
+   const central=ray.intersectObject(robot,true);
+   if(central.length)centroZ=central[0].point.z;
+   for(let i=0;i<points.count;i++){
+     const px=x+points.getX(i),py=y+points.getY(i);
+     ray.set(new THREE.Vector3(px,py,originZ),new THREE.Vector3(0,0,-1));
+     const hits=ray.intersectObject(robot,true);
+     const z=hits.length?hits[0].point.z:centroZ;
+     points.setZ(i,z+0.004);
+   }
+   points.needsUpdate=true;geom.computeVertexNormals();
+   const mat=new THREE.MeshBasicMaterial({
+     map:tex,transparent:true,side:THREE.DoubleSide,
+     depthTest:true,depthWrite:true,toneMapped:false,
+     polygonOffset:true,polygonOffsetFactor:-2
+   });
+   const placa=new THREE.Mesh(geom,mat);
+   placa.position.set(x,y,0);
+   placa.name='Claude — placa 3D con nombre corregido';
+   placa.renderOrder=2;
+   robot.add(placa);
+ }
+ corregirNombreClaude(obj);
  root.add(obj);
  const box=new THREE.Box3().setFromObject(root),size=new THREE.Vector3(),center=new THREE.Vector3();
  box.getSize(size);box.getCenter(center);obj.position.sub(center);
