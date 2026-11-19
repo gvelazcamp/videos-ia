@@ -15,9 +15,9 @@ def mat(n,rgba,rough=.36,metal=0):
  b.inputs['Roughness'].default_value=rough
  b.inputs['Metallic'].default_value=metal
  return m
-teal=mat('Grok cuerpo gris grafito',(0.255,.270,.308),.68,.01)
-shellgray=mat('Grok cabeza plateado suave',(0.62,.64,.69),.35,.04)
-antenna=mat('Grok antena gris oscuro',(0.37,.39,.43),.32,.12)
+teal=mat('Grok cuerpo gris grafito',(0.125,.135,.162),.72,.00)
+shellgray=mat('Grok cabeza plateado suave',(0.36,.385,.435),.42,.01)
+antenna=mat('Grok antena gris oscuro',(0.25,.26,.30),.43,.02)
 white=mat('Casco y guantes blancos',(.94,.95,.99),.24,.05)
 black=mat('Visor negro brillante',(.012,.015,.022),.15,.13)
 labelwhite=mat('Placa blanca',(.97,.975,1),.29)
@@ -79,7 +79,7 @@ sphere('Cuerpo gris grafito',(0,0,1.265),(.60,.465,.63),teal,'torso',48)
 # Símbolo de Grok gris: aro blanco con corte y diagonal plateada.
 # Todos los componentes permanecen rígidos en el hueso torso.
 import math
-logo_white=mat('Insignia Grok blanco plata',(.94,.95,.98),.28,.08)
+logo_white=mat('Insignia Grok blanco plata',(.66,.70,.77),.42,.03)
 logo_black=mat('Centro oscuro Grok',(.035,.04,.055),.52)
 center_x,center_z=0,1.465
 front=-.499
@@ -205,11 +205,11 @@ print('GROK_GLB_VALIDADO '+json.dumps(report,ensure_ascii=False))
 # Cada imagen usa el MISMO modelo geométrico: vistas realmente consistentes.
 bpy.ops.object.camera_add(location=(0,-8.5,2.2))
 cam=bpy.context.object;cam.data.type='ORTHO';cam.data.ortho_scale=3.30;scene.camera=cam
-for loc,power in [((-3,-5,6),1000),((4,-3,4),600),((1,5,3),400)]:
+for loc,power in [((-3,-5,6),540),((4,-3,4),270),((1,5,3),170)]:
  bpy.ops.object.light_add(type='AREA',location=loc)
  lamp=bpy.context.object;lamp.data.energy=power;lamp.data.size=3.8
  lamp.rotation_euler=(Vector((0,0,1.45))-lamp.location).to_track_quat('-Z','Y').to_euler()
-scene.render.engine='CYCLES';scene.cycles.samples=32
+scene.render.engine='CYCLES';scene.cycles.samples=22
 scene.render.resolution_x=640;scene.render.resolution_y=800
 scene.render.resolution_percentage=100
 scene.render.image_settings.file_format='PNG'
