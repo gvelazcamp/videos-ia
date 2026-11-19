@@ -1,0 +1,63 @@
+name: Claude 3D limpio - correr articulado 5 segundos
+
+on:
+  push:
+    paths:
+      - 'experimentos/claude-limpio-corriendo-20261119/generar.py'
+      - '.github/workflows/claude-limpio-corriendo-20261119.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: claude-modelo-limpio-corre
+  cancel-in-progress: false
+
+jobs:
+  construir:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Blender gratuito y numpy para exportar GLB
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y blender python3-numpy
+      - name: Crear piezas 3D articuladas y renderizar cuatro poses
+        run: |
+          blender -b -t 2 --python-exit-code 1 \
+            --python experimentos/claude-limpio-corriendo-20261119/generar.py \
+            -- experimentos/claude-limpio-corriendo-20261119/resultado
+      - name: Validar GLB articulado
+        run: |
+          python - <<'PY'
+          import json,struct
+          from pathlib import Path
+          root=Path('experimentos/claude-limpio-corriendo-20261119/resultado')
+          blob=(root/'Claude_3D_CARRERA_REAL.glb').read_bytes()
+          assert blob[:4]==b'glTF'
+          size=struct.unpack_from('<I',blob,12)[0]
+          data=json.loads(blob[20:20+size])
+          assert data.get('skins') and len(data['skins'][0]['joints'])>=12
+          assert data.get('animations') and sum(len(a['channels']) for a in data['animations'])>=12
+          assert all((root/f'vista_{n:02d}.png').is_file() for n in (1,5,9,13))
+          print('CLAUDE_3D_ARTICULADO_GENERADO',len(data['skins'][0]['joints']))
+          PY
+      - name: Publicar solo candidato nuevo
+        run: |
+          set -euo pipefail
+          git add -- experimentos/claude-limpio-corriendo-20261119/resultado/
+          if git diff --cached --quiet; then echo 'Sin salida'; exit 1; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Claude limpio 3D: candidato de carrera y fotogramas para auditar'
+          git pull --rebase origin main
+          git push origin HEAD:main
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: claude-limpio-articulado-${{ github.run_id }}
+          path: experimentos/claude-limpio-corriendo-20261119/resultado/
+          if-no-files-found: warn
+          retention-days: 7
