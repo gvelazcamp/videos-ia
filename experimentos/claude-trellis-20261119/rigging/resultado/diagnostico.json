@@ -1,0 +1,12 @@
+{
+  "estado": "CANDIDATO PENDIENTE REVISION VISUAL",
+  "huesos": 13,
+  "vertices": 5479,
+  "clips": [
+    "Correr_hacia_camara_5s"
+  ],
+  "canales": 39,
+  "duracion_segundos": 5,
+  "origen": "/home/runner/work/videos-ia/videos-ia/experimentos/claude-trellis-20261119/claude-trellis-nombre-corregido.glb",
+  "nota": "Modelo no aprobado; comprobar manos y pies antes de considerarlo definitivo."
+}
