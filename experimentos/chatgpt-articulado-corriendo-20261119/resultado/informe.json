@@ -1,0 +1,13 @@
+{
+  "estado": "CANDIDATO - pendiente de revision visual",
+  "personaje": "ChatGPT original de la imagen proporcionada",
+  "glb": "ChatGPT_3D_Corriendo_Articulado.glb",
+  "esqueleto": 15,
+  "canales_animacion": 46,
+  "clips": [
+    "ChatGPT_CORRER_hacia_camara_5s"
+  ],
+  "duracion_segundos": 5,
+  "tecnica": "Blender, huesos y piezas 3D separadas",
+  "regla": "No sustituir modelos originales ni deformar vertices manualmente."
+}
