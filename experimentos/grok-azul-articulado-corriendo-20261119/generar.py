@@ -15,7 +15,7 @@ def mat(n,rgba,rough=.36,metal=0):
  b.inputs['Roughness'].default_value=rough
  b.inputs['Metallic'].default_value=metal
  return m
-teal=mat('Grok azul brillante original',(0.025,.20,.92),.25,.08)
+teal=mat('Grok azul eléctrico original',(0.004,.065,.65),.31,.01)
 white=mat('Casco y guantes blancos',(.94,.95,.99),.24,.05)
 black=mat('Visor negro brillante',(.012,.015,.022),.15,.13)
 labelwhite=mat('Placa blanca',(.97,.975,1),.29)
@@ -200,12 +200,13 @@ for loc,power in [((-3,-5,6),1000),((4,-3,4),600),((1,5,3),400)]:
  bpy.ops.object.light_add(type='AREA',location=loc)
  lamp=bpy.context.object;lamp.data.energy=power;lamp.data.size=3.8
  lamp.rotation_euler=(Vector((0,0,1.45))-lamp.location).to_track_quat('-Z','Y').to_euler()
-scene.render.engine='CYCLES';scene.cycles.samples=12
+scene.render.engine='CYCLES';scene.cycles.samples=25
 scene.render.resolution_x=530;scene.render.resolution_y=650
 scene.render.resolution_percentage=100
 scene.render.image_settings.file_format='PNG'
 scene.render.image_settings.color_mode='RGBA'
 scene.render.film_transparent=True
+scene.view_settings.view_transform='Standard'
 scene.world.color=(.18,.18,.20)
 scene.frame_set(1)
 views=[
