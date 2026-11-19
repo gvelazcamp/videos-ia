@@ -75,7 +75,7 @@ footer{padding:0 14px 18px;color:#a7bdc7;font-size:12px}
   <div class="smallrow" style="margin-top:8px">
    <button id="zoomOut">− Alejar</button><button id="zoomIn">+ Acercar</button>
   </div>
-  <a id="glbDownload" class="download" href="./resultado/Claude_Biblioteca_12_Movimientos.glb" download>Descargar GLB con 12 movimientos</a>
+  <a id="glbDownload" class="download" href="./resultado-saludo-verificado/Claude_Biblioteca_12_Movimientos.glb?v=saludo-adelante-20261119" download>Descargar GLB con 12 movimientos</a>
  </aside>
 </div>
 <footer>Prueba 3D independiente: el Claude original y su visor anterior no se modifican. Los movimientos están incorporados al GLB; las flechas del visor controlan el recorrido y orientación. Girar la cámara no cambia la dirección de Claude.</footer>
@@ -175,7 +175,7 @@ const playbackEnd=(event)=>{
   setClip('idle');
  }
 };
-new GLTFLoader().load('./resultado/Claude_Biblioteca_12_Movimientos.glb',gltf=>{
+new GLTFLoader().load('./resultado-saludo-verificado/Claude_Biblioteca_12_Movimientos.glb?v=saludo-adelante-20261119',gltf=>{
  actor=gltf.scene;worldRoot.add(actor);
  actor.traverse(o=>{if(o.isMesh){o.frustumCulled=false;o.castShadow=true;if(o.material)o.material.side=THREE.DoubleSide;}});
  const b=new THREE.Box3().setFromObject(actor),c=new THREE.Vector3();b.getCenter(c);
