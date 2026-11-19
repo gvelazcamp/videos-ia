@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - '.github/workflows/claude-saludo-verificacion-rapida-20261119.yml'
+      - 'experimentos/claude-movimientos-20261119/generar_biblioteca.py'
   workflow_dispatch:
 
 permissions:
