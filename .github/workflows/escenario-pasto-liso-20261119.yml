@@ -1,0 +1,72 @@
+name: Crear escenario 3D con pasto liso elevado (Blender)
+
+on:
+  push:
+    paths:
+      - '.github/workflows/escenario-pasto-liso-20261119.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: escenario-pasto-liso-20261119
+  cancel-in-progress: false
+
+jobs:
+  generar:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    steps:
+      - name: Obtener archivos del proyecto
+        uses: actions/checkout@v4
+      - name: Instalar Blender únicamente en GitHub Actions
+        shell: bash
+        run: |
+          set -euo pipefail
+          export DEBIAN_FRONTEND=noninteractive
+          timeout 150 sudo apt-get update -qq -o Acquire::Retries=2 -o Acquire::http::Timeout=15
+          timeout 300 sudo apt-get install -y --no-install-recommends blender python3-numpy
+          blender --version | head -n 2
+      - name: Construir terreno de pasto plano elevado en Blender
+        shell: bash
+        run: |
+          set -euo pipefail
+          blender -b -t 2 --python-exit-code 1 \
+            --python experimentos/escenario-pasto-liso-20261119/generar.py
+      - name: Verificar GLB, PNG y proyecto Blender
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,struct
+          root=Path('experimentos/escenario-pasto-liso-20261119/resultado')
+          glb=(root/'escenario_pasto_liso_elevado.glb').read_bytes()
+          assert glb[:4]==b'glTF' and len(glb)==struct.unpack_from('<I',glb,8)[0]
+          n=struct.unpack_from('<I',glb,12)[0]
+          meta=json.loads(glb[20:20+n])
+          assert len(meta.get('meshes',[]))==2
+          assert (root/'vista_previa.png').read_bytes()[:8] == bytes((137,80,78,71,13,10,26,10))
+          assert (root/'escenario_pasto_liso.blend').stat().st_size > 1000
+          informe=json.loads((root/'informe.json').read_text())
+          assert informe['ancho_m']==18 and informe['altura_superficie_caminable_m']==1.28
+          print('ESCENARIO_VALIDADO',informe['superficie'])
+          PY
+      - name: Archivar SOLO el nuevo escenario
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add -- experimentos/escenario-pasto-liso-20261119/resultado/escenario_pasto_liso_elevado.glb \
+                     experimentos/escenario-pasto-liso-20261119/resultado/escenario_pasto_liso.blend \
+                     experimentos/escenario-pasto-liso-20261119/resultado/vista_previa.png \
+                     experimentos/escenario-pasto-liso-20261119/resultado/informe.json
+          if git diff --cached --quiet; then
+            echo 'Los mismos archivos ya están publicados'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Generar escenario Blender de pasto liso elevado'
+          git pull --rebase origin main
+          git push origin HEAD:main
