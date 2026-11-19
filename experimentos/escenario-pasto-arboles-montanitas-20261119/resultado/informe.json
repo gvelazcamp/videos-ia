@@ -1,0 +1,16 @@
+{
+  "version": "Escenario 02 - arboles y montanitas",
+  "base": "Escenario 01, 18 x 18 metros, plataforma de 1.28 m",
+  "arboles": 10,
+  "montanitas": 3,
+  "altura_base_m": 1.28,
+  "altura_maxima_terreno_m": 3.03,
+  "tipo_colinas": "lomas redondeadas integradas al mismo terreno",
+  "mallas_exportadas": 37,
+  "original_intacto": "experimentos/escenario-pasto-liso-20261119/",
+  "archivos": [
+    "escenario_pasto_arboles_montanitas.glb",
+    "escenario_pasto_arboles_montanitas.blend",
+    "vista_previa.png"
+  ]
+}
