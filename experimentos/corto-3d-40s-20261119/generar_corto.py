@@ -124,7 +124,12 @@ for name,glb,x,y in models:
   st=track.strips.new(clipname+'_'+str(k),1+t0*FPS,action)
   st.action_frame_start=action.frame_range[0]
   st.action_frame_end=action.frame_range[1]
-  st.repeat=max(1,((t1-t0)*FPS)/length)
+  # Blender source animation is at 24 fps, but this preview is rendered at 8 fps.
+  # Scale each NLA strip to the exact scene duration; repeating cannot shorten
+  # it, and would cause strips to overlap and abort the Blender render.
+  st.repeat=1
+  st.scale=((t1-t0)*FPS)/length
+  assert abs((st.frame_end-st.frame_start)-(t1-t0)*FPS)<=1.01,(name,clipname,st.frame_start,st.frame_end)
   st.extrapolation='NOTHING';st.blend_type='REPLACE'
  for seconds,px,py in [(0,x,y),(6,x,y),(12,x*.77,y+.3),
                         (24,x*.77,y+.3),(32,x*.55,y+1.05),(40,x*.55,y+1.05)]:
