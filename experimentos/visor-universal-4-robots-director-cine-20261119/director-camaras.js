@@ -73,7 +73,7 @@ export function createDirectorDeCamaras(THREE,camera,worldRoot,getState){
       desired.set(wx-fx*distance*.76,height*1.05,wz-fz*distance*.76);
       look.x+=fx*1.2;look.z+=fz*1.2;
     }else if(active==='subjetiva'){
-      desired.set(wx+fx*.20,height*.79,wz+fz*.20);
+      desired.set(wx+fx*.82,height*.79,wz+fz*.82); // delante del casco para no filmar su interior
       look.set(desired.x+fx*5,desired.y-.02,desired.z+fz*5);
       fov=60;
     }else if(active==='aerea'){
