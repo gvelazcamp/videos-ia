@@ -1,0 +1,20 @@
+{
+  "estado": "candidato con placa corregida, sin alterar modelo base",
+  "origen": "claude-trellis-candidato.glb",
+  "salida": "claude-trellis-nombre-corregido.glb",
+  "correccion": "Una única placa 3D frontal con texto exacto Claude",
+  "texto": "Claude",
+  "posicion": {
+    "x": -0.0011096000671386719,
+    "y": -0.16410045653581617,
+    "z": 0.17847059321809722
+  },
+  "ancho_m": 0.2046358874440193,
+  "alto_m": 0.07486678808927535,
+  "cobertura_raycast": 1.0,
+  "geometrias_originales": 1,
+  "geometrias_finales": 2,
+  "original_sha256": "f4ed80a091665a8a3f1856d066e6561e38187af4f0027a7c05b96afd9d2fc3a6",
+  "modificado_sha256": "8dab82be72e6f8f048c58de94145e3b5940f06c2d4587cf87795539514332cbe",
+  "bytes": 1349848
+}
