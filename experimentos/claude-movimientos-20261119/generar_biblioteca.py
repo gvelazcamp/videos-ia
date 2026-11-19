@@ -118,9 +118,9 @@ def saludo_quaternions(t,d):
  lower=rig.data.bones['antebrazo_R']
  upper_rest=(upper.tail_local-upper.head_local).normalized()
  lower_rest=(lower.tail_local-lower.head_local).normalized()
- upper_goal=Vector((-.22,-.07,.29)).normalized() # codo elevado y hacia afuera
+ upper_goal=Vector((-.24,-.33,.23)).normalized() # levantar codo DELANTE del pecho (frente = -Y)
  wave=math.sin(2*math.pi*2.7*t)
- lower_goal=Vector((-.07+.055*wave,-.05,.20)).normalized() # mano por encima de hombro
+ lower_goal=Vector((-.06+.06*wave,-.33,.30)).normalized() # mano alta y visiblemente delante de Claude
  up_global=upper_rest.rotation_difference(upper_goal)
  low_global=lower_rest.rotation_difference(lower_goal)
  up_rest_q=upper.matrix_local.to_quaternion()
@@ -234,7 +234,8 @@ bpy.context.view_layer.update()
 shoulder=rig.matrix_world @ rig.pose.bones['brazo_R'].head
 wrist=rig.matrix_world @ rig.pose.bones['antebrazo_R'].tail
 print('SALUDO_POSICIONES',tuple(round(v,3) for v in shoulder),tuple(round(v,3) for v in wrist))
-assert wrist.z > shoulder.z+.13, 'El brazo de SALUDAR aún no se levanta: muñeca por debajo de hombro'
+assert wrist.z > shoulder.z+.13, 'SALUDAR no levanta la mano por encima del hombro'
+assert wrist.y < shoulder.y-.25, 'SALUDAR no lleva la mano hacia el frente (-Y) del cuerpo'
 # Dos renders sirven para confirmar la dirección en la propia malla, no solo en huesos.
 bpy.ops.object.camera_add(location=(0,-8,2.8))
 cam=bpy.context.object;scene.camera=cam
