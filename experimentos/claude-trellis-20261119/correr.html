@@ -40,7 +40,7 @@ h2{font-size:15px;color:#ffe3ab;margin:0 0 8px}
 <button type="button" id="top">Arriba</button><button type="button" id="bottom">Abajo</button>
 <a href="./claude-trellis-nombre-corregido.glb" download>Descargar GLB</a>
 </div>
-<div class="controls" aria-label="Prueba de animación 3D"><button type="button" id="runBtn">▶ Correr hacia mí · 5 segundos</button><button type="button" id="stopRun">Detener</button><button type="button" id="resetRun">Volver al visor</button><span id="runStatus" role="status" aria-live="polite">Prueba de carrera 3D: avanza hacia la cámara y mueve brazos y piernas.</span></div>
+<div class="controls" aria-label="Prueba de animación 3D"><button type="button" id="runBtn">▶ Avanzar hacia mí · 5 segundos</button><button type="button" id="stopRun">Detener</button><button type="button" id="resetRun">Volver al visor</button><span id="runStatus" role="status" aria-live="polite">Avance 3D de prueba sin deformar la malla. Para una carrera con piernas articuladas hace falta rigging.</span></div>
 <section><h2>Claude · candidato TRELLIS</h2><p class="note">Esta vista permite girar el archivo GLB verdadero con el dedo, inclinarlo, hacer zoom o girarlo automáticamente. Se conserva como candidato para comparar con las diez imágenes de referencia, sin reemplazar ningún modelo anterior.</p></section>
 <script type="module">
 import * as THREE from '../voltito-3d-alta-calidad-20261117/three.module.js';
@@ -54,7 +54,7 @@ renderer.toneMapping=THREE.NoToneMapping;renderer.toneMappingExposure=1.0;
 host.insertBefore(renderer.domElement,host.firstChild);
 const root=new THREE.Group();scene.add(root);const runner=new THREE.Group();root.add(runner);scene.add(new THREE.AmbientLight(0xffffff,2.5));const key=new THREE.DirectionalLight(0xffffff,2.8);key.position.set(-3,5,7);scene.add(key);const fill=new THREE.DirectionalLight(0x9cf9e6,1.5);fill.position.set(4,2,-5);scene.add(fill);
 let yaw=0,pitch=0,auto=false,lastT=0,dragging=false,px=0,py=0,loaded=false;
-let running=false,startedAt=0,modelHeight=1,initialCameraZ=3,runMeshes=[],runBounds=null,poseCount=0;
+let running=false,startedAt=0,modelHeight=1,initialCameraZ=3,runBounds=null;
 function resize(){const w=host.clientWidth,h=host.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}
 resize();new ResizeObserver(resize).observe(host);
 function updateYaw(a){yaw=(a%(Math.PI*2)+Math.PI*2)%(Math.PI*2);root.rotation.y=yaw;let d=Math.round(yaw*180/Math.PI)%360;slider.value=d;degree.textContent=d+'°'}
@@ -71,81 +71,38 @@ host.addEventListener('pointermove',e=>{if(!dragging)return;updateYaw(yaw+(e.cli
 for(const evt of ['pointerup','pointercancel','lostpointercapture'])host.addEventListener(evt,()=>dragging=false);
 host.addEventListener('wheel',e=>{e.preventDefault();camera.position.z=THREE.MathUtils.clamp(camera.position.z+e.deltaY*.008,1,30)},{passive:false});
 
-/* Experimento aislado de carrera con la malla TRELLIS existente, sin reemplazar GLB.
-   La malla estática no está riggeada: las zancadas usan deformación procedimental. */
-function smooth(a,b,x){const t=THREE.MathUtils.clamp((x-a)/(b-a),0,1);return t*t*(3-2*t)}
+/* Corrección: jamás alterar vértices, geometrías ni texturas originales.
+   El GLB TRELLIS no tiene esqueleto; este es un avance con rebote, no
+   una carrera articulada. Para articular piernas debe autoriggearse. */
 function prepareRunGeometry(robot){
- robot.updateMatrixWorld(true);
- const inverseRoot=robot.matrixWorld.clone().invert();
- const bounds={minX:Infinity,maxX:-Infinity,minY:Infinity,maxY:-Infinity,minZ:Infinity,maxZ:-Infinity};
- runMeshes=[];
- robot.traverse(mesh=>{
-  if(!mesh.isMesh||!mesh.geometry?.attributes?.position||mesh.name.includes('placa 3D'))return;
-  mesh.geometry=mesh.geometry.clone();
-  const attribute=mesh.geometry.attributes.position;
-  const meshToRobot=new THREE.Matrix4().multiplyMatrices(inverseRoot,mesh.matrixWorld);
-  const robotToMesh=meshToRobot.clone().invert();
-  const original=new Float32Array(attribute.count*3),v=new THREE.Vector3();
-  for(let i=0;i<attribute.count;i++){
-   v.fromBufferAttribute(attribute,i).applyMatrix4(meshToRobot);
-   const j=i*3;original[j]=v.x;original[j+1]=v.y;original[j+2]=v.z;
-   bounds.minX=Math.min(bounds.minX,v.x);bounds.maxX=Math.max(bounds.maxX,v.x);
-   bounds.minY=Math.min(bounds.minY,v.y);bounds.maxY=Math.max(bounds.maxY,v.y);
-   bounds.minZ=Math.min(bounds.minZ,v.z);bounds.maxZ=Math.max(bounds.maxZ,v.z);
-  }
-  runMeshes.push({mesh,attribute,original,robotToMesh});
- });
- if(!runMeshes.length)throw Error('El GLB no contiene una malla animable.');
- runBounds=bounds;modelHeight=Math.max(.01,bounds.maxY-bounds.minY);
-}
-function runPose(phase){
- if(!runBounds)return;
- const b=runBounds,height=Math.max(.001,b.maxY-b.minY),width=Math.max(.001,b.maxX-b.minX);
- const midX=(b.minX+b.maxX)/2,midZ=(b.minZ+b.maxZ)/2,v=new THREE.Vector3();
- for(const {mesh,attribute,original,robotToMesh} of runMeshes){
-  for(let i=0;i<attribute.count;i++){
-   const j=i*3,ox=original[j],oy=original[j+1],oz=original[j+2];
-   const ny=(oy-b.minY)/height,nx=(ox-midX)/width,side=nx>=0?1:-1;
-   const stride=Math.sin(phase+(side>0?Math.PI:0));let yy=oy,zz=oz;
-   const legWeight=(1-smooth(.25,.41,ny))*smooth(.012,.08,Math.abs(nx));
-   if(legWeight>0){
-    const a=stride*.43*legWeight,cy=b.minY+height*.35,dy=yy-cy,dz=zz-midZ;
-    yy=cy+dy*Math.cos(a)-dz*Math.sin(a);
-    zz=midZ+dy*Math.sin(a)+dz*Math.cos(a);
-    yy+=Math.max(0,stride)*.065*height*(1-smooth(.08,.24,ny))*legWeight;
-   }
-   const armWeight=smooth(.26,.39,Math.abs(nx))*smooth(.32,.42,ny)*(1-smooth(.70,.79,ny));
-   if(armWeight>0){
-    const a=-stride*.55*armWeight,cy=b.minY+height*.69,dy=yy-cy,dz=zz-midZ;
-    yy=cy+dy*Math.cos(a)-dz*Math.sin(a);
-    zz=midZ+dy*Math.sin(a)+dz*Math.cos(a);
-   }
-   v.set(ox,yy,zz).applyMatrix4(robotToMesh);
-   attribute.setXYZ(i,v.x,v.y,v.z);
-  }
-  attribute.needsUpdate=true;
-  if(++poseCount%4===0)mesh.geometry.computeVertexNormals();
- }
+ const bounds=new THREE.Box3().setFromObject(robot);
+ const size=new THREE.Vector3();bounds.getSize(size);
+ modelHeight=Math.max(.01,size.y);
+ runBounds=bounds;
 }
 function stopRun(){
- running=false;if(runBounds)runPose(0);
- runner.position.y=0;runner.rotation.set(0,0,0);
- document.getElementById('runStatus').textContent='Carrera detenida. Podés repetirla o volver al visor 360°.';
+ running=false;
+ runner.position.x=0;runner.position.y=0;
+ runner.rotation.set(0,0,0);
+ document.getElementById('runStatus').textContent='Animación detenida. El modelo 3D conserva su forma original.';
 }
 function resetRun(){
- if(running)stopRun();if(runBounds)runPose(0);
+ if(running)stopRun();
  runner.position.set(0,0,0);runner.rotation.set(0,0,0);
  if(loaded){camera.position.z=initialCameraZ;camera.lookAt(0,0,0);}
  play(false);updateYaw(0);updatePitch(0);
- document.getElementById('runStatus').textContent='Claude está de frente. Podés girarlo o correr otra vez.';
+ document.getElementById('runStatus').textContent='Claude intacto y de frente. Podés girarlo o repetir el avance.';
 }
 function startRun(){
- if(!loaded||!runBounds){document.getElementById('runStatus').textContent='Aún se está cargando el GLB.';return}
+ if(!loaded||!runBounds){
+  document.getElementById('runStatus').textContent='Aún se está cargando el GLB.';
+  return;
+ }
  play(false);updateYaw(0);updatePitch(0);
  runner.rotation.set(0,0,0);runner.position.set(0,0,-modelHeight*.90);
  camera.position.z=initialCameraZ;camera.lookAt(0,0,0);
  running=true;startedAt=performance.now();
- document.getElementById('runStatus').textContent='Claude corre hacia vos…';
+ document.getElementById('runStatus').textContent='Claude avanza hacia vos sin deformaciones…';
 }
 document.getElementById('runBtn').addEventListener('click',startRun);
 document.getElementById('stopRun').addEventListener('click',stopRun);
@@ -253,10 +210,11 @@ function frame(t){
   const p=THREE.MathUtils.clamp((t-startedAt)/5000,0,1),step=(t-startedAt)*.017;
   const travel=Math.min(modelHeight*1.55,initialCameraZ*.75);
   runner.position.z=-modelHeight*.90+travel*(p*p*(3-2*p));
-  runner.position.y=modelHeight*.023*Math.abs(Math.sin(step*2));
-  runner.rotation.x=.055;runner.rotation.z=.018*Math.sin(step);
-  runPose(step);
-  if(p>=1){stopRun();document.getElementById('runStatus').textContent='Terminó la carrera de 5 segundos. Claude quedó cerca de la cámara.'}
+  // Todo el robot se traslada rígidamente; no hay deformación de malla.
+  runner.position.x=modelHeight*.012*Math.sin(step);
+  runner.position.y=modelHeight*.016*Math.abs(Math.sin(step));
+  runner.rotation.x=.025;runner.rotation.z=.012*Math.sin(step);
+  if(p>=1){stopRun();document.getElementById('runStatus').textContent='Terminó el avance de 5 segundos sin deformaciones.'}
  }
  if(lastT&&auto&&loaded)updateYaw(yaw+Math.min(60,t-lastT)*.0007);
  lastT=t;renderer.render(scene,camera);requestAnimationFrame(frame)
