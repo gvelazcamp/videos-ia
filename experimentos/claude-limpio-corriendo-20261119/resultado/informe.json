@@ -1,0 +1,13 @@
+{
+  "archivo": "Claude_3D_CARRERA_REAL.glb",
+  "estado": "CANDIDATO, pendiente de inspección visual",
+  "origen": "Reconstrucción original desde referencias del usuario",
+  "huesos": 15,
+  "canales": 46,
+  "clips": [
+    "Claude_CORRER_hacia_camara_5s"
+  ],
+  "duracion_segundos": 5,
+  "geometria": "piezas 3D separadas, skin rígido real",
+  "reemplaza_trellis": false
+}
