@@ -114,17 +114,17 @@ scene.frame_start=1;scene.frame_end=121;scene.render.fps=24
 for pb in rig.pose.bones:pb.rotation_mode='QUATERNION'
 for frame in range(1,122,2):
  t=(frame-1)/24;phase=2*math.pi*2.4*t
- rig.location=(0,-.9*t/5,.030*abs(math.sin(phase)))
+ rig.location=(0,-.9*t/5,.045*abs(math.sin(phase)))
  rig.keyframe_insert(data_path='location',frame=frame)
  poses={'torso':(-.08,0,.025*math.sin(phase)),'cabeza':(.045,0,-.014*math.sin(phase))}
  for tag,offset in [('L',0),('R',math.pi)]:
   s=math.sin(phase+offset)
-  poses['brazo_'+tag]=(-.70*s,0,.08*s)
-  poses['antebrazo_'+tag]=(-.18-.3*max(0,-s),0,0)
-  poses['mano_'+tag]=(.13*s,0,0)
-  poses['pierna_'+tag]=(.60*s,0,0)
-  poses['pantorrilla_'+tag]=(.14+.72*max(0,-s),0,0)
-  poses['pie_'+tag]=(-.14-.29*max(0,-s),0,0)
+  poses['brazo_'+tag]=(-.95*s,0,.14*s)
+  poses['antebrazo_'+tag]=(-.30-.40*max(0,-s),0,0)
+  poses['mano_'+tag]=(.22*s,0,0)
+  poses['pierna_'+tag]=(.98*s,.07*s,.12*s)
+  poses['pantorrilla_'+tag]=(.22+1.08*max(0,-s),0,0)
+  poses['pie_'+tag]=(-.18-.38*max(0,-s),0,0)
  for name,angles in poses.items():
   p=rig.pose.bones[name]
   p.rotation_quaternion=Euler(angles,'XYZ').to_quaternion()
@@ -157,7 +157,7 @@ for loc,power in [((-3,-4,5),800),((3,-3,3),500)]:
  bpy.ops.object.light_add(type='AREA',location=loc)
  o=bpy.context.object;o.data.energy=power;o.data.size=3
  o.rotation_euler=(Vector((0,0,1.3))-o.location).to_track_quat('-Z','Y').to_euler()
-scene.render.engine='CYCLES';scene.cycles.samples=8
+scene.render.engine='CYCLES';scene.cycles.samples=22
 scene.render.resolution_x=450;scene.render.resolution_y=540;scene.render.resolution_percentage=100
 scene.render.image_settings.file_format='PNG'
 scene.world.color=(.12,.16,.19)
