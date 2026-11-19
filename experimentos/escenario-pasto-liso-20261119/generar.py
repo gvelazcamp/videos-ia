@@ -110,7 +110,7 @@ bpy.ops.wm.save_as_mainfile(filepath=str(SALIDA / "escenario_pasto_liso.blend"))
 bpy.ops.render.render(write_still=True)
 
 imagen = SALIDA / "vista_previa.png"
-assert imagen.read_bytes()[:8] == b"\\x89PNG\\r\\n\\x1a\\n", "No se generó PNG válido"
+assert imagen.read_bytes()[:8] == bytes((137, 80, 78, 71, 13, 10, 26, 10)), "No se generó PNG válido"
 datos = {
     "escenario": "01 - Pasto liso elevado",
     "generador": "Blender mediante GitHub Actions",
