@@ -38,7 +38,7 @@ h2{font-size:15px;color:#ffe3ab;margin:0 0 8px}
 <label for="pitch">Vertical</label><input id="pitch" type="range" min="-90" max="90" value="0" step="1">
 <span id="pitchValue">0°</span>
 <button type="button" id="top">Arriba</button><button type="button" id="bottom">Abajo</button>
-<a href="./claude-trellis-candidato.glb" download>Descargar GLB</a>
+<a href="./claude-trellis-nombre-corregido.glb" download>Descargar GLB</a>
 </div>
 <section><h2>Claude · candidato TRELLIS</h2><p class="note">Esta vista permite girar el archivo GLB verdadero con el dedo, inclinarlo, hacer zoom o girarlo automáticamente. Se conserva como candidato para comparar con las diez imágenes de referencia, sin reemplazar ningún modelo anterior.</p></section>
 <script type="module">
@@ -68,7 +68,7 @@ host.addEventListener('pointerdown',e=>{dragging=true;px=e.clientX;py=e.clientY;
 host.addEventListener('pointermove',e=>{if(!dragging)return;updateYaw(yaw+(e.clientX-px)*.012);updatePitch(pitch+(e.clientY-py)*.008);px=e.clientX;py=e.clientY});
 for(const evt of ['pointerup','pointercancel','lostpointercapture'])host.addEventListener(evt,()=>dragging=false);
 host.addEventListener('wheel',e=>{e.preventDefault();camera.position.z=THREE.MathUtils.clamp(camera.position.z+e.deltaY*.008,1,30)},{passive:false});
-new GLTFLoader().load('./claude-trellis-candidato.glb',gltf=>{
+new GLTFLoader().load('./claude-trellis-nombre-corregido.glb',gltf=>{
  const obj=gltf.scene;
  // Modo claro: renderizar los colores de la propia textura de TRELLIS sin
  // volverlos oscuros por falta de un entorno HDR.
@@ -154,7 +154,7 @@ new GLTFLoader().load('./claude-trellis-candidato.glb',gltf=>{
    placa.renderOrder=2;
    robot.add(placa);
  }
- corregirNombreClaude(obj);
+ if(!obj.getObjectByName('Claude_nombre_corregido')) corregirNombreClaude(obj);
  root.add(obj);
  const box=new THREE.Box3().setFromObject(root),size=new THREE.Vector3(),center=new THREE.Vector3();
  box.getSize(size);box.getCenter(center);obj.position.sub(center);
