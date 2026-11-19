@@ -1,0 +1,28 @@
+{
+  "titulo": "El último pulso",
+  "duracion_objetivo_segundos": 40,
+  "fps_render": 8,
+  "fps_mp4": 24,
+  "robots": [
+    "ChatGPT",
+    "Claude",
+    "Gemini",
+    "Grok"
+  ],
+  "camaras_cinematograficas": 8,
+  "modelo": "GLB articulados originales",
+  "narracion": "No incluida: se requiere voz real Gemini Charon a velocidad 1.2",
+  "audio": "Banda sonora sintetizada original para demostración técnica",
+  "estado": "MP4 3D verificado técnicamente",
+  "mp4": "El_Ultimo_Pulso_3D_40s.mp4",
+  "duracion_real_segundos": 40.0,
+  "resolucion_final": [
+    1080,
+    1920
+  ],
+  "codec_video": "h264",
+  "codec_audio": "aac",
+  "audio_incluido": "Ambiente original sin narracion Charon",
+  "bytes": 4696566,
+  "comprobaciones": "Archivo existe, duración 40s, codecs, cuatro robots importados y 8 tomas renderizadas"
+}
