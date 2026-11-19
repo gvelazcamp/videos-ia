@@ -13,7 +13,7 @@ permissions:
 
 concurrency:
   group: corto-3d-real-40s-20261119
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   renderizar:
@@ -21,6 +21,16 @@ jobs:
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            experimentos/corto-3d-40s-20261119/
+            experimentos/chatgpt-movimientos-universal-20261119/resultado/
+            experimentos/claude-movimientos-20261119/resultado-saludo-verificado/
+            experimentos/gemini-movimientos-universal-20261119/resultado/
+            experimentos/grok-gris-movimientos-universal-20261119/resultado/
       - name: Instalar Blender y FFmpeg
         shell: bash
         run: |
