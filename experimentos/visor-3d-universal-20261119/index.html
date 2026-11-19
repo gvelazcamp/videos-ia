@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Visor 3D universal · Claude y ChatGPT</title>
+<title>Visor 3D universal · ChatGPT, Claude y Gemini</title>
 <style>
 :root{color-scheme:dark;font-family:system-ui,-apple-system,sans-serif}
 *{box-sizing:border-box}
@@ -37,9 +37,9 @@ footer{padding:0 14px 18px;color:#a7bdc7;font-size:12px}
 </style>
 </head>
 <body><main>
-<header><h1>Visor 3D universal · Claude y ChatGPT</h1>
-<p>Elegí un robot articulado y usá los mismos 12 movimientos en ambos. Caminá, corré, saludá hacia adelante, girá y agarrá objetos. Arrastrá la cámara para verlo en 360°.</p>
-<div class="selector"><label for="robotSelect">Personaje 3D</label><select id="robotSelect" aria-label="Elegir robot"><option value="chatgpt" selected>ChatGPT</option><option value="claude">Claude</option></select></div></header>
+<header><h1>Visor 3D universal · ChatGPT, Claude y Gemini</h1>
+<p>Elegí un robot articulado y usá los mismos 12 movimientos en los tres. Caminá, corré, saludá hacia adelante, girá y agarrá objetos. Arrastrá la cámara para verlo en 360°.</p>
+<div class="selector"><label for="robotSelect">Personaje 3D</label><select id="robotSelect" aria-label="Elegir robot"><option value="chatgpt" selected>ChatGPT</option><option value="claude">Claude</option><option value="gemini">Gemini</option></select></div></header>
 <div id="stage" aria-label="Visor 3D universal articulado">
  <div id="status" role="status" aria-live="polite">Cargando ChatGPT con 12 animaciones…</div>
 </div>
@@ -80,13 +80,14 @@ footer{padding:0 14px 18px;color:#a7bdc7;font-size:12px}
   <a id="glbDownload" class="download" href="../chatgpt-movimientos-universal-20261119/resultado/ChatGPT_Biblioteca_12_Movimientos.glb" download>Descargar GLB del robot seleccionado</a>
  </aside>
 </div>
-<footer>Visor universal independiente: no se modifican los modelos originales de Claude ni ChatGPT. Ambos GLB tienen 12 clips, incluidos caminar lento y el saludo hacia adelante. Las flechas mueven al personaje; arrastrar gira solo la cámara. Los robots adicionales se incorporarán cuando tengan sus clips validados.</footer>
+<footer>Visor universal independiente: no se modifican los modelos originales de Claude, ChatGPT ni Gemini. Los tres GLB tienen 12 clips, incluidos caminar lento y el saludo hacia adelante. Las flechas mueven al personaje; arrastrar gira solo la cámara. Grok se podrá incorporar cuando sus clips estén generados y verificados.</footer>
 <script type="module">
 import * as THREE from '../voltito-3d-alta-calidad-20261117/three.module.js';
 import {GLTFLoader} from '../voltito-3d-multivista-prueba-20261118/GLTFLoader.js';
 const MODELS={
   chatgpt:{name:'ChatGPT',glb:'../chatgpt-movimientos-universal-20261119/resultado/ChatGPT_Biblioteca_12_Movimientos.glb'},
-  claude:{name:'Claude',glb:'../claude-movimientos-20261119/resultado-saludo-verificado/Claude_Biblioteca_12_Movimientos.glb?v=saludo-adelante-20261119'}
+  claude:{name:'Claude',glb:'../claude-movimientos-20261119/resultado-saludo-verificado/Claude_Biblioteca_12_Movimientos.glb?v=saludo-adelante-20261119'},
+  gemini:{name:'Gemini',glb:'../gemini-movimientos-universal-20261119/resultado/Gemini_Biblioteca_12_Movimientos.glb'}
 };
 const host=document.getElementById('stage'),status=document.getElementById('status');
 const scene=new THREE.Scene();
