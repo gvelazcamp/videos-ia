@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Escenario 01 - Pasto liso elevado · Blender</title>
+<style>
+:root{color-scheme:dark;font-family:system-ui,-apple-system,Arial,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:#101e18;color:#eef7ec}
+main{max-width:1100px;margin:auto}
+header{padding:16px 16px 10px}
+h1{font-size:clamp(19px,4vw,27px);margin:0 0 6px}
+p{margin:0 0 8px;color:#b2c7ba;font-size:14px;line-height:1.55}
+#escena{height:min(72vh,680px);min-height:360px;position:relative;overflow:hidden;touch-action:none;background:radial-gradient(ellipse at center,#536c5b,#213e30 65%,#101c17)}
+#escena canvas{width:100%;height:100%;display:block;touch-action:none}
+#estado{position:absolute;left:12px;bottom:12px;padding:10px 13px;background:#0b1b14df;border-radius:9px;font-size:12px}
+#controles{padding:16px;display:flex;gap:8px;flex-wrap:wrap}
+button,a.descarga{background:#294b36;border:1px solid #739f7a;border-radius:9px;color:#effbef;font:inherit;font-size:13px;padding:11px 13px;text-decoration:none;cursor:pointer}
+button:focus-visible,a:focus-visible{outline:3px solid #d0ffe0}
+small{display:block;padding:0 16px 20px;color:#b6c9ba;line-height:1.6}
+@media(max-width:640px){#escena{height:56svh;min-height:330px}#controles{gap:7px}button,a.descarga{flex:1}}
+</style>
+</head>
+<body>
+<main>
+<header>
+<h1>Escenario 01 · Pasto liso elevado</h1>
+<p>Terreno 3D para videojuego. Superficie verde totalmente plana, levantada sobre un bloque de tierra. Sin árboles, piedras, montañas ni personajes.</p>
+</header>
+<div id="escena"><div id="estado" role="status">Cargando escenario 3D…</div></div>
+<div id="controles">
+<button id="arriba">Vista desde arriba</button>
+<button id="costado">Vista lateral</button>
+<button id="isometrica">Vista 3D</button>
+<button id="girar">Girar automáticamente</button>
+<button id="acercar">+ Acercar</button>
+<button id="alejar">− Alejar</button>
+<a class="descarga" href="./resultado/escenario_pasto_liso_elevado.glb" download>Descargar GLB</a>
+<a class="descarga" href="./resultado/escenario_pasto_liso.blend" download>Proyecto Blender</a>
+</div>
+<small>Arrastrá con el mouse o el dedo para girar 360°. El piso es completamente liso para comenzar a construir el videojuego. Modelo generado por Blender en GitHub Actions; los personajes 3D existentes no se modifican.</small>
+</main>
+<script type="module">
+import * as THREE from '../voltito-3d-alta-calidad-20261117/three.module.js';
+import {GLTFLoader} from '../voltito-3d-multivista-prueba-20261118/GLTFLoader.js';
+
+const contenedor=document.getElementById('escena');
+const estado=document.getElementById('estado');
+const escena=new THREE.Scene();
+const camara=new THREE.PerspectiveCamera(44,1,.01,250);
+const render=new THREE.WebGLRenderer({antialias:true,alpha:true});
+render.setPixelRatio(Math.min(devicePixelRatio||1,2));
+render.outputColorSpace=THREE.SRGBColorSpace;
+contenedor.insertBefore(render.domElement,contenedor.firstChild);
+escena.add(new THREE.HemisphereLight(0xffffff,0x6b816b,2));
+const sol=new THREE.DirectionalLight(0xffffff,2.2);
+sol.position.set(-10,17,9);escena.add(sol);
+const foco=new THREE.DirectionalLight(0xc4ffc3,1.0);
+foco.position.set(9,9,-6);escena.add(foco);
+let theta=Math.PI/4,phi=1.04,dist=38,auto=false;
+const centro=new THREE.Vector3(0,0,0);
+let listo=false,arrastrando=false,prevX=0,prevY=0;
+function dimensiones(){
+ const w=contenedor.clientWidth,h=contenedor.clientHeight;
+ render.setSize(w,h,false);
+ camara.aspect=w/h;camara.updateProjectionMatrix();
+}
+function actualizarCamara(){
+ const s=Math.sin(phi);
+ camara.position.set(centro.x+dist*s*Math.sin(theta),centro.y+dist*Math.cos(phi),centro.z+dist*s*Math.cos(theta));
+ camara.lookAt(centro);
+}
+function vista(t,p){auto=false;theta=t;phi=p;actualizarCamara();}
+document.getElementById('isometrica').onclick=()=>vista(Math.PI/4,1.04);
+document.getElementById('arriba').onclick=()=>vista(Math.PI/4,.02);
+document.getElementById('costado').onclick=()=>vista(0,Math.PI/2);
+document.getElementById('acercar').onclick=()=>{dist=Math.max(7,dist*.83);actualizarCamara()};
+document.getElementById('alejar').onclick=()=>{dist=Math.min(110,dist*1.2);actualizarCamara()};
+document.getElementById('girar').onclick=()=>{auto=!auto;document.getElementById('girar').textContent=auto?'Detener giro':'Girar automáticamente'};
+contenedor.addEventListener('pointerdown',e=>{arrastrando=true;auto=false;prevX=e.clientX;prevY=e.clientY;contenedor.setPointerCapture(e.pointerId)});
+contenedor.addEventListener('pointermove',e=>{
+ if(!arrastrando)return;
+ theta+=(e.clientX-prevX)*.009;
+ phi=THREE.MathUtils.clamp(phi+(e.clientY-prevY)*.009,.02,Math.PI-.02);
+ prevX=e.clientX;prevY=e.clientY;actualizarCamara();
+});
+['pointerup','pointercancel','lostpointercapture'].forEach(t=>contenedor.addEventListener(t,()=>{arrastrando=false}));
+contenedor.addEventListener('wheel',e=>{e.preventDefault();dist=THREE.MathUtils.clamp(dist+e.deltaY*.018,7,110);actualizarCamara()},{passive:false});
+new GLTFLoader().load('./resultado/escenario_pasto_liso_elevado.glb',gltf=>{
+ const obj=gltf.scene;escena.add(obj);
+ const caja=new THREE.Box3().setFromObject(obj);
+ caja.getCenter(centro);
+ const size=new THREE.Vector3();caja.getSize(size);
+ dist=Math.max(21,Math.max(size.x,size.z)*2.2);
+ actualizarCamara();
+ estado.textContent='Escenario cargado · pasto plano de 18 × 18 m · altura 1,28 m';
+ listo=true;
+},undefined,error=>{estado.textContent='No se pudo cargar el GLB. Verificá el resultado de GitHub Actions.';console.error(error)});
+function animar(){requestAnimationFrame(animar);if(auto&&listo){theta+=.004;actualizarCamara()}render.render(escena,camara)}
+if('ResizeObserver' in window)new ResizeObserver(dimensiones).observe(contenedor);
+window.addEventListener('resize',dimensiones);dimensiones();actualizarCamara();animar();
+</script>
+</body>
+</html>
