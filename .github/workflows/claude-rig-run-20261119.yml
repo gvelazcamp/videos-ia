@@ -25,10 +25,11 @@ jobs:
       - name: Instalar Blender gratuito
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y blender
+          sudo apt-get install -y blender python3-numpy
+          blender -b --python-exit-code 1 --python-expr 'import numpy; print("NUMPY_LISTO", numpy.__version__)'
       - name: Crear rig y clip real de 5 segundos sin reemplazar originales
         run: |
-          blender -b -t 2 \
+          blender -b -t 2 --python-exit-code 1 \
             --python experimentos/claude-trellis-20261119/rigging/claude_rig_run.py \
             -- \
             experimentos/claude-trellis-20261119/claude-trellis-nombre-corregido.glb \
