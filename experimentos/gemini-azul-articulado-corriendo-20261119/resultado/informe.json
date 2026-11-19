@@ -1,0 +1,13 @@
+{
+  "estado": "CANDIDATO - pendiente de revision visual",
+  "personaje": "Gemini azul y blanco corregido de la imagen aprobada; dos estrellas y placa Gemini",
+  "glb": "Gemini_3D_Corriendo_Articulado.glb",
+  "esqueleto": 15,
+  "canales_animacion": 46,
+  "clips": [
+    "Gemini_CORRER_hacia_camara_5s"
+  ],
+  "duracion_segundos": 5,
+  "tecnica": "Blender, huesos y piezas 3D separadas",
+  "regla": "No sustituir modelos originales ni deformar vertices manualmente."
+}
