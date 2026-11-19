@@ -1,0 +1,95 @@
+{
+  "archivo": "ChatGPT_Biblioteca_12_Movimientos.glb",
+  "origen": "ChatGPT_3D_Corriendo_Articulado.glb",
+  "estado": "CANDIDATO, pendiente de revisión visual",
+  "huesos": 15,
+  "clips": [
+    {
+      "nombre": "01_Reposo",
+      "duracion_s": 2.6,
+      "bucle": true,
+      "accion": "01_Reposo"
+    },
+    {
+      "nombre": "02_Caminar_lento",
+      "duracion_s": 3.2,
+      "bucle": true,
+      "accion": "02_Caminar_lento"
+    },
+    {
+      "nombre": "03_Correr",
+      "duracion_s": 2.0,
+      "bucle": true,
+      "accion": "03_Correr"
+    },
+    {
+      "nombre": "04_Saludar",
+      "duracion_s": 2.2,
+      "bucle": false,
+      "accion": "04_Saludar"
+    },
+    {
+      "nombre": "05_Girar_izquierda_90",
+      "duracion_s": 1.1,
+      "bucle": false,
+      "accion": "05_Girar_izquierda_90"
+    },
+    {
+      "nombre": "06_Girar_derecha_90",
+      "duracion_s": 1.1,
+      "bucle": false,
+      "accion": "06_Girar_derecha_90"
+    },
+    {
+      "nombre": "07_Frenar",
+      "duracion_s": 0.75,
+      "bucle": false,
+      "accion": "07_Frenar"
+    },
+    {
+      "nombre": "08_Saltar",
+      "duracion_s": 1.25,
+      "bucle": false,
+      "accion": "08_Saltar"
+    },
+    {
+      "nombre": "09_Agarrar_objeto",
+      "duracion_s": 1.3,
+      "bucle": false,
+      "accion": "09_Agarrar_objeto"
+    },
+    {
+      "nombre": "10_Soltar_objeto",
+      "duracion_s": 1.1,
+      "bucle": false,
+      "accion": "10_Soltar_objeto"
+    },
+    {
+      "nombre": "11_Sentarse",
+      "duracion_s": 1.3,
+      "bucle": false,
+      "accion": "11_Sentarse"
+    },
+    {
+      "nombre": "12_Levantarse",
+      "duracion_s": 1.3,
+      "bucle": false,
+      "accion": "12_Levantarse"
+    }
+  ],
+  "clips_exportados": [
+    "01_Reposo",
+    "02_Caminar_lento",
+    "03_Correr",
+    "04_Saludar",
+    "05_Girar_izquierda_90",
+    "06_Girar_derecha_90",
+    "07_Frenar",
+    "08_Saltar",
+    "09_Agarrar_objeto",
+    "10_Soltar_objeto",
+    "11_Sentarse",
+    "12_Levantarse"
+  ],
+  "integridad": "GLB con skins y animaciones separadas verificado"
+}
