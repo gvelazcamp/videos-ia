@@ -5,7 +5,7 @@ Requiere Blender 3.x: blender -b -P generar_biblioteca.py -- fuente.glb carpeta_
 """
 import bpy, sys, math, json, struct
 from pathlib import Path
-from mathutils import Euler
+from mathutils import Euler, Vector, Quaternion
 
 argv=sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else []
 if len(argv)!=2:raise SystemExit("Uso: blender -b -P generar_biblioteca.py -- CLAUDE.glb DESTINO")
@@ -38,21 +38,23 @@ def clip(name,duration,func,loop=False):
  for frame in range(1,total+2,2):
   t=(frame-1)/frames_per_sec
   angles,loc,rotation=func(t,duration)
+  salute_q=saludo_quaternions(t,duration) if name=='04_Saludar' else {}
   rig.location=loc
   rig.rotation_euler=rotation
   rig.keyframe_insert(data_path='location',frame=frame)
   rig.keyframe_insert(data_path='rotation_euler',frame=frame)
   for pb in rig.pose.bones:
-   pb.rotation_quaternion=Euler(angles.get(pb.name,(0,0,0)),'XYZ').to_quaternion()
+   pb.rotation_quaternion=salute_q.get(pb.name) if pb.name in salute_q else Euler(angles.get(pb.name,(0,0,0)),'XYZ').to_quaternion()
    pb.keyframe_insert(data_path='rotation_quaternion',frame=frame,group='Huesos')
  # Asegurar fotograma final exacto sin disparidad de duración.
  frame=total+1;t=duration
  angles,loc,rotation=func(t,duration)
+ salute_q=saludo_quaternions(t,duration) if name=='04_Saludar' else {}
  rig.location=loc;rig.rotation_euler=rotation
  rig.keyframe_insert(data_path='location',frame=frame)
  rig.keyframe_insert(data_path='rotation_euler',frame=frame)
  for pb in rig.pose.bones:
-  pb.rotation_quaternion=Euler(angles.get(pb.name,(0,0,0)),'XYZ').to_quaternion()
+  pb.rotation_quaternion=salute_q.get(pb.name) if pb.name in salute_q else Euler(angles.get(pb.name,(0,0,0)),'XYZ').to_quaternion()
   pb.keyframe_insert(data_path='rotation_quaternion',frame=frame,group='Huesos')
  rig.animation_data.action=None
  track=rig.animation_data.nla_tracks.new()
@@ -100,13 +102,39 @@ def idle(t,d):
  pulse=math.sin(t*math.pi*2/2.6)
  return {'torso':(.012*pulse,0,0),'cabeza':(-.014*pulse,0,0)},(0,0,0),(0,0,0)
 def saludo(t,d):
- enter=min(1,t/.38,(d-t)/.38)
- enter=max(0,enter)
- wave=math.sin(2*math.pi*3.0*t)
- return {'brazo_R':(-.10,0,-1.26*enter),
-         'antebrazo_R':(-.57*enter,0,.22*wave*enter),
-         'mano_R':(0,.32*wave*enter,0),
-         'cabeza':(0,0,-.10*enter)},(0,0,0),(0,0,0)
+ # SOLO gesto de cabeza; brazo, antebrazo y mano se calculan con quaterniones
+ # del esqueleto real para que el brazo SUBA, no gire hacia atrás.
+ enter=max(0,min(1,t/.38,(d-t)/.38))
+ return {'cabeza':(0,0,-.08*enter)},(0,0,0),(0,0,0)
+
+def saludo_quaternions(t,d):
+ # La anterior rotación Euler Z giraba el brazo sobre su eje local (torcía
+ # el hombro y parecía extenderlo hacia atrás). Apuntar cada segmento a una
+ # dirección en el ESPACIO DEL RIG, sin depender del roll local del hueso.
+ enter=max(0,min(1,t/.38,(d-t)/.38))
+ smooth=enter*enter*(3-2*enter)
+ if smooth<=0: return {}
+ upper=rig.data.bones['brazo_R']
+ lower=rig.data.bones['antebrazo_R']
+ upper_rest=(upper.tail_local-upper.head_local).normalized()
+ lower_rest=(lower.tail_local-lower.head_local).normalized()
+ upper_goal=Vector((-.22,-.07,.29)).normalized() # codo elevado y hacia afuera
+ wave=math.sin(2*math.pi*2.7*t)
+ lower_goal=Vector((-.07+.055*wave,-.05,.20)).normalized() # mano por encima de hombro
+ up_global=upper_rest.rotation_difference(upper_goal)
+ low_global=lower_rest.rotation_difference(lower_goal)
+ up_rest_q=upper.matrix_local.to_quaternion()
+ low_rest_q=lower.matrix_local.to_quaternion()
+ up_local=(up_rest_q.inverted() @ up_global @ up_rest_q).normalized()
+ # Compensar el giro del hueso padre al orientar el antebrazo: su nueva
+ # dirección es verdaderamente hacia arriba, no hacia la espalda.
+ low_local=(low_rest_q.inverted() @ up_global.inverted() @ low_global @ low_rest_q).normalized()
+ identity=Quaternion((1,0,0,0))
+ return {
+  'brazo_R':identity.slerp(up_local,smooth),
+  'antebrazo_R':identity.slerp(low_local,smooth),
+  'mano_R':Euler((0,.22*wave*smooth,.08*wave*smooth),'XYZ').to_quaternion(),
+ }
 def salto(t,d):
  p=t/d
  z=.53*math.sin(math.pi*p) if p<1 else 0
@@ -195,3 +223,33 @@ report={'archivo':result.name,'origen':source.name,
         'integridad':'GLB con skins y animaciones separadas verificado'}
 (out/'informe.json').write_text(json.dumps(report,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
 print('CLAUDE_BIBLIOTECA_VERIFICADA',len(found),'animaciones')
+# Auditar exclusivamente SALUDAR a mitad de gesto desde frente y 45 grados.
+# Las pistas NLA se silencian durante la renderización, sin tocar su exportación.
+wave_action=next((x for x in bpy.data.actions if x.name.startswith('04_Saludar')),None)
+assert wave_action is not None
+for tr in rig.animation_data.nla_tracks: tr.mute=True
+rig.animation_data.action=wave_action
+scene.frame_set(29)
+bpy.context.view_layer.update()
+shoulder=rig.matrix_world @ rig.pose.bones['brazo_R'].head
+wrist=rig.matrix_world @ rig.pose.bones['antebrazo_R'].tail
+print('SALUDO_POSICIONES',tuple(round(v,3) for v in shoulder),tuple(round(v,3) for v in wrist))
+assert wrist.z > shoulder.z+.13, 'El brazo de SALUDAR aún no se levanta: muñeca por debajo de hombro'
+# Dos renders sirven para confirmar la dirección en la propia malla, no solo en huesos.
+bpy.ops.object.camera_add(location=(0,-8,2.8))
+cam=bpy.context.object;scene.camera=cam
+cam.data.type='ORTHO';cam.data.ortho_scale=3.5
+for light_pos,energy in [((-4,-5,6),700),((4,-3,3),450)]:
+ bpy.ops.object.light_add(type='AREA',location=light_pos)
+ lamp=bpy.context.object;lamp.data.energy=energy;lamp.data.size=3
+scene.render.engine='CYCLES';scene.cycles.samples=12
+scene.render.resolution_x=450;scene.render.resolution_y=540
+scene.render.resolution_percentage=100
+scene.render.image_settings.file_format='PNG'
+for name,position in [('saludo_frontal',(0,-8,2.8)),('saludo_45_grados',(5.5,-5.5,2.8))]:
+ cam.location=position
+ cam.rotation_euler=(Vector((0,0,1.4))-cam.location).to_track_quat('-Z','Y').to_euler()
+ scene.render.filepath=str(out/(name+'.png'))
+ bpy.ops.render.render(write_still=True)
+ print('SALUDO_RENDER_VALIDADO',name)
+
