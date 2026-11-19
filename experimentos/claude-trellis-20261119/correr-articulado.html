@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="es">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claude 3D — Carrera articulada (candidato)</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#081f29;color:#eafff6;font:15px system-ui,Arial}main{max-width:900px;margin:auto;background:#0d3441;min-height:100dvh}
+header{padding:15px}h1{font-size:21px;margin:0 0 5px;color:#ffe0a3}p{margin:7px 0;font-size:12px;color:#c6e5e2}
+#stage{height:67dvh;min-height:360px;position:relative;background:radial-gradient(ellipse at 50% 40%,#3e7d8f,#0b2e3f 75%);touch-action:none}
+#status{position:absolute;bottom:10px;left:8px;right:8px;text-align:center;background:#071f2cd9;padding:8px;border-radius:8px;font-size:12px}
+.controls{display:flex;gap:10px;padding:12px;flex-wrap:wrap;background:#0a2a38}
+button,a{color:#f1fff3;border:1px solid #6ce4bc66;background:#1d665a;padding:11px 14px;border-radius:9px;font-weight:700;font-size:13px;text-decoration:none}
+button:disabled{opacity:.45}small{display:block;padding:12px;color:#c7e5dc;line-height:1.55}
+</style></head>
+<body><main>
+<header><h1>Claude · carrera 3D articulada</h1><p>Prueba independiente: esqueleto y movimiento real de brazos, codos, piernas, rodillas y pies.</p></header>
+<div id="stage"><div id="status" role="status">Cargando candidato GLB animado…</div></div>
+<div class="controls">
+<button id="play" disabled>▶ Correr hacia mí · 5 s</button>
+<button id="stop" disabled>Detener</button>
+<button id="front">De frente</button>
+<a href="./rigging/resultado/claude-corriendo-articulado.glb" download>Descargar GLB articulado</a>
+<a href="./index.html">Visor 360° original</a>
+</div>
+<small>Este candidato está separado del original. La animación solo se considera válida si el archivo incluye huesos y un clip reproducible. Revisar que los miembros se articulen sin torcer el cuerpo ni las texturas.</small>
+<script type="module">
+import * as THREE from '../voltito-3d-alta-calidad-20261117/three.module.js';
+import {GLTFLoader} from '../voltito-3d-multivista-prueba-20261118/GLTFLoader.js';
+const host=document.getElementById('stage'),status=document.getElementById('status');
+const play=document.getElementById('play'),stop=document.getElementById('stop');
+const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(35,1,.01,300);
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+renderer.setPixelRatio(Math.min(2,devicePixelRatio||1));renderer.outputColorSpace=THREE.SRGBColorSpace;
+host.insertBefore(renderer.domElement,status);
+scene.add(new THREE.AmbientLight(0xffffff,2.3));
+const light=new THREE.DirectionalLight(0xffffff,2);light.position.set(5,8,7);scene.add(light);
+let model=null,mixer=null,action=null,last=performance.now(),yaw=0,dragging=false,px=0;
+function size(){renderer.setSize(host.clientWidth,host.clientHeight,false);camera.aspect=host.clientWidth/host.clientHeight;camera.updateProjectionMatrix()}
+size();new ResizeObserver(size).observe(host);
+host.addEventListener('pointerdown',e=>{dragging=true;px=e.clientX;host.setPointerCapture(e.pointerId)});
+host.addEventListener('pointermove',e=>{if(dragging&&model){yaw+=(e.clientX-px)*.009;model.rotation.y=yaw;px=e.clientX}});
+for(const e of ['pointerup','pointercancel','lostpointercapture'])host.addEventListener(e,()=>dragging=false);
+new GLTFLoader().load('./rigging/resultado/claude-corriendo-articulado.glb',gltf=>{
+ if(!gltf.animations?.length)throw Error('Este archivo no tiene clip de animación');
+ model=gltf.scene;scene.add(model);
+ model.traverse(o=>{if(o.isMesh){o.frustumCulled=false;if(o.material)o.material.side=THREE.DoubleSide}});
+ const bounds=new THREE.Box3().setFromObject(model),center=new THREE.Vector3(),dim=new THREE.Vector3();
+ bounds.getCenter(center);bounds.getSize(dim);model.position.sub(center);
+ const h=Math.max(.1,dim.y),dist=h/(2*Math.tan(camera.fov*Math.PI/360))*1.6;
+ camera.position.set(0,0,dist);camera.lookAt(0,0,0);
+ camera.near=.01;camera.far=dist*20;camera.updateProjectionMatrix();
+ mixer=new THREE.AnimationMixer(model);action=mixer.clipAction(gltf.animations[0]);
+ action.setLoop(THREE.LoopOnce,1);action.clampWhenFinished=true;
+ play.disabled=false;stop.disabled=false;
+ status.textContent='Modelo con esqueleto cargado. Presioná Correr para ver brazos y piernas.';
+ mixer.addEventListener('finished',()=>{status.textContent='Terminó la carrera articulada de Claude.';play.disabled=false});
+},undefined,err=>{
+ status.textContent='El candidato animado todavía no está disponible o falló la generación. Comprobar GitHub Actions.';
+ console.error(err);
+});
+play.addEventListener('click',()=>{
+ if(!action)return;
+ action.reset();action.paused=false;action.play();play.disabled=true;
+ status.textContent='Claude corre hacia la cámara con movimientos articulados…';
+});
+stop.addEventListener('click',()=>{
+ if(action){action.stop();mixer.update(0);play.disabled=false;status.textContent='Animación detenida.';}
+});
+document.getElementById('front').addEventListener('click',()=>{yaw=0;if(model)model.rotation.y=0});
+function frame(t){const dt=Math.min(.08,(t-last)/1000);last=t;if(mixer)mixer.update(dt);renderer.render(scene,camera);requestAnimationFrame(frame)}
+requestAnimationFrame(frame);
+</script></main></body></html>
