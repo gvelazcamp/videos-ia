@@ -26,13 +26,13 @@ jobs:
           set -euo pipefail
           export DEBIAN_FRONTEND=noninteractive
           timeout 150 sudo apt-get update -qq -o Acquire::Retries=2 -o Acquire::http::Timeout=15
-          timeout 300 sudo apt-get install -y --no-install-recommends blender python3-numpy
+          timeout 300 sudo apt-get install -y --no-install-recommends blender python3-numpy xvfb
           blender --version | head -n 2
       - name: Construir terreno de pasto plano elevado en Blender
         shell: bash
         run: |
           set -euo pipefail
-          blender -b -t 2 --python-exit-code 1 \
+          xvfb-run -a -s "-screen 0 1280x1024x24" blender -b -t 2 --python-exit-code 1 \
             --python experimentos/escenario-pasto-liso-20261119/generar.py
       - name: Verificar GLB, PNG y proyecto Blender
         shell: bash
