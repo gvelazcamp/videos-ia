@@ -1,0 +1,15 @@
+{
+  "escenario": "01 - Pasto liso elevado",
+  "generador": "Blender mediante GitHub Actions",
+  "ancho_m": 18.0,
+  "largo_m": 18.0,
+  "altura_tierra_m": 1.2,
+  "espesor_pasto_m": 0.08,
+  "altura_superficie_caminable_m": 1.28,
+  "superficie": "completamente plana, sin montanas, rampas, arboles ni obstaculos",
+  "salidas": [
+    "escenario_pasto_liso_elevado.glb",
+    "escenario_pasto_liso.blend",
+    "vista_previa.png"
+  ]
+}
