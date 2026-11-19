@@ -1,0 +1,69 @@
+name: Claude - biblioteca 12 animaciones y visor 360
+
+on:
+  push:
+    paths:
+      - 'experimentos/claude-movimientos-20261119/generar_biblioteca.py'
+      - '.github/workflows/claude-biblioteca-movimientos-20261119.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: claude-biblioteca-12-movimientos-20261119
+  cancel-in-progress: false
+
+jobs:
+  preparar-clips:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Instalar Blender y numpy gratuitos
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y blender python3-numpy
+      - name: Generar 12 clips de Claude sobre su GLB existente sin reemplazarlo
+        run: |
+          blender -b -t 2 --python-exit-code 1 \
+            --python experimentos/claude-movimientos-20261119/generar_biblioteca.py \
+            -- experimentos/claude-limpio-corriendo-20261119/resultado/Claude_3D_CARRERA_REAL.glb \
+               experimentos/claude-movimientos-20261119/resultado
+      - name: Verificar clips separados dentro del GLB
+        run: |
+          python3 - <<'PY'
+          import json,struct
+          from pathlib import Path
+          p=Path('experimentos/claude-movimientos-20261119/resultado/Claude_Biblioteca_12_Movimientos.glb')
+          data=p.read_bytes()
+          assert data[:4]==b'glTF'
+          assert struct.unpack_from('<I',data,8)[0]==len(data)
+          j=json.loads(data[20:20+struct.unpack_from('<I',data,12)[0]])
+          assert len(j.get('skins',[]))>=1
+          assert len(j['skins'][0]['joints'])>=15
+          found=[x.get('name','') for x in j.get('animations',[])]
+          assert len(found)>=12, found
+          assert any('Caminar_lento' in n for n in found)
+          assert any('Agarrar_objeto' in n for n in found)
+          assert any('Saludar' in n for n in found)
+          print('CLAUDE_OK',len(found),'clips separados:',found)
+          PY
+      - name: Publicar únicamente GLB y manifiesto nuevos de Claude
+        run: |
+          set -euo pipefail
+          git add -- experimentos/claude-movimientos-20261119/resultado/
+          if git diff --cached --quiet; then echo 'Ya estaban publicados'; exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Claude: GLB de 12 clips de caminar, girar, saludar y acciones'
+          git pull --rebase origin main
+          git push origin HEAD:main
+      - name: Mantener copia descargable de los resultados
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: claude-12-movimientos-${{ github.run_id }}
+          path: experimentos/claude-movimientos-20261119/resultado/
+          retention-days: 7
+          if-no-files-found: warn
