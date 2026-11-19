@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="es"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#161a26"><title>Claude | visor 3D 360°</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:#111523;color:#f7f7f8;font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+main{max-width:850px;margin:auto;min-height:100dvh;background:#171d2e}
+header{display:flex;justify-content:space-between;align-items:center;gap:15px;padding:17px 18px 12px}h1{font-size:27px;letter-spacing:.05em;margin:0;color:#ffe2bd}p{margin:4px 0;color:#bfc6d6;font-size:12px}.pill{border:1px solid #f4a35c66;border-radius:20px;font-size:11px;padding:8px 10px;color:#ffdab1;white-space:nowrap}
+#stage{height:min(67dvh,690px);min-height:370px;position:relative;overflow:hidden;background:radial-gradient(ellipse at center,#525a74 0,#252e45 60%,#151d2d 100%);touch-action:none}
+#stage canvas{width:100%;height:100%;display:block;touch-action:none}
+#hint{position:absolute;bottom:15px;left:50%;transform:translateX(-50%);padding:8px 14px;background:#0e1625c9;border-radius:24px;color:white;font-size:11px;white-space:nowrap;pointer-events:none}
+#loading{position:absolute;inset:0;display:grid;place-items:center;font-weight:bold;color:#ffe1ba;background:#22283f}
+.controls{padding:12px 15px;display:flex;align-items:center;gap:9px;flex-wrap:wrap;background:#131b2d;border-bottom:1px solid #ffffff10}
+button{border:1px solid #f5b56a77;background:#343d53;color:#fff7e5;padding:10px 12px;border-radius:11px;font-size:13px;font-weight:700;cursor:pointer}
+button:active{background:#5e5260}input[type=range]{flex:1;min-width:80px;accent-color:#f99735}output{font-size:12px;color:#ffdbb7;font-variant-numeric:tabular-nums;min-width:37px}
+.note{padding:13px 17px 22px;font-size:12px;line-height:1.55;color:#c3cbda}
+.note strong{color:#ffe5c7}
+@media(max-width:500px){#stage{height:59dvh;min-height:340px}h1{font-size:23px}header{padding:13px 11px}.controls{padding:10px;gap:6px}button{padding:9px 10px}#hint{font-size:10px}}
+</style></head><body><main>
+<header><div><h1>CLAUDE · 3D 360°</h1><p>Modelo geométrico de vista previa · giro libre</p></div><span class="pill">Objeto 3D real</span></header>
+<div id="stage" aria-label="Modelo 3D interactivo de Claude: tocar y arrastrar para girar"><div id="loading">Cargando visor 3D…</div><div id="hint">Arrastrá para girar · dos dedos para acercar</div></div>
+<div class="controls"><span>Horizontal</span><input id="angle" type="range" min="0" max="360" value="0"><output id="degree">0°</output><button id="spin" type="button">Ⅱ Pausar</button><button id="reset" type="button">Frente</button></div>
+<div class="controls"><span>Vertical</span><input id="pitch" type="range" min="-90" max="90" value="0"><output id="pitchValue">0°</output><button id="top" type="button">Arriba</button><button id="bottom" type="button">Abajo</button><button id="zoomIn" type="button">＋</button><button id="zoomOut" type="button">－</button></div>
+<div class="note"><strong>Vista previa geométrica giratoria:</strong> es un objeto 3D volumétrico, no una sucesión de fotos. Se armó para inspeccionar proporciones y diseño mientras el candidato TRELLIS de Claude queda pendiente de reconstrucción. <strong>No es todavía un GLB producido por TRELLIS</strong> ni una copia 3D idéntica aprobada. El puente y el modelo de Voltito permanecen intactos.</div>
+<script type="module">
+import * as THREE from '../voltito-3d-alta-calidad-20261117/three.module.js';
+const host=document.getElementById('stage');
+const scene=new THREE.Scene();const camera=new THREE.PerspectiveCamera(34,1,.01,100);
+camera.position.set(0,0,6.55);camera.lookAt(0,0,0);
+const renderer=new THREE.WebGLRenderer({alpha:true,antialias:true,powerPreference:'high-performance'});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));renderer.outputColorSpace=THREE.SRGBColorSpace;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.5;
+host.insertBefore(renderer.domElement,host.firstChild);
+scene.add(new THREE.HemisphereLight(0xf9f9ff,0x4e5a80,2.3));
+const key=new THREE.DirectionalLight(0xffffff,3.3);key.position.set(-4,7,7);scene.add(key);
+const fill=new THREE.DirectionalLight(0xffaa47,1.2);fill.position.set(3,3,-5);scene.add(fill);
+const root=new THREE.Group();scene.add(root);const robot=new THREE.Group();root.add(robot);robot.position.y=-1.91;
+const orange=new THREE.MeshPhysicalMaterial({color:0xff8400,roughness:.34,metalness:.0,clearcoat:.28});
+const orangeDark=new THREE.MeshPhysicalMaterial({color:0xe97000,roughness:.45,metalness:.0});
+const pale=new THREE.MeshPhysicalMaterial({color:0xf3f0fc,roughness:.40,metalness:.02,clearcoat:.18});
+const white=new THREE.MeshPhysicalMaterial({color:0xffffff,roughness:.40});
+const black=new THREE.MeshPhysicalMaterial({color:0x090b11,roughness:.30,metalness:.10});
+const lightEye=new THREE.MeshBasicMaterial({color:0xffffff,toneMapped:false});
+function ball(x,y,z,a,b,c,mat,segments=48){const m=new THREE.Mesh(new THREE.SphereGeometry(1,segments,Math.ceil(segments*.68)),mat);m.position.set(x,y,z);m.scale.set(a,b,c);robot.add(m);return m}
+function cylinder(x,y,z,rTop,rBot,height,mat){let m=new THREE.Mesh(new THREE.CylinderGeometry(rTop,rBot,height,40),mat);m.position.set(x,y,z);robot.add(m);return m}
+// Head shell and integrated front display. All dimensions fixed in real 3D space.
+ball(0,2.62,0,.95,.78,.77,pale);
+ball(0,2.65,.716,.745,.285,.105,black,64);
+function eye(cx){const pts=[];for(let i=0;i<=20;i++){const t=i/20*Math.PI;pts.push(new THREE.Vector3(cx+Math.cos(t)*.17,2.65+Math.sin(t)*.115-.06,.824+.012*Math.sin(t)))}const geo=new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts),28,.031,10,false);robot.add(new THREE.Mesh(geo,lightEye))}
+eye(-.34);eye(.34);
+cylinder(0,3.415,0,.080,.085,.20,orange);ball(0,3.59,0,.176,.176,.176,orange);
+// Body, sleeves, mittens, short legs, shoes.
+ball(0,1.28,0,.775,.99,.636,orange,64);
+for(const s of [-1,1]){
+ const arm=ball(s*.76,1.39,.02,.221,.459,.237,orange);arm.rotation.z=s*.20;
+ ball(s*.85,.958,.095,.194,.248,.183,pale);
+ for(let k=0;k<3;k++)ball(s*(.757+k*.085),.849,.240,.054,.111,.050,pale,20);
+ cylinder(s*.355,.457,-.01,.257,.257,.60,orange);
+ ball(s*.355,.195,.16,.372,.232,.435,orange,48);
+ ball(s*.355,.068,.16,.368,.055,.427,orangeDark,40);
+}
+// Chest circular medallion plus 12 true radial spokes.
+const disc=new THREE.Mesh(new THREE.CylinderGeometry(.334,.334,.035,64),white);disc.rotation.x=Math.PI/2;disc.position.set(0,1.62,.611);robot.add(disc);
+for(let i=0;i<12;i++){let a=i*Math.PI/6;let shape=new THREE.CapsuleGeometry(.028,.168,4,8);let m=new THREE.Mesh(shape,orange);m.position.set(Math.sin(a)*.165,1.62+Math.cos(a)*.165,.642);m.rotation.z=-a;robot.add(m)}
+function roundedShape(w,h,r){let x=-w/2,y=-h/2,s=new THREE.Shape();s.moveTo(x+r,y);s.lineTo(x+w-r,y);s.quadraticCurveTo(x+w,y,x+w,y+r);s.lineTo(x+w,y+h-r);s.quadraticCurveTo(x+w,y+h,x+w-r,y+h);s.lineTo(x+r,y+h);s.quadraticCurveTo(x,y+h,x,y+h-r);s.lineTo(x,y+r);s.quadraticCurveTo(x,y,x+r,y);return s}
+let badge=new THREE.Mesh(new THREE.ExtrudeGeometry(roundedShape(.91,.252,.10),{depth:.045,bevelEnabled:true,bevelSegments:3,steps:1,bevelSize:.02,bevelThickness:.01,curveSegments:10}),white);
+badge.position.set(0,.995,.627);robot.add(badge);
+const labelCanvas=document.createElement('canvas');labelCanvas.width=512;labelCanvas.height=145;
+const ctx=labelCanvas.getContext('2d');ctx.clearRect(0,0,512,145);ctx.fillStyle='#101014';ctx.font='bold 109px Arial,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('Claude',256,78);
+const tex=new THREE.CanvasTexture(labelCanvas);tex.colorSpace=THREE.SRGBColorSpace;
+const textPlane=new THREE.Mesh(new THREE.PlaneGeometry(.74,.21),new THREE.MeshBasicMaterial({map:tex,transparent:true,depthWrite:false,toneMapped:false}));textPlane.position.set(0,.996,.710);robot.add(textPlane);
+const slider=document.getElementById('angle'),pitchSlider=document.getElementById('pitch'),out=document.getElementById('degree'),outPitch=document.getElementById('pitchValue'),spin=document.getElementById('spin');
+let yaw=0,pitch=0,auto=true,dragging=false,px=0,py=0,dist=6.55,last=0;const pointers=new Map();let prevSpread=0;
+function update(){root.rotation.order='YXZ';root.rotation.y=yaw;root.rotation.x=pitch;const yd=((Math.round(yaw*180/Math.PI)%360)+360)%360;slider.value=yd;out.textContent=yd+'°';const pd=Math.round(pitch*180/Math.PI);pitchSlider.value=pd;outPitch.textContent=pd+'°'}
+function goYaw(v){yaw=v;update()}function goPitch(v){pitch=THREE.MathUtils.clamp(v,-Math.PI/2,Math.PI/2);update()}
+function playing(v){auto=v;spin.textContent=v?'Ⅱ Pausar':'▶ Girar'}
+slider.addEventListener('input',()=>{playing(false);goYaw(Number(slider.value)*Math.PI/180)});
+pitchSlider.addEventListener('input',()=>{playing(false);goPitch(Number(pitchSlider.value)*Math.PI/180)});
+spin.addEventListener('click',()=>playing(!auto));
+document.getElementById('reset').addEventListener('click',()=>{playing(false);goYaw(0);goPitch(0);camera.position.z=dist=6.55});
+document.getElementById('top').addEventListener('click',()=>{playing(false);goPitch(Math.PI/2)});
+document.getElementById('bottom').addEventListener('click',()=>{playing(false);goPitch(-Math.PI/2)});
+function zoom(d){dist=THREE.MathUtils.clamp(dist+d,3.9,11);camera.position.z=dist}
+document.getElementById('zoomIn').addEventListener('click',()=>zoom(-.65));document.getElementById('zoomOut').addEventListener('click',()=>zoom(.65));
+host.addEventListener('pointerdown',e=>{playing(false);host.setPointerCapture(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});dragging=true;px=e.clientX;py=e.clientY});
+host.addEventListener('pointermove',e=>{if(!pointers.has(e.pointerId))return;pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.size===2){let pp=[...pointers.values()];let spread=Math.hypot(pp[0].x-pp[1].x,pp[0].y-pp[1].y);if(prevSpread)zoom((prevSpread-spread)*.017);prevSpread=spread}else{prevSpread=0;goYaw(yaw+(e.clientX-px)*.011);goPitch(pitch+(e.clientY-py)*.007);px=e.clientX;py=e.clientY}});
+for(const t of ['pointerup','pointercancel','lostpointercapture'])host.addEventListener(t,e=>{pointers.delete(e.pointerId);prevSpread=0;dragging=pointers.size>0});
+host.addEventListener('wheel',e=>{e.preventDefault();zoom(e.deltaY*.006)},{passive:false});
+function resize(){let w=host.clientWidth,h=host.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}
+resize();new ResizeObserver(resize).observe(host);update();document.getElementById('loading').remove();
+function render(t){if(last&&auto)goYaw(yaw+Math.min(48,t-last)*.00057);last=t;renderer.render(scene,camera);requestAnimationFrame(render)}requestAnimationFrame(render);
+window.__CLAUDE_3D__={ready:true,engine:'Three.js procedural geometry',getYaw:()=>yaw,getPitch:()=>pitch};
+</script></main></body></html>
