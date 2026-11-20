@@ -13,10 +13,12 @@ SOURCE_SHA256="30d12f261f03eefee163a7079b17176242a6d5a0762be87df10efc5f427faa58"
 ROOT=Path(__file__).resolve().parent
 DEST=ROOT/"vistas-10"
 DEST.mkdir(parents=True,exist_ok=True)
-req=Request(SOURCE_URL,headers={"User-Agent":"Mozilla/5.0"})
-with urlopen(req,timeout=45) as resp:
-    original=resp.read()
-assert hashlib.sha256(original).hexdigest()==SOURCE_SHA256,"La imagen remota no coincide con el archivo de Gonzalo"
+import base64
+reference_b64=ROOT/"referencia-original.png.b64"
+if not reference_b64.is_file():
+    raise FileNotFoundError(f"Falta referencia local: {reference_b64}")
+original=base64.b64decode(reference_b64.read_text().strip(), validate=True)
+assert hashlib.sha256(original).hexdigest()==SOURCE_SHA256,"La imagen local no coincide con la referencia original verificada"
 source=DEST.parent/"referencia-original.png"
 source.write_bytes(original)
 photo=Image.open(source).convert("RGB")
