@@ -1,0 +1,75 @@
+name: Duende navideno articulado - visor publico 360
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/duende-navideno-visor-publico.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: duende-navideno-visor-publico-20261120
+  cancel-in-progress: false
+jobs:
+  construir:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Dependencias de imagenes y reconstruccion volumetrica
+        run: python -m pip install --disable-pip-version-check -q numpy pillow opencv-python-headless scikit-image trimesh
+      - name: Preparar ocho PNG con fondo eliminado desde referencia verificada
+        run: python experimentos/duende-navideno-articulado-20261120/preparar_vistas.py
+      - name: Reconstruir malla 3D real (no imagenes planas)
+        run: |
+          python experimentos/duende-navideno-articulado-20261120/visualhull.py \
+            experimentos/duende-navideno-articulado-20261120/vistas-10 \
+            experimentos/duende-navideno-articulado-20261120/malla_multivista_base.glb
+      - name: Instalar Blender en runner temporal, no en computadora del usuario
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends blender
+      - name: Crear armadura, pesos y movimientos y exportar GLB real
+        run: |
+          blender -b -t 2 --python-exit-code 1 \
+            --python experimentos/duende-navideno-articulado-20261120/rig_trellis.py \
+            -- experimentos/duende-navideno-articulado-20261120/malla_multivista_base.glb \
+               experimentos/duende-navideno-articulado-20261120
+      - name: Validar malla, skin y animaciones del GLB
+        run: |
+          python - <<'PY'
+          import json,struct
+          from pathlib import Path
+          p=Path("experimentos/duende-navideno-articulado-20261120/duende_navideno_3d_articulado.glb")
+          raw=p.read_bytes()
+          assert raw[:4]==b"glTF"
+          assert struct.unpack_from("<I",raw,8)[0]==len(raw)
+          n=struct.unpack_from("<I",raw,12)[0]
+          meta=json.loads(raw[20:20+n])
+          assert meta.get("meshes") and meta.get("skins") and meta.get("animations"), "GLB no articulado"
+          print("GLB_VERIFICADO",len(meta["meshes"]),len(meta["skins"]),len(meta["animations"]),len(raw))
+          PY
+      - name: Publicar solo el candidato aislado para visor online
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add experimentos/duende-navideno-articulado-20261120/
+          git diff --cached --quiet && { echo "No se genero candidato nuevo"; exit 1; }
+          git commit -m "Duende navideno: GLB articulado 360 para visor publico"
+          for n in 1 2 3 4; do
+            git pull --rebase origin main
+            if git push origin HEAD:main; then exit 0; fi
+            sleep 3
+          done
+          exit 1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: duende-navideno-articulado-360
+          path: experimentos/duende-navideno-articulado-20261120/
+          retention-days: 14
