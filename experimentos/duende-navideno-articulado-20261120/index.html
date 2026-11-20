@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Duende navideño: modelo 3D articulado 360°</title>
+<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"></script>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#0e1423;color:#f1f5f9;font:16px system-ui,Arial,sans-serif}main{max-width:1100px;margin:auto;padding:18px}
+h1{font-size:22px;margin:0 0 12px}model-viewer{display:block;width:100%;height:70vh;min-height:350px;background:radial-gradient(#3b4c69,#0e1423);border:1px solid #334155;border-radius:14px}
+.bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:14px 0}button,select,a.btn{border:1px solid #64748b;background:#1e293b;color:#fff;border-radius:8px;padding:10px 12px;font:inherit;cursor:pointer;text-decoration:none}
+button:hover,a.btn:hover{background:#334155}.note{color:#cbd5e1;font-size:14px}#estado{color:#93c5fd}
+</style></head><body><main>
+<h1>Duende navideño · 3D articulado 360°</h1>
+<model-viewer id="visor" src="./duende_navideno_3d_articulado.glb" camera-controls auto-rotate autoplay interaction-prompt="none"
+ shadow-intensity="1" exposure="1.25" camera-orbit="35deg 75deg auto" alt="Modelo 3D articulado del duende navideño">
+</model-viewer>
+<div class="bar">
+<button id="giro">Detener giro</button><button id="pausa">Pausar movimiento</button>
+<label>Animación <select id="anim"><option>Cargando...</option></select></label>
+<button id="frente">Ver de frente</button><a class="btn" href="./duende_navideno_3d_articulado.glb" download>Descargar GLB</a>
+</div>
+<p class="note">Arrastrá para girar libremente el modelo; soltá para frenarlo. Rueda o pellizco para zoom. Giro automático y animación se pueden detener por separado.</p>
+<p id="estado">Cargando modelo 3D...</p>
+<p class="note">Reconstrucción multivista desde ocho imágenes y esqueleto de Blender. Candidato: semejanza y deformaciones requieren validación visual; no es salida TRELLIS.</p>
+</main>
+<script>
+const v=document.getElementById('visor'),a=document.getElementById('anim'),status=document.getElementById('estado');
+v.addEventListener('load',()=>{
+ status.textContent='Modelo 3D cargado. Podés girarlo 360° y detenerlo en cualquier ángulo.';
+ const clips=v.availableAnimations||[];
+ a.replaceChildren();
+ if(!clips.length){const opt=new Option('Sin animaciones', '');a.add(opt)}
+ else{clips.forEach(x=>a.add(new Option(x,x)));v.animationName=clips[0];v.play()}
+});
+v.addEventListener('error',()=>{status.textContent='Error cargando el archivo GLB. Revisar publicación del modelo.'});
+a.addEventListener('change',()=>{if(a.value){v.animationName=a.value;v.play()}});
+document.getElementById('giro').onclick=()=>{v.autoRotate=!v.autoRotate;document.getElementById('giro').textContent=v.autoRotate?'Detener giro':'Activar giro'};
+document.getElementById('pausa').onclick=()=>{if(v.paused){v.play()}else{v.pause()}document.getElementById('pausa').textContent=v.paused?'Reproducir movimiento':'Pausar movimiento'};
+document.getElementById('frente').onclick=()=>{v.cameraOrbit='0deg 75deg auto'};
+</script></body></html>
