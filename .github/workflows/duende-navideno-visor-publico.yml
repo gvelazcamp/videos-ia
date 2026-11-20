@@ -4,6 +4,7 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/duende-navideno-visor-publico.yml'
+      - 'experimentos/duende-navideno-articulado-20261120/INICIAR_GENERACION.txt'
   workflow_dispatch:
 permissions:
   contents: write
