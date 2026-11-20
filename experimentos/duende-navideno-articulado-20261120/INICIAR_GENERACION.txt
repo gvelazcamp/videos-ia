@@ -1,0 +1,2 @@
+Construir y publicar el duende 3D articulado desde las ocho vistas originales.
+Validar GLB con malla, skin y animaciones. No modificar otros personajes.
