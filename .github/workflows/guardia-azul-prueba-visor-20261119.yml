@@ -1,0 +1,79 @@
+name: Guardia Azul - prueba aislada visor 360
+
+on:
+  push:
+    paths:
+      - '.github/workflows/guardia-azul-prueba-visor-20261119.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Comprobar archivos reales y dependencias locales del visor
+        shell: bash
+        run: |
+          set -euo pipefail
+          DIR=experimentos/guardia-azul-candidato-20261119
+          for f in index.html OrbitControls.js guardia_azul_articulada.glb rifle_independiente.glb base_engranajes_independiente.glb; do
+            test -s "$DIR/$f"
+          done
+          test -s experimentos/voltito-3d-alta-calidad-20261117/three.module.js
+          test -s experimentos/voltito-3d-multivista-prueba-20261118/GLTFLoader.js
+          test -s experimentos/voltito-3d-multivista-prueba-20261118/BufferGeometryUtils.js
+          python3 - <<'PY'
+          from pathlib import Path
+          s=Path('experimentos/guardia-azul-candidato-20261119/index.html').read_text()
+          assert 'cdn.jsdelivr.net' not in s
+          assert "load('./guardia_azul_articulada.glb',false)" in s
+          assert 'id="overlay"' in s
+          body=s.split('<script type="module">',1)[1].split('</script>',1)[0]
+          Path('/tmp/guardia-azul-visor.mjs').write_text(body)
+          import struct
+          for p in Path('experimentos/guardia-azul-candidato-20261119').glob('*.glb'):
+              d=p.read_bytes()
+              assert d[:4]==b'glTF' and struct.unpack_from('<I',d,8)[0]==len(d),p
+          PY
+          node --check /tmp/guardia-azul-visor.mjs
+      - name: Probar en Chrome headless con servidor local
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m http.server 8999 --bind 127.0.0.1 >/tmp/guardia-http.log 2>&1 &
+          CHROME="$(command -v google-chrome || command -v chromium || true)"
+          if [ -z "$CHROME" ]; then echo "No hay Chrome preinstalado"; exit 1; fi
+          "$CHROME" --headless=new --no-sandbox --disable-dev-shm-usage \
+            --enable-webgl --enable-unsafe-swiftshader --use-angle=swiftshader \
+            --virtual-time-budget=12000 \
+            --window-size=800,900 \
+            --screenshot=/tmp/guardia-visor.png \
+            --dump-dom 'http://127.0.0.1:8999/experimentos/guardia-azul-candidato-20261119/index.html' \
+            >/tmp/guardia-dom.html 2>/tmp/guardia-chrome.log || true
+          test -s /tmp/guardia-dom.html
+          python3 - <<'PY'
+          from pathlib import Path
+          s=Path('/tmp/guardia-dom.html').read_text()
+          print('GLB cargado:', 'GLB cargado:' in s)
+          print('Animaciones:', 'Huesos:' in s)
+          print('Overlay:', 'id="overlay"' in s)
+          print('chrome log:',Path('/tmp/guardia-chrome.log').read_text()[-1800:])
+          if 'GLB cargado:' not in s:
+              raise SystemExit('El visor aun no cargo el personaje en navegador de prueba')
+          PY
+      - name: Guardar evidencia para revisar
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: prueba-visor-guardia-azul
+          path: |
+            /tmp/guardia-visor.png
+            /tmp/guardia-dom.html
+            /tmp/guardia-chrome.log
+            /tmp/guardia-http.log
+          if-no-files-found: warn
+          retention-days: 7
