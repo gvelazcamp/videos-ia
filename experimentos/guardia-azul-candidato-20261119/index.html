@@ -1,11 +1,11 @@
 <!doctype html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Visor GLB · Guardia Azul</title>
 <style>
-:root{color-scheme:dark;font-family:system-ui,sans-serif}*{box-sizing:border-box}body{margin:0;background:#121821;color:#e8f0fa}header{padding:14px 18px;background:#1b2736;border-bottom:1px solid #344559}header h1{font-size:20px;margin:0 0 4px}header p{font-size:12px;margin:0;color:#b9c5d4}main{display:grid;grid-template-columns:1fr 290px;height:calc(100vh - 82px)}#stage{height:100%;touch-action:none;min-height:400px}aside{padding:16px;background:#202e3f;overflow:auto;border-left:1px solid #344559}label{display:block;font-size:13px;margin:14px 0 5px}input[type=file],select,button{display:block;max-width:100%;width:100%;padding:10px;background:#30445b;border:1px solid #5b779a;color:white;border-radius:8px}button{margin-top:10px;cursor:pointer}input[type=range]{width:100%}#status{font-size:12px;color:#b3cadf;line-height:1.5;overflow-wrap:anywhere}.help{font-size:12px;line-height:1.5;color:#abc2d6}.row{display:flex;gap:8px}.row button{flex:1} @media(max-width:680px){main{grid-template-columns:1fr;grid-template-rows:57vh auto;height:auto}aside{border:0;border-top:1px solid #344559}#stage{min-height:57vh}}
+:root{color-scheme:dark;font-family:system-ui,sans-serif}*{box-sizing:border-box}body{margin:0;background:#121821;color:#e8f0fa}header{padding:14px 18px;background:#1b2736;border-bottom:1px solid #344559}header h1{font-size:20px;margin:0 0 4px}header p{font-size:12px;margin:0;color:#b9c5d4}main{display:grid;grid-template-columns:1fr 290px;height:calc(100vh - 82px)}#stage{position:relative;height:100%;touch-action:none;min-height:400px;background:radial-gradient(ellipse at 50% 40%,#263b51 0,#121821 75%)}#stage canvas{display:block;width:100%;height:100%}#overlay{position:absolute;z-index:2;bottom:15px;left:15px;right:15px;padding:12px;border:1px solid #546b80;border-radius:9px;color:#fff;background:#10253cdd;font-size:13px;line-height:1.4;pointer-events:none}#overlay[data-error="1"]{border-color:#d19b75;background:#562e2edc}aside{padding:16px;background:#202e3f;overflow:auto;border-left:1px solid #344559}label{display:block;font-size:13px;margin:14px 0 5px}input[type=file],select,button{display:block;max-width:100%;width:100%;padding:10px;background:#30445b;border:1px solid #5b779a;color:white;border-radius:8px}button{margin-top:10px;cursor:pointer}input[type=range]{width:100%}#status{font-size:12px;color:#b3cadf;line-height:1.5;overflow-wrap:anywhere}.help{font-size:12px;line-height:1.5;color:#abc2d6}.row{display:flex;gap:8px}.row button{flex:1} @media(max-width:680px){main{grid-template-columns:1fr;grid-template-rows:57vh auto;height:auto}aside{border:0;border-top:1px solid #344559}#stage{min-height:57vh}}
 </style>
-<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.163.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.163.0/examples/jsm/"}}</script>
+<!-- Tres dependencias locales del mismo repositorio, sin CDN externo. -->
 </head><body><header><h1>Guardia Azul · visor GLB 360°</h1><p>Modelo geométrico articulado aproximado. No es idéntico a la figura original. Podés girarlo y elegir animaciones.</p></header><main>
-<div id="stage"></div><aside>
+<div id="stage"><div id="overlay" role="status" aria-live="polite">Preparando el visor y cargando el personaje 3D…</div></div><aside>
 <p class="help"><a href="guardia_azul_articulada.glb" download>Descargar personaje GLB</a> · <a href="rifle_independiente.glb" download>Rifle</a> · <a href="base_engranajes_independiente.glb" download>Base</a></p><label for="file">Cambiar personaje por otro archivo (.glb)</label><input id="file" type="file" accept=".glb,model/gltf-binary">
 <label for="prop">Objeto independiente (rifle o base .glb)</label><input id="prop" type="file" accept=".glb,model/gltf-binary">
 <button id="reset">Centrar cámara</button>
@@ -19,26 +19,30 @@
 <p class="help">Arrastrá para girar. Pellizcá o usá la rueda para zoom. El rifle y la base deben exportarse por separado y cargarse como archivos GLB; un PNG no es un modelo 3D.</p>
 </aside></main>
 <script type="module">
-import * as THREE from 'three';
-import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
-import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
-const stage=document.getElementById('stage'), status=document.getElementById('status');
+import * as THREE from '../voltito-3d-alta-calidad-20261117/three.module.js';
+import {OrbitControls} from './OrbitControls.js';
+import {GLTFLoader} from '../voltito-3d-multivista-prueba-20261118/GLTFLoader.js';
+const stage=document.getElementById('stage'), status=document.getElementById('status'), overlay=document.getElementById('overlay');
+function showStage(text,error=false){overlay.textContent=text;overlay.dataset.error=error?'1':'0';overlay.style.display='block'}
+function readyStage(){overlay.style.display='none'}
+window.addEventListener('error',event=>showStage('Error al iniciar el visor 3D: '+(event.message||'revisá Chrome/WebGL'),true));
+window.addEventListener('unhandledrejection',event=>showStage('Error de carga 3D: '+(event.reason?.message||'no se pudieron cargar recursos'),true));
 const scene=new THREE.Scene(); scene.background=new THREE.Color(0x121821);
 const camera=new THREE.PerspectiveCamera(38,1,.01,1000);camera.position.set(2,1.8,4);
-const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.outputColorSpace=THREE.SRGBColorSpace;stage.appendChild(renderer.domElement);
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:false});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.outputColorSpace=THREE.SRGBColorSpace;stage.insertBefore(renderer.domElement,overlay);
 scene.add(new THREE.HemisphereLight(0xeef4ff,0x4e5260,2));const key=new THREE.DirectionalLight(0xffffff,3);key.position.set(3,6,8);scene.add(key);
 const ctrl=new OrbitControls(camera,renderer.domElement);ctrl.enableDamping=true;
 const loader=new GLTFLoader();const clock=new THREE.Clock();let main=null, accessory=null, mixer=null, action=null, bones=[], poses=new Map();
 const anims=document.getElementById('animation'), boneSelect=document.getElementById('bone');
-function viewport(){let w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}
+function viewport(){let w=Math.max(stage.clientWidth,1),h=Math.max(stage.clientHeight,1);renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix()}
 new ResizeObserver(viewport).observe(stage);viewport();
 function frame(object){const b=new THREE.Box3().setFromObject(object);if(b.isEmpty())return;let c=b.getCenter(new THREE.Vector3()), r=Math.max(b.getSize(new THREE.Vector3()).length()*.75,.7);ctrl.target.copy(c);camera.position.set(c.x+r*.55,c.y+r*.36,c.z+r*1.6);camera.near=Math.max(r/1000,.001);camera.far=1000;camera.updateProjectionMatrix();ctrl.update()}
-function load(file,prop){if(!file)return;const remote=typeof file==="string";const u=remote?file:URL.createObjectURL(file);loader.load(u, gltf=>{if(!remote)URL.revokeObjectURL(u);let node=gltf.scene;if(prop){scene.add(node);if(typeof u==='string'&&u.includes('rifle')){node.position.set(1.6,1.5,.04);node.rotation.z=-.32;node.scale.setScalar(.56)}status.textContent='Accesorio GLB cargado como objeto independiente.';return}
-if(main)scene.remove(main);main=node;scene.add(main);frame(main);bones=[];poses.clear();main.traverse(obj=>{if(obj.isBone){bones.push(obj);poses.set(obj.uuid,obj.rotation.clone())}});
+function load(file,prop){if(!file)return;const remote=typeof file==="string";const u=remote?file:URL.createObjectURL(file);if(!prop)showStage('Cargando geometría 3D y articulaciones…');loader.load(u, gltf=>{if(!remote)URL.revokeObjectURL(u);let node=gltf.scene;if(prop){scene.add(node);if(typeof u==='string'&&u.includes('rifle')){node.position.set(1.6,1.5,.04);node.rotation.z=-.32;node.scale.setScalar(.56)}status.textContent='Accesorio GLB cargado como objeto independiente.';return}
+if(main)scene.remove(main);main=node;scene.add(main);main.traverse(obj=>{if(obj.isMesh){obj.frustumCulled=false}});frame(main);readyStage();bones=[];poses.clear();main.traverse(obj=>{if(obj.isBone){bones.push(obj);poses.set(obj.uuid,obj.rotation.clone())}});
 boneSelect.innerHTML='<option value="">Seleccionar hueso</option>';bones.forEach((b,i)=>{let o=document.createElement('option');o.value=String(i);o.textContent=b.name||('Hueso '+i);boneSelect.appendChild(o)});
 anims.innerHTML='<option value="">Sin animación</option>';gltf.animations.forEach((a,i)=>{let o=document.createElement('option');o.value=String(i);o.textContent=a.name||('Animación '+(i+1));anims.appendChild(o)});mixer=gltf.animations.length?new THREE.AnimationMixer(main):null;window.__clips=gltf.animations;action=null;
-status.textContent=`GLB cargado: ${file.name}. Huesos: ${bones.length}. Animaciones: ${gltf.animations.length}. La existencia de un rig no garantiza deformación correcta: revisá pesos y articulaciones.`;
-}, undefined, err=>{if(!remote)URL.revokeObjectURL(u);status.textContent='Error al cargar GLB: '+err.message})}
+status.textContent=`GLB cargado: ${remote?file:file.name}. Huesos: ${bones.length}. Animaciones: ${gltf.animations.length}. La existencia de un rig no garantiza deformación correcta: revisá pesos y articulaciones.`;
+}, undefined, err=>{if(!remote)URL.revokeObjectURL(u);const msg='No se pudo cargar '+u+': '+(err?.message||err);status.textContent=msg;if(!prop)showStage(msg,true);console.error(err)})}
 document.getElementById('file').onchange=e=>load(e.target.files[0],false);document.getElementById('prop').onchange=e=>load(e.target.files[0],true);
 document.getElementById('reset').onclick=()=>main&&frame(main);
 document.getElementById('play').onclick=()=>{if(!mixer||!anims.value)return; if(action)action.stop();action=mixer.clipAction(window.__clips[Number(anims.value)]);action.reset().play()};
@@ -47,5 +51,5 @@ function setSlider(){let b=bones[Number(boneSelect.value)];if(!boneSelect.value|
 boneSelect.onchange=setSlider;
 ['x','y','z'].forEach(axis=>document.getElementById('r'+axis).oninput=e=>{if(!boneSelect.value)return;let b=bones[Number(boneSelect.value)], orig=poses.get(b.uuid);if(!b||!orig)return;b.rotation[axis]=orig[axis]+THREE.MathUtils.degToRad(Number(e.target.value))});
 document.getElementById('neutral').onclick=()=>{if(!boneSelect.value)return;let b=bones[Number(boneSelect.value)];b.rotation.copy(poses.get(b.uuid));setSlider()};
-load('guardia_azul_articulada.glb',false);load('rifle_independiente.glb',true);load('base_engranajes_independiente.glb',true);function tick(){requestAnimationFrame(tick);const dt=clock.getDelta();if(mixer)mixer.update(dt);ctrl.update();renderer.render(scene,camera)}tick();
+load('./guardia_azul_articulada.glb',false);load('./rifle_independiente.glb',true);load('./base_engranajes_independiente.glb',true);function tick(){requestAnimationFrame(tick);const dt=clock.getDelta();if(mixer)mixer.update(dt);ctrl.update();renderer.render(scene,camera)}tick();
 </script></body></html>
