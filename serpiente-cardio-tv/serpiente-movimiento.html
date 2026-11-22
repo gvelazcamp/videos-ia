@@ -1,0 +1,23 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"><title>Camino de la Serpiente — prueba de movimiento</title><style>*{box-sizing:border-box}body{margin:0;background:#151027;color:white;font:16px system-ui;overflow:hidden}canvas{display:block;width:100vw;height:100vh}.hud{position:fixed;left:16px;top:14px;background:#18132abf;padding:12px 16px;border-radius:12px;backdrop-filter:blur(6px)}.hud strong{display:block;font-size:17px}.hud small{opacity:.8}button{position:fixed;bottom:18px;right:18px;border:0;border-radius:12px;background:#fff;color:#171029;padding:12px 18px;font-weight:700;cursor:pointer}</style></head><body><canvas id="game"></canvas><div class="hud"><strong>CAMINO DE LA SERPIENTE</strong><small>Prueba 1 · recorrido animado continuo · sin personajes</small><div id="km">0,00 km</div></div><button id="speed">Velocidad ×1</button><script>
+const canvas=document.getElementById('game'),ctx=canvas.getContext('2d');let W=0,H=0,dpr=1;function resize(){dpr=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;canvas.width=Math.round(W*dpr);canvas.height=Math.round(H*dpr);ctx.setTransform(dpr,0,0,dpr,0,0)}addEventListener('resize',resize);resize();
+let distance=0,last=0,speed=1;document.getElementById('speed').onclick=()=>{speed=speed===1?2:speed===2?0.5:1;document.getElementById('speed').textContent='Velocidad ×'+speed};
+// Curvas suaves de la pista en coordenadas de mundo; el mundo avanza debajo de la cámara.
+function curve(z){return 1.35*Math.sin(z*.006)+.85*Math.sin(z*.012+1.3)+.3*Math.sin(z*.023)}
+function cloud(x,y,r,alpha){ctx.globalAlpha=alpha;ctx.fillStyle='#fff9da';for(let i=-2;i<=2;i++){ctx.beginPath();ctx.ellipse(x+i*r*.48,y-Math.abs(i%2)*r*.13,r*.65,r*.38,0,0,Math.PI*2);ctx.fill()}ctx.globalAlpha=1}
+function roadPoint(z){let p=1/(1+z*.018);let near=curve(distance+4),at=curve(distance+z+4);let x=W*.5+(at-near)*W*.18*p+Math.sin(distance*.0009)*W*.018;let y=H*.34+H*.63*p;let half=W*(.013+.36*p);return{x,y,half,p}}
+function draw(t){if(!last)last=t;let dt=Math.min(.06,(t-last)/1000);last=t;distance+=dt*24*speed;let sky=ctx.createLinearGradient(0,0,0,H);sky.addColorStop(0,'#9172c9');sky.addColorStop(.42,'#d9b6de');sky.addColorStop(.75,'#f8d99b');sky.addColorStop(1,'#e9ae61');ctx.fillStyle=sky;ctx.fillRect(0,0,W,H);
+// Nubes a distintas profundidades: paralaje visible durante el avance.
+for(let layer=0;layer<3;layer++){for(let i=0;i<18;i++){let base=(i*137.7+layer*67)%1100;let x=((base-distance*(.12+layer*.14))% (W+450)+(W+450))%(W+450)-220;let y=H*(.37+layer*.2)+Math.sin(i*3.7+layer)*H*.09;cloud(x,y,(30+layer*18)*(W/1000+.45),.15+layer*.11)}}
+// Se dibuja del horizonte hacia la cámara: segmentos de pista se desplazan en perspectiva.
+let far=210;for(let z=far;z>0;z-=1.3){let a=roadPoint(z),b=roadPoint(Math.max(0,z-1.3));const poly=(wa,wb,color)=>{ctx.fillStyle=color;ctx.beginPath();ctx.moveTo(a.x-wa*a.half,a.y);ctx.lineTo(a.x+wa*a.half,a.y);ctx.lineTo(b.x+wb*b.half,b.y+1);ctx.lineTo(b.x-wb*b.half,b.y+1);ctx.closePath();ctx.fill()};
+// El cuerpo inferior de la serpiente, bordes escamados y superficie de carrera.
+poly(1.22,1.22,'#6d7894');poly(1.13,1.13,'#9da9bf');poly(1.025,1.025,'#d9dce3');poly(.90,.90,Math.floor((distance+z)/5)%2===0?'#e8e9ed':'#d7dbe4');
+// Línea central y juntas móviles: prueban que hay desplazamiento real.
+if(Math.floor((distance+z)/7)%2===0)poly(.016,.016,'#b7b9c4');
+if(Math.floor((distance+z)/3)%2===0){poly(1.09,1.055,'#e9edf4')}
+// Crestas en los bordes del camino.
+if(Math.floor((distance+z)/3)!==Math.floor((distance+z-1.3)/3)){let k=b.p*15+2;ctx.fillStyle='#b7c5d4';for(let s of [-1,1]){ctx.beginPath();ctx.moveTo(b.x+s*b.half*.98,b.y);ctx.lineTo(b.x+s*(b.half*1.13),b.y-k);ctx.lineTo(b.x+s*b.half*1.19,b.y);ctx.fill()}}}
+// Viñeta de profundidad sin personajes ni obstáculos.
+let vign=ctx.createRadialGradient(W/2,H*.48,W*.18,W/2,H*.5,W*.82);vign.addColorStop(0,'#0000');vign.addColorStop(1,'#2e174d40');ctx.fillStyle=vign;ctx.fillRect(0,0,W,H);
+document.getElementById('km').textContent=(distance/1000).toFixed(2).replace('.',',')+' km';requestAnimationFrame(draw)}requestAnimationFrame(draw);
+</script></body></html>
