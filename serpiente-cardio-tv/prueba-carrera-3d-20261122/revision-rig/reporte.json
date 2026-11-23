@@ -16,15 +16,21 @@
     "animacion": [
       {
         "name": "Correr_Ciclo_32f",
-        "adjusted_curves": 0,
-        "sample_paths": []
+        "adjusted_curves": 36,
+        "sample_paths": [
+          "pose.bones[\"Head\"].location",
+          "pose.bones[\"Head\"].location",
+          "pose.bones[\"Head\"].location",
+          "pose.bones[\"Head\"].rotation_quaternion",
+          "pose.bones[\"Head\"].rotation_quaternion"
+        ]
       }
     ],
     "estado": "candidato_pendiente_verificacion_visual"
   },
   "vegeta": {
     "archivo": "revision-rig/vegeta.glb",
-    "bytes": 2339376,
+    "bytes": 2339516,
     "huesos": 17,
     "clips": 2,
     "mallas": {
@@ -39,8 +45,14 @@
     "animacion": [
       {
         "name": "Correr_Ciclo_32f.001",
-        "adjusted_curves": 0,
-        "sample_paths": []
+        "adjusted_curves": 36,
+        "sample_paths": [
+          "pose.bones[\"Head\"].location",
+          "pose.bones[\"Head\"].location",
+          "pose.bones[\"Head\"].location",
+          "pose.bones[\"Head\"].rotation_quaternion",
+          "pose.bones[\"Head\"].rotation_quaternion"
+        ]
       }
     ],
     "estado": "candidato_pendiente_verificacion_visual"
