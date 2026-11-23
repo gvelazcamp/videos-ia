@@ -73,10 +73,24 @@ realKaioTexture.load('./assets-kaio/kaio-real.webp',texture=>{
  const footX=8.0, footZ=17.0;
  const radius=goal.radius||22;
  const footY=Math.sqrt(Math.max(0,radius*radius-footX*footX-footZ*footZ));
+ // El sprite debe quedar justo DELANTE de la malla, no sumergido en ella.
+ // Si no, la esfera tapa los zapatos aunque los pies estén a la altura correcta.
  kaioSprite.position.copy(goal.center).add(new THREE.Vector3(
-  footX,footY+kaioHeight*.50,footZ+.08
+  footX,footY+kaioHeight*.50+.14,footZ+.92
  ));
  kaioSprite.scale.set(kaioHeight*aspect,kaioHeight,1);
+ // Sombra suave de contacto sobre el césped, orientada a la esfera.
+ const normal=new THREE.Vector3(footX,footY,footZ).normalize();
+ const shoeShadow=new THREE.Mesh(
+  new THREE.CircleGeometry(2.7,36),
+  new THREE.MeshBasicMaterial({
+   color:0x254b14,transparent:true,opacity:.27,depthWrite:false,
+   polygonOffset:true,polygonOffsetFactor:-1,side:THREE.DoubleSide
+  })
+ );
+ shoeShadow.position.copy(goal.center).add(normal.clone().multiplyScalar(radius+.11));
+ shoeShadow.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1),normal);
+ scene.add(shoeShadow);
  scene.add(kaioSprite);
  goal.kaio.visible=false;
 },undefined,error=>{
