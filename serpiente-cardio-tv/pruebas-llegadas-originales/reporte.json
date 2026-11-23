@@ -1,0 +1,45 @@
+{
+  "distancias": [
+    {
+      "km": 5,
+      "dialog": "¡Llegaste a Casa de Bulma!",
+      "reward": "¡Completaste 5 km!",
+      "image_loaded": true,
+      "status": "OK"
+    },
+    {
+      "km": 10,
+      "dialog": "¡Llegaste a Planeta de Kaio-sama!",
+      "reward": "¡Completaste 10 km y llegaste a Kaio-sama!",
+      "image_loaded": true,
+      "status": "OK"
+    },
+    {
+      "km": 15,
+      "dialog": "¡Llegaste a Kame House!",
+      "reward": "¡Completaste 15 km!",
+      "image_loaded": true,
+      "status": "OK"
+    },
+    {
+      "km": 20,
+      "dialog": "¡Llegaste a Casa de Goku!",
+      "reward": "¡Completaste 20 km!",
+      "image_loaded": true,
+      "status": "OK"
+    }
+  ],
+  "console_errors": [],
+  "screenshots": [
+    "01-menu.jpg",
+    "02-casi-5-km.jpg",
+    "03-mundo-final-5-km.jpg",
+    "02-casi-10-km.jpg",
+    "03-mundo-final-10-km.jpg",
+    "02-casi-15-km.jpg",
+    "03-mundo-final-15-km.jpg",
+    "02-casi-20-km.jpg",
+    "03-mundo-final-20-km.jpg"
+  ],
+  "resultado": "success"
+}
