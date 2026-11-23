@@ -77,9 +77,16 @@ function mesh(pos,ind,material,uvs){const g=new THREE.BufferGeometry();g.setAttr
 const cv=document.createElement('canvas');cv.width=256;cv.height=256;const cx=cv.getContext('2d');cx.fillStyle='#c4d0d9';cx.fillRect(0,0,256,256);cx.strokeStyle='#8a9ead';cx.lineWidth=3;for(let y=0;y<256;y+=64){cx.beginPath();cx.moveTo(0,y);cx.lineTo(256,y);cx.stroke()}for(let y=0;y<256;y+=128){cx.beginPath();cx.moveTo(128,y);cx.lineTo(128,y+64);cx.stroke()}const tex=new THREE.CanvasTexture(cv);tex.wrapS=tex.wrapT=THREE.RepeatWrapping;tex.repeat.set(1,2);
 const road=mesh(top,indices,new THREE.MeshStandardMaterial({map:tex,color:0xf5f8ff,roughness:.94,side:THREE.DoubleSide}),uv);scene.add(road);
 // Deep blue scaled underside, so this is an elevated serpentine body rather than a flat floating ribbon.
-const under=[],underIdx=[];let u=0;for(let t=0;t<=maxT;t+=step*2){const {p,right}=frame(t);for(let j=0;j<9;j++){const theta=Math.PI*j/8;const v=p.clone().addScaledVector(right,Math.cos(theta)*width/2);v.y-=Math.sin(theta)*5+.35;under.push(v.x,v.y,v.z)}if(u>0){for(let j=0;j<8;j++){const k=(u-1)*9+j;underIdx.push(k,k+1,k+9,k+1,k+10,k+9)}}u++}scene.add(mesh(under,underIdx,new THREE.MeshStandardMaterial({color:0x8399b0,roughness:.9,side:THREE.DoubleSide})));
+const under=[],underIdx=[];let u=0;for(let t=0;t<=maxT;t+=step*2){const {p,right}=frame(t);for(let j=0;j<9;j++){const theta=Math.PI*j/8;const v=p.clone().addScaledVector(right,Math.cos(theta)*width/2);v.y-=Math.sin(theta)*5+.35;under.push(v.x,v.y,v.z)}if(u>0){for(let j=0;j<8;j++){const k=(u-1)*9+j;underIdx.push(k,k+1,k+9,k+1,k+10,k+9)}}u++}const roadUnder=mesh(under,underIdx,new THREE.MeshStandardMaterial({color:0x8399b0,roughness:.9,side:THREE.DoubleSide}));scene.add(roadUnder);
 // Distinctive triangular spines on BOTH edges, not a conventional green highway railing.
 const spikeMaterial=new THREE.MeshStandardMaterial({color:0x24b5e8,side:THREE.DoubleSide,roughness:.8});const spikeGeo=new THREE.BufferGeometry();const spikePos=[],spikeInd=[];let si=0;for(let t=0;t<maxT-2;t+=2.6){for(const side of [-1,1]){const f=frame(t),f2=frame(t+2.4);const a=f.p.clone().addScaledVector(f.right,side*(width/2+.1));const b=f2.p.clone().addScaledVector(f2.right,side*(width/2+.1));const peak=a.clone().lerp(b,.48);peak.y+=0.85;for(const v of [a,b,peak])spikePos.push(v.x,v.y,v.z);spikeInd.push(si,si+1,si+2);si+=3}}spikeGeo.setAttribute('position',new THREE.Float32BufferAttribute(spikePos,3));spikeGeo.setIndex(spikeInd);spikeGeo.computeVertexNormals();scene.add(new THREE.Mesh(spikeGeo,spikeMaterial));
+// Evitar que el camino atraviese las casas o pase detrás de la meta.
+function limitRoadTo(meters){
+ const end=meters+9;
+ road.geometry.setDrawRange(0,Math.min(indices.length,Math.floor(end/step)*6));
+ roadUnder.geometry.setDrawRange(0,Math.min(underIdx.length,Math.floor(end/(step*2))*48));
+ spikeGeo.setDrawRange(0,Math.min(spikeInd.length,Math.floor(end/2.6)*6));
+}
 // Vast golden cloud sea: layered, overlapping soft cloud forms, never blue water or green land.
 const cloudMats=[new THREE.MeshLambertMaterial({color:0xffc400,transparent:true,opacity:.98}),new THREE.MeshLambertMaterial({color:0xffdf3d,transparent:true,opacity:.98}),new THREE.MeshLambertMaterial({color:0xf6a800,transparent:true,opacity:.97})];const sphere=new THREE.SphereGeometry(1,9,6);const rng=(i)=>{let x=Math.sin(i*127.1+4.71)*43758.5453;return x-Math.floor(x)};const cloudField=new THREE.Group();scene.add(cloudField);for(let i=0;i<2800;i++){const z=-rng(i*3+1)*1900,x=(rng(i*3+2)-.5)*550,y=14+rng(i*3+3)*4;const m=new THREE.Mesh(sphere,cloudMats[i%3]);m.position.set(x,y,z);m.scale.set(15+rng(i+5)*27,6+rng(i+6)*5,16+rng(i+7)*25);cloudField.add(m)}
 // Escenario completo del destino: suelo, edificio, personaje o planeta real en 3D.
@@ -124,7 +131,7 @@ function updateMission(m){
  const remain=Math.max(0,Math.ceil(targetMeters-m));
  const kilometers=(remain/1000).toLocaleString('es-UY',{maximumFractionDigits:2});
  let label;
- if(remain===0)label='¡Llegaste a '+selectedStage.name+'!';
+ if(remain===0)label='¡Llegaste a '+selectedStage.name+'! Tocá Ver destino para ver la imagen y bienvenida.';
  else if(remain<=100)label='¡Últimos '+remain+' metros! '+selectedStage.name+' te espera';
  else if(remain<=500)label='¡Ya se ve '+selectedStage.name+'! Faltan '+remain+' m';
  else label='Rumbo a '+selectedStage.name+' · faltan '+kilometers+' km';
@@ -235,6 +242,7 @@ function startRoute(km){
  const st=stageData[km];if(!st)return;
  selectedStage={...st,km};targetMeters=km*1000;
  started=true;distance=0;t=9;arrived=false;rewarded=false;paused=false;
+ limitRoadTo(targetMeters);
  viewMode='corredor';camera.up.set(0,1,0);
  document.querySelector('#view').textContent='Vista: corredor';
  document.querySelector('#pause').textContent='Pausar';
