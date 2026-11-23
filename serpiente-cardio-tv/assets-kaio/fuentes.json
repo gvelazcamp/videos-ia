@@ -1,0 +1,30 @@
+{
+  "planeta-real.webp": {
+    "estado": "ok",
+    "source": "https://c0.uidownload.com/pngpics/1002/2220/king-kai-planet-dragon-ball-z-art-saiyan-world-goku-s-universe-cartoon-landscape-anime-scenery-green-planet-illustration.png",
+    "input_size": [
+      500,
+      500
+    ],
+    "output_size": [
+      447,
+      460
+    ],
+    "bytes": 27762,
+    "transparent_pixels": 70067
+  },
+  "kaio-real.webp": {
+    "estado": "ok",
+    "source": "https://vignette.wikia.nocookie.net/vsdebating/images/9/99/King_Kai.png/revision/latest?cb=20170530062719",
+    "input_size": [
+      741,
+      1024
+    ],
+    "output_size": [
+      740,
+      1020
+    ],
+    "bytes": 112990,
+    "transparent_pixels": 278824
+  }
+}
