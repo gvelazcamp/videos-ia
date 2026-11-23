@@ -1,0 +1,1088 @@
+{
+  "goku": {
+    "bones": {
+      "Root": {
+        "head_world": [
+          0.0002,
+          0.0211,
+          -0.4903
+        ],
+        "tail_world": [
+          0.0002,
+          0.0211,
+          -0.0512
+        ],
+        "parent": null,
+        "length": 0.43908
+      },
+      "Pelvis": {
+        "head_world": [
+          0.0002,
+          0.0211,
+          -0.0512
+        ],
+        "tail_world": [
+          0.0002,
+          0.0211,
+          0.0043
+        ],
+        "parent": "Root",
+        "length": 0.05551
+      },
+      "Torso": {
+        "head_world": [
+          0.0002,
+          0.0211,
+          0.0286
+        ],
+        "tail_world": [
+          0.0002,
+          0.0211,
+          0.2382
+        ],
+        "parent": "Pelvis",
+        "length": 0.20956
+      },
+      "Neck": {
+        "head_world": [
+          0.0002,
+          0.0211,
+          0.2382
+        ],
+        "tail_world": [
+          0.0002,
+          0.0211,
+          0.2881
+        ],
+        "parent": "Torso",
+        "length": 0.0499
+      },
+      "Head": {
+        "head_world": [
+          0.0002,
+          0.0211,
+          0.2881
+        ],
+        "tail_world": [
+          0.0002,
+          0.0211,
+          0.338
+        ],
+        "parent": "Neck",
+        "length": 0.0499
+      },
+      "UpperArm_L": {
+        "head_world": [
+          -0.0923,
+          0.0211,
+          0.2182
+        ],
+        "tail_world": [
+          -0.1589,
+          0.0211,
+          0.0585
+        ],
+        "parent": "Torso",
+        "length": 0.173
+      },
+      "Forearm_L": {
+        "head_world": [
+          -0.1589,
+          0.0211,
+          0.0585
+        ],
+        "tail_world": [
+          -0.1774,
+          0.0211,
+          -0.0911
+        ],
+        "parent": "UpperArm_L",
+        "length": 0.15083
+      },
+      "Hand_L": {
+        "head_world": [
+          -0.1774,
+          0.0211,
+          -0.0911
+        ],
+        "tail_world": [
+          -0.1589,
+          0.0211,
+          -0.2408
+        ],
+        "parent": "Forearm_L",
+        "length": 0.15083
+      },
+      "UpperArm_R": {
+        "head_world": [
+          0.0926,
+          0.0211,
+          0.2182
+        ],
+        "tail_world": [
+          0.1592,
+          0.0211,
+          0.0585
+        ],
+        "parent": "Torso",
+        "length": 0.173
+      },
+      "Forearm_R": {
+        "head_world": [
+          0.1592,
+          0.0211,
+          0.0585
+        ],
+        "tail_world": [
+          0.1777,
+          0.0211,
+          -0.0911
+        ],
+        "parent": "UpperArm_R",
+        "length": 0.15083
+      },
+      "Hand_R": {
+        "head_world": [
+          0.1777,
+          0.0211,
+          -0.0911
+        ],
+        "tail_world": [
+          0.1592,
+          0.0211,
+          -0.2408
+        ],
+        "parent": "Forearm_R",
+        "length": 0.15083
+      },
+      "Thigh_L": {
+        "head_world": [
+          -0.0516,
+          0.0211,
+          -0.0313
+        ],
+        "tail_world": [
+          -0.0627,
+          0.0211,
+          -0.2309
+        ],
+        "parent": "Pelvis",
+        "length": 0.19989
+      },
+      "Shin_L": {
+        "head_world": [
+          -0.0627,
+          0.0211,
+          -0.2308
+        ],
+        "tail_world": [
+          -0.059,
+          0.0211,
+          -0.4005
+        ],
+        "parent": "Thigh_L",
+        "length": 0.16969
+      },
+      "Foot_L": {
+        "head_world": [
+          -0.059,
+          0.0211,
+          -0.4005
+        ],
+        "tail_world": [
+          -0.059,
+          0.0211,
+          -0.5702
+        ],
+        "parent": "Shin_L",
+        "length": 0.16969
+      },
+      "Thigh_R": {
+        "head_world": [
+          0.0519,
+          0.0211,
+          -0.0313
+        ],
+        "tail_world": [
+          0.063,
+          0.0211,
+          -0.2309
+        ],
+        "parent": "Pelvis",
+        "length": 0.19989
+      },
+      "Shin_R": {
+        "head_world": [
+          0.063,
+          0.0211,
+          -0.2308
+        ],
+        "tail_world": [
+          0.0593,
+          0.0211,
+          -0.4005
+        ],
+        "parent": "Thigh_R",
+        "length": 0.16969
+      },
+      "Foot_R": {
+        "head_world": [
+          0.0593,
+          0.0211,
+          -0.4005
+        ],
+        "tail_world": [
+          0.0593,
+          0.0211,
+          -0.5702
+        ],
+        "parent": "Shin_R",
+        "length": 0.16969
+      }
+    },
+    "meshes": [
+      {
+        "name": "geometry_0",
+        "bound": {
+          "min": [
+            -0.2368,
+            -0.3549,
+            -0.4284
+          ],
+          "max": [
+            0.1747,
+            0.4154,
+            0.4834
+          ],
+          "location": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "vertices": 24074,
+        "faces": 8026,
+        "group_stats": {
+          "Root": {
+            "count": 0,
+            "weight_sum": 0.0
+          },
+          "Pelvis": {
+            "count": 837,
+            "weight_sum": 669.6
+          },
+          "Torso": {
+            "count": 2561,
+            "weight_sum": 1891.4
+          },
+          "Neck": {
+            "count": 816,
+            "weight_sum": 816.0
+          },
+          "Head": {
+            "count": 9967,
+            "weight_sum": 9967.0
+          },
+          "UpperArm_L": {
+            "count": 1175,
+            "weight_sum": 1175.0
+          },
+          "Forearm_L": {
+            "count": 653,
+            "weight_sum": 653.0
+          },
+          "Hand_L": {
+            "count": 572,
+            "weight_sum": 572.0
+          },
+          "UpperArm_R": {
+            "count": 1047,
+            "weight_sum": 1047.0
+          },
+          "Forearm_R": {
+            "count": 572,
+            "weight_sum": 572.0
+          },
+          "Hand_R": {
+            "count": 489,
+            "weight_sum": 489.0
+          },
+          "Thigh_L": {
+            "count": 1481,
+            "weight_sum": 1263.5
+          },
+          "Shin_L": {
+            "count": 1591,
+            "weight_sum": 1345.9
+          },
+          "Foot_L": {
+            "count": 641,
+            "weight_sum": 599.6
+          },
+          "Thigh_R": {
+            "count": 1307,
+            "weight_sum": 1101.0
+          },
+          "Shin_R": {
+            "count": 1575,
+            "weight_sum": 1345.8
+          },
+          "Foot_R": {
+            "count": 601,
+            "weight_sum": 566.2
+          }
+        },
+        "material": "Material_0"
+      },
+      {
+        "name": "Icosphere",
+        "bound": {
+          "min": [
+            -0.9511,
+            -1.0,
+            -1.0
+          ],
+          "max": [
+            0.9511,
+            1.0,
+            1.0
+          ],
+          "location": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "vertices": 42,
+        "faces": 80,
+        "group_stats": {},
+        "material": null
+      }
+    ],
+    "frames": {
+      "1": {
+        "geometry_0": {
+          "min": [
+            -0.2368,
+            -0.3549,
+            -0.4284
+          ],
+          "max": [
+            0.1747,
+            0.4154,
+            0.4834
+          ]
+        }
+      },
+      "5": {
+        "geometry_0": {
+          "min": [
+            -0.2209,
+            -0.2365,
+            -0.4972
+          ],
+          "max": [
+            0.1728,
+            0.314,
+            0.479
+          ]
+        }
+      },
+      "9": {
+        "geometry_0": {
+          "min": [
+            -0.1858,
+            -0.2303,
+            -0.499
+          ],
+          "max": [
+            0.1722,
+            0.2902,
+            0.4744
+          ]
+        }
+      },
+      "13": {
+        "geometry_0": {
+          "min": [
+            -0.172,
+            -0.2983,
+            -0.4712
+          ],
+          "max": [
+            0.2118,
+            0.3925,
+            0.479
+          ]
+        }
+      },
+      "17": {
+        "geometry_0": {
+          "min": [
+            -0.1744,
+            -0.3553,
+            -0.4291
+          ],
+          "max": [
+            0.2374,
+            0.4147,
+            0.4834
+          ]
+        }
+      },
+      "21": {
+        "geometry_0": {
+          "min": [
+            -0.1727,
+            -0.237,
+            -0.5002
+          ],
+          "max": [
+            0.2214,
+            0.3115,
+            0.479
+          ]
+        }
+      },
+      "25": {
+        "geometry_0": {
+          "min": [
+            -0.1719,
+            -0.2303,
+            -0.4989
+          ],
+          "max": [
+            0.1868,
+            0.2911,
+            0.4744
+          ]
+        }
+      },
+      "29": {
+        "geometry_0": {
+          "min": [
+            -0.2114,
+            -0.2963,
+            -0.47
+          ],
+          "max": [
+            0.1723,
+            0.3944,
+            0.479
+          ]
+        }
+      },
+      "33": {
+        "geometry_0": {
+          "min": [
+            -0.2368,
+            -0.3549,
+            -0.4284
+          ],
+          "max": [
+            0.1747,
+            0.4154,
+            0.4834
+          ]
+        }
+      }
+    },
+    "armature_transforms": {
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  },
+  "vegeta": {
+    "bones": {
+      "Root": {
+        "head_world": [
+          -0.0073,
+          -0.0026,
+          -0.4888
+        ],
+        "tail_world": [
+          -0.0073,
+          -0.0026,
+          -0.0493
+        ],
+        "parent": null,
+        "length": 0.43953
+      },
+      "Pelvis": {
+        "head_world": [
+          -0.0073,
+          -0.0026,
+          -0.0493
+        ],
+        "tail_world": [
+          -0.0073,
+          -0.0026,
+          0.0073
+        ],
+        "parent": "Root",
+        "length": 0.05656
+      },
+      "Torso": {
+        "head_world": [
+          -0.0073,
+          -0.0026,
+          0.0306
+        ],
+        "tail_world": [
+          -0.0073,
+          -0.0026,
+          0.2404
+        ],
+        "parent": "Pelvis",
+        "length": 0.20978
+      },
+      "Neck": {
+        "head_world": [
+          -0.0073,
+          -0.0026,
+          0.2404
+        ],
+        "tail_world": [
+          -0.0073,
+          -0.0026,
+          0.2903
+        ],
+        "parent": "Torso",
+        "length": 0.04995
+      },
+      "Head": {
+        "head_world": [
+          -0.0073,
+          -0.0026,
+          0.2903
+        ],
+        "tail_world": [
+          -0.0073,
+          -0.0026,
+          0.3403
+        ],
+        "parent": "Neck",
+        "length": 0.04995
+      },
+      "UpperArm_L": {
+        "head_world": [
+          -0.1018,
+          -0.0026,
+          0.2204
+        ],
+        "tail_world": [
+          -0.1698,
+          -0.0026,
+          0.0606
+        ],
+        "parent": "Torso",
+        "length": 0.17371
+      },
+      "Forearm_L": {
+        "head_world": [
+          -0.1698,
+          -0.0026,
+          0.0606
+        ],
+        "tail_world": [
+          -0.1887,
+          -0.0026,
+          -0.0892
+        ],
+        "parent": "UpperArm_L",
+        "length": 0.15103
+      },
+      "Hand_L": {
+        "head_world": [
+          -0.1887,
+          -0.0026,
+          -0.0892
+        ],
+        "tail_world": [
+          -0.1698,
+          -0.0026,
+          -0.2391
+        ],
+        "parent": "Forearm_L",
+        "length": 0.15103
+      },
+      "UpperArm_R": {
+        "head_world": [
+          0.0872,
+          -0.0026,
+          0.2204
+        ],
+        "tail_world": [
+          0.1552,
+          -0.0026,
+          0.0606
+        ],
+        "parent": "Torso",
+        "length": 0.17371
+      },
+      "Forearm_R": {
+        "head_world": [
+          0.1552,
+          -0.0026,
+          0.0606
+        ],
+        "tail_world": [
+          0.1741,
+          -0.0026,
+          -0.0892
+        ],
+        "parent": "UpperArm_R",
+        "length": 0.15103
+      },
+      "Hand_R": {
+        "head_world": [
+          0.1741,
+          -0.0026,
+          -0.0892
+        ],
+        "tail_world": [
+          0.1552,
+          -0.0026,
+          -0.2391
+        ],
+        "parent": "Forearm_R",
+        "length": 0.15103
+      },
+      "Thigh_L": {
+        "head_world": [
+          -0.0602,
+          -0.0026,
+          -0.0293
+        ],
+        "tail_world": [
+          -0.0715,
+          -0.0026,
+          -0.2291
+        ],
+        "parent": "Pelvis",
+        "length": 0.20011
+      },
+      "Shin_L": {
+        "head_world": [
+          -0.0715,
+          -0.0026,
+          -0.2291
+        ],
+        "tail_world": [
+          -0.0678,
+          -0.0026,
+          -0.3989
+        ],
+        "parent": "Thigh_L",
+        "length": 0.16986
+      },
+      "Foot_L": {
+        "head_world": [
+          -0.0678,
+          -0.0026,
+          -0.3989
+        ],
+        "tail_world": [
+          -0.0678,
+          -0.0026,
+          -0.5688
+        ],
+        "parent": "Shin_L",
+        "length": 0.16986
+      },
+      "Thigh_R": {
+        "head_world": [
+          0.0456,
+          -0.0026,
+          -0.0293
+        ],
+        "tail_world": [
+          0.057,
+          -0.0026,
+          -0.2291
+        ],
+        "parent": "Pelvis",
+        "length": 0.20011
+      },
+      "Shin_R": {
+        "head_world": [
+          0.057,
+          -0.0026,
+          -0.2291
+        ],
+        "tail_world": [
+          0.0532,
+          -0.0026,
+          -0.3989
+        ],
+        "parent": "Thigh_R",
+        "length": 0.16986
+      },
+      "Foot_R": {
+        "head_world": [
+          0.0532,
+          -0.0026,
+          -0.3989
+        ],
+        "tail_world": [
+          0.0532,
+          -0.0026,
+          -0.5688
+        ],
+        "parent": "Shin_R",
+        "length": 0.16986
+      }
+    },
+    "meshes": [
+      {
+        "name": "geometry_0",
+        "bound": {
+          "min": [
+            -0.2312,
+            -0.3722,
+            -0.4305
+          ],
+          "max": [
+            0.1817,
+            0.396,
+            0.5064
+          ],
+          "location": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "vertices": 18734,
+        "faces": 6246,
+        "group_stats": {
+          "Root": {
+            "count": 0,
+            "weight_sum": 0.0
+          },
+          "Pelvis": {
+            "count": 596,
+            "weight_sum": 476.8
+          },
+          "Torso": {
+            "count": 3258,
+            "weight_sum": 2781.2
+          },
+          "Neck": {
+            "count": 1191,
+            "weight_sum": 1191.0
+          },
+          "Head": {
+            "count": 5639,
+            "weight_sum": 5639.0
+          },
+          "UpperArm_L": {
+            "count": 496,
+            "weight_sum": 496.0
+          },
+          "Forearm_L": {
+            "count": 542,
+            "weight_sum": 542.0
+          },
+          "Hand_L": {
+            "count": 203,
+            "weight_sum": 203.0
+          },
+          "UpperArm_R": {
+            "count": 680,
+            "weight_sum": 680.0
+          },
+          "Forearm_R": {
+            "count": 667,
+            "weight_sum": 667.0
+          },
+          "Hand_R": {
+            "count": 296,
+            "weight_sum": 296.0
+          },
+          "Thigh_L": {
+            "count": 1194,
+            "weight_sum": 1023.0
+          },
+          "Shin_L": {
+            "count": 1201,
+            "weight_sum": 1001.6
+          },
+          "Foot_L": {
+            "count": 771,
+            "weight_sum": 728.4
+          },
+          "Thigh_R": {
+            "count": 1465,
+            "weight_sum": 1271.0
+          },
+          "Shin_R": {
+            "count": 1241,
+            "weight_sum": 1017.4
+          },
+          "Foot_R": {
+            "count": 765,
+            "weight_sum": 720.6
+          }
+        },
+        "material": "Material_0.001"
+      },
+      {
+        "name": "Icosphere",
+        "bound": {
+          "min": [
+            -0.9511,
+            -1.0,
+            -1.0
+          ],
+          "max": [
+            0.9511,
+            1.0,
+            1.0
+          ],
+          "location": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "vertices": 42,
+        "faces": 80,
+        "group_stats": {},
+        "material": null
+      },
+      {
+        "name": "Icosphere.001",
+        "bound": {
+          "min": [
+            -0.9511,
+            -1.0,
+            -1.0
+          ],
+          "max": [
+            0.9511,
+            1.0,
+            1.0
+          ],
+          "location": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "rotation": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "scale": [
+            1.0,
+            1.0,
+            1.0
+          ]
+        },
+        "vertices": 42,
+        "faces": 80,
+        "group_stats": {},
+        "material": null
+      }
+    ],
+    "frames": {
+      "1": {
+        "geometry_0": {
+          "min": [
+            -0.2312,
+            -0.3722,
+            -0.4305
+          ],
+          "max": [
+            0.1817,
+            0.396,
+            0.5064
+          ]
+        }
+      },
+      "5": {
+        "geometry_0": {
+          "min": [
+            -0.2121,
+            -0.2648,
+            -0.4914
+          ],
+          "max": [
+            0.1817,
+            0.2954,
+            0.5072
+          ]
+        }
+      },
+      "9": {
+        "geometry_0": {
+          "min": [
+            -0.1963,
+            -0.2554,
+            -0.494
+          ],
+          "max": [
+            0.1817,
+            0.2686,
+            0.5075
+          ]
+        }
+      },
+      "13": {
+        "geometry_0": {
+          "min": [
+            -0.1963,
+            -0.3165,
+            -0.4723
+          ],
+          "max": [
+            0.2034,
+            0.371,
+            0.5072
+          ]
+        }
+      },
+      "17": {
+        "geometry_0": {
+          "min": [
+            -0.1963,
+            -0.3737,
+            -0.4314
+          ],
+          "max": [
+            0.2303,
+            0.3951,
+            0.5064
+          ]
+        }
+      },
+      "21": {
+        "geometry_0": {
+          "min": [
+            -0.1963,
+            -0.2589,
+            -0.4947
+          ],
+          "max": [
+            0.2112,
+            0.2927,
+            0.5072
+          ]
+        }
+      },
+      "25": {
+        "geometry_0": {
+          "min": [
+            -0.1963,
+            -0.2554,
+            -0.4936
+          ],
+          "max": [
+            0.1862,
+            0.2688,
+            0.5075
+          ]
+        }
+      },
+      "29": {
+        "geometry_0": {
+          "min": [
+            -0.2036,
+            -0.3133,
+            -0.4711
+          ],
+          "max": [
+            0.1817,
+            0.3728,
+            0.5072
+          ]
+        }
+      },
+      "33": {
+        "geometry_0": {
+          "min": [
+            -0.2312,
+            -0.3722,
+            -0.4305
+          ],
+          "max": [
+            0.1817,
+            0.396,
+            0.5064
+          ]
+        }
+      }
+    },
+    "armature_transforms": {
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rotation": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    }
+  }
+}
