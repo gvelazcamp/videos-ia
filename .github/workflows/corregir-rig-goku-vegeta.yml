@@ -1,0 +1,65 @@
+name: Corregir pesos y carrera de Goku Vegeta en Blender
+
+on:
+  push:
+    paths:
+      - '.github/workflows/corregir-rig-goku-vegeta.yml'
+      - 'serpiente-cardio-tv/prueba-carrera-3d-20261122/reparar_rig.py'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: revisar-rig-goku-vegeta-20261122
+  cancel-in-progress: false
+
+jobs:
+  candidatos-reparados:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Instalar Blender gratuito
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y blender python3-numpy
+      - name: Crear GLB con pesos suavizados y carrera menos exagerada
+        run: |
+          blender -b -t 2 --python-exit-code 1 \
+            --python serpiente-cardio-tv/prueba-carrera-3d-20261122/reparar_rig.py
+      - name: Validar geometría, huesos y animaciones
+        run: |
+          python3 - <<'PY'
+          import struct,json
+          from pathlib import Path
+          path=Path("serpiente-cardio-tv/prueba-carrera-3d-20261122/revision-rig")
+          report=json.loads((path/"reporte.json").read_text())
+          for who in ("goku","vegeta"):
+              b=(path/(who+".glb")).read_bytes()
+              assert b[:4]==b'glTF' and len(b)==struct.unpack_from("<I",b,8)[0]
+              n=struct.unpack_from("<I",b,12)[0]
+              doc=json.loads(b[20:20+n])
+              assert doc.get("skins") and doc.get("animations")
+              assert report[who]["huesos"]==17
+              print(who,report[who]["bytes"],"bytes")
+          PY
+      - name: Guardar solamente nueva prueba, sin cambiar originales
+        run: |
+          set -euo pipefail
+          git add -- serpiente-cardio-tv/prueba-carrera-3d-20261122/revision-rig/
+          if git diff --cached --quiet; then echo "Sin resultados nuevos"; exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Candidatos nuevos Goku Vegeta: pesos suavizados y carrera revisada'
+          git pull --rebase origin main
+          git push origin HEAD:main
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: revision-rig-goku-vegeta
+          path: serpiente-cardio-tv/prueba-carrera-3d-20261122/revision-rig/
+          if-no-files-found: warn
+          retention-days: 7
