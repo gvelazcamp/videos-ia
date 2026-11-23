@@ -1,0 +1,91 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>AZRAK | Infinity AI Studio</title><style>
+*{box-sizing:border-box}body{margin:0;background:#090914;color:#fff;font:14px system-ui;overflow:hidden}#view{position:absolute;inset:0;touch-action:none}header{position:absolute;top:0;left:0;padding:18px 20px;pointer-events:none}header small{letter-spacing:3px;color:#ffad73;font-size:10px}h1{font-size:clamp(32px,7vw,64px);line-height:.95;letter-spacing:5px;margin:9px 0;color:#ffddad;text-shadow:0 0 24px #ff431e}header p{margin:5px 0;color:#c4a7a2}#status{position:absolute;top:18px;right:18px;border:1px solid #753c2e;background:#170e18b8;padding:9px 13px;border-radius:12px;color:#ffb384;font-size:11px}#controls{position:absolute;bottom:0;left:0;right:0;padding:12px 12px max(15px,env(safe-area-inset-bottom));background:linear-gradient(transparent,#090914ee 30%);display:flex;flex-wrap:wrap;justify-content:center;gap:7px}button{font:600 12px system-ui;color:#ffd7c1;background:#261722e8;border:1px solid #754031;padding:10px 13px;border-radius:9px;cursor:pointer;touch-action:manipulation}button.active{border-color:#ff8b35;background:#6e241f;color:white;box-shadow:0 0 14px #ff551f55}#hint{flex:0 0 100%;text-align:center;color:#d5b3aa;font-size:11px;margin:5px 0}#err{position:absolute;top:45%;width:100%;text-align:center;padding:20px;display:none} @media(max-height:480px){header{padding:8px 12px}header p{display:none}h1{font-size:32px}#controls{padding:5px;gap:4px}button{padding:7px 9px;font-size:11px}#hint{margin:2px}}
+</style><script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script></head><body><div id="view"></div><header><small>INFINITY AI STUDIO / PROTOTIPO 3D</small><h1>AZRAK</h1><p>Dragón de sombra ígnea · prueba interactiva</p></header><div id="status">Cargando modelo…</div><div id="err">No se pudo iniciar WebGL. Probá abrir el enlace en Chrome.</div><div id="controls"><button data-mode="idle" class="active">Reposo</button><button data-mode="walk">Caminar</button><button data-mode="fly">Volar</button><button data-mode="fire">🔥 Aliento ígneo</button><button data-mode="aura">🌑 Aura sombra</button><button data-mode="shield">🛡 Escudo</button><button data-mode="teleport">✦ Teletransporte</button><button id="spin">360°</button><div id="hint">Arrastrá para girar · pellizcá para acercar · tocá un poder</div></div><script type="module">
+import * as T from 'three';
+import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+const V=(x,y,z)=>new T.Vector3(x,y,z), scene=new T.Scene();
+scene.background=new T.Color(0x0a0917);scene.fog=new T.FogExp2(0x0a0917,.035);
+let renderer;try{renderer=new T.WebGLRenderer({antialias:true});}catch(e){document.querySelector('#err').style.display='block';throw e;}
+renderer.setPixelRatio(Math.min(devicePixelRatio,1.6));renderer.setSize(innerWidth,innerHeight);renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.35;document.querySelector('#view').appendChild(renderer.domElement);
+const camera=new T.PerspectiveCamera(39,innerWidth/innerHeight,.1,100);camera.position.set(7,4.4,8.6);
+const controls=new OrbitControls(camera,renderer.domElement);controls.target.set(0,1.8,0);controls.enableDamping=true;controls.minDistance=3;controls.maxDistance=19;controls.maxPolarAngle=Math.PI*.49;controls.autoRotate=true;controls.autoRotateSpeed=.7;controls.update();
+scene.add(new T.HemisphereLight(0xb9bcff,0x512418,2.2));const key=new T.DirectionalLight(0xffb36d,3.2);key.position.set(4,6,6);scene.add(key);const rim=new T.DirectionalLight(0x858bff,4);rim.position.set(-5,4,-4);scene.add(rim);const red=new T.PointLight(0xff3311,15,12);red.position.set(0,1,-1);scene.add(red);
+function mat(c,metal=.3,em=0,int=0){return new T.MeshStandardMaterial({color:c,metalness:metal,roughness:.53,flatShading:true,emissive:em,emissiveIntensity:int});}
+const obs=mat(0x242137,.5), obs2=mat(0x3c344c,.55), obs3=mat(0x141424,.4), redM=mat(0x551221,.35,0xb50900,.32), gold=mat(0xdaa044,.6,0x9b3500,.17), hot=mat(0xff5a08,.3,0xff2900,2.2), bright=mat(0xffdf63,.2,0xff731a,3), eye=mat(0xffc21d,.1,0xff5500,3), white=mat(0xffe6bf,.25), black=mat(0x070609);
+const dragon=new T.Group();scene.add(dragon);const body=new T.Group();dragon.add(body);
+function mesh(g,m,p,parent=body){const o=new T.Mesh(g,m);o.position.copy(p);parent.add(o);return o}
+function ell(p,s,m,parent=body,detail=1){let o=mesh(new T.IcosahedronGeometry(1,detail),m,p,parent);o.scale.set(...s);return o}
+function cone(a,b,r1,r2,m,parent=body,n=8){let d=b.clone().sub(a),o=mesh(new T.CylinderGeometry(r2,r1,d.length(),n),m,a.clone().add(b).multiplyScalar(.5),parent);o.quaternion.setFromUnitVectors(V(0,1,0),d.normalize());return o}
+function chain(points,radii,m,parent=body){for(let i=0;i<points.length-1;i++){cone(points[i],points[i+1],radii[i],radii[i+1],m,parent);if(i>0)ell(points[i],[radii[i],radii[i],radii[i]],m,parent,0);}}
+function spike(a,b,r,m=gold,parent=body){return cone(a,b,r,0,m,parent,5)}
+function plate(p,s,m=obs2,parent=body){let o=ell(p,s,m,parent,0);return o}
+ell(V(0,1.38,-.25),[.72,.77,1.2],obs);ell(V(0,1.52,.65),[.72,.74,.77],obs2);ell(V(0,1.27,-1.08),[.68,.62,.65],obs);
+chain([V(0,1.53,.6),V(0,2.13,.96),V(0,2.63,1.25)],[.50,.43,.37],obs);
+for(let i=0;i<7;i++){let y=1.37+i*.18,z=1.17+i*.065;plate(V(0,y,z),[.36-i*.017,.16,.16],i%2?gold:redM);}
+for(let i=0;i<6;i++){let z=.68-i*.38,y=2.04-.06*i;spike(V(0,y,z),V(0,y+.40+(i%2)*.09,z-.24),.19,hot);for(let s of [-1,1]){let x=s*(.43+.07*Math.sin(i));let o=plate(V(x,y-.22,z),[.23,.17,.34],i%2?obs2:obs3);o.rotation.z=-s*.6;cone(V(x,y-.08,z+.14),V(x*1.13,y-.24,z-.12),.027,.016,hot);}}
+const head=new T.Group();head.position.set(0,2.66,1.23);body.add(head);
+ell(V(0,.12,.04),[.57,.49,.64],obs2,head);ell(V(0,-.04,.54),[.43,.27,.65],obs,head);ell(V(0,.04,1.01),[.37,.22,.22],obs3,head);
+const jaw=new T.Group();jaw.position.set(0,-.19,.10);head.add(jaw);ell(V(0,-.07,.49),[.39,.14,.65],obs3,jaw);ell(V(0,.016,.57),[.28,.045,.49],redM,jaw);
+for(let s of [-1,1]){
+ for(let i=0;i<4;i++){spike(V(s*(.30-i*.025),-.12,.42+i*.15),V(s*(.30-i*.025),-.27,.42+i*.15),.045,white,head);spike(V(s*(.28-i*.02),.055,.38+i*.15),V(s*(.28-i*.02),.17,.38+i*.15),.038,white,jaw);}
+ const e=ell(V(s*.435,.19,.36),[.17,.135,.23],eye,head);e.rotation.y=s*.42;
+ let pupil=ell(V(s*.52,.19,.40),[.042,.10,.065],black,head);pupil.rotation.y=s*.4;
+ let brow=plate(V(s*.39,.34,.38),[.28,.115,.31],obs3,head);brow.rotation.z=-s*.32;
+ ell(V(s*.225,.12,1.15),[.085,.05,.04],hot,head);
+ chain([V(s*.32,.38,-.17),V(s*.52,.68,-.39),V(s*.59,1.00,-.63),V(s*.47,1.30,-.68)],[.18,.13,.075,.005],gold,head);
+ for(let j=0;j<3;j++){spike(V(s*.47,.05+j*.15,-.12-j*.15),V(s*(.82+j*.035),.13+j*.24,-.37-j*.16),.15, j===1?hot:obs3,head);}
+}
+spike(V(0,.48,.04),V(0,.84,-.22),.18,hot,head);
+const legs=[];
+for(let s of [-1,1])for(let rear of [false,true]){
+ const leg=new T.Group();leg.position.set(s*(rear?.54:.51),1.48,rear?-1.0:.72);body.add(leg);legs.push({leg,s,rear});
+ const knee=V(s*(rear?.26:.13),-.51,rear?.23:.07), ankle=V(s*.17,-1.10,rear?-.16:.18);
+ ell(V(s*.08,-.18,0),[.33,.45,.38],obs2,leg);chain([V(0,0,0),knee,ankle],[.30,.24,.18],obs,leg);ell(V(s*.17,-1.19,rear?.02:.28),[.30,.20,.37],obs3,leg);
+ for(let k=-1;k<=1;k++)spike(V(s*.17+k*.15,-1.19,rear?.29:.55),V(s*.17+k*.17,-1.30,rear?.52:.78),.11,gold,leg);
+ for(let i=0;i<3;i++){let p=V(s*(.23+i*.015),-.26-i*.25,.15);plate(p,[.16,.19,.22],obs2,leg);cone(p.clone().add(V(0,.08,.19)),p.clone().add(V(0,-.09,.18)),.02,.015,hot,leg);}
+}
+const tail=new T.Group();tail.position.set(0,1.30,-1.52);body.add(tail);let tailSeg=[],prev=tail;
+for(let i=0;i<7;i++){let seg=new T.Group();if(i)seg.position.set(0,0,-.43);prev.add(seg);let r=.32-i*.037;cone(V(0,0,0),V(0,0,-.46),r,r-.035,obs,seg);spike(V(0,r*.8,-.19),V(0,r+.27,-.43),r*.53, i%2?gold:hot,seg);for(let s of [-1,1])cone(V(s*r*.89,0,-.05),V(s*r*.75,0,-.39),.021,.012,hot,seg);tailSeg.push(seg);prev=seg;}
+spike(V(0,0,-.38),V(0,.15,-.89),.15,hot,prev);
+const wings=[];
+for(let s of [-1,1]){
+ const wing=new T.Group();wing.position.set(s*.49,1.98,-.16);body.add(wing);wings.push({wing,s});
+ const p=(x,y,z)=>V(s*x,y,z);
+ const root=p(0,0,0),elbow=p(.79,1.04,-.16),top=p(1.82,1.41,-.42),tip=p(2.94,.86,-.84),mid=p(2.54,-.43,-1.18),low=p(1.31,-.67,-1.16),notch1=p(1.98,.13,-.85),notch2=p(1.12,-.12,-.68),inner=p(.40,-.34,-.49);
+ const mem=new T.MeshStandardMaterial({color:0x5f1429,emissive:0xe12b00,emissiveIntensity:.53,metalness:.12,roughness:.82,side:T.DoubleSide,flatShading:true,vertexColors:true});
+ function panel(a,b,c){let g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute([...a,...b,...c],3));g.setAttribute('color',new T.Float32BufferAttribute([.55,.12,.19,1,.64,.36,.82,.22,.31],3));g.computeVertexNormals();mesh(g,mem,V(0,0,0),wing);}
+ panel(root,elbow,top);panel(root,top,notch1);panel(top,tip,notch1);panel(tip,mid,notch1);panel(notch1,mid,notch2);panel(notch2,mid,low);panel(root,notch1,notch2);panel(root,notch2,inner);panel(notch2,low,inner);
+ chain([root,elbow,top,tip],[.15,.105,.08,.015],obs2,wing);chain([root,notch1,mid],[.095,.065,.015],obs,wing);chain([root,notch2,low],[.078,.045,.012],obs,wing);chain([root,inner],[.07,.015],obs3,wing);
+ for(let line of [[elbow,top,tip],[root,notch1,mid],[root,notch2,low]])for(let i=0;i<line.length-1;i++){let a=line[i].clone().add(V(0,0,.038)),b=line[i+1].clone().add(V(0,0,.038));cone(a,b,.024,.011,hot,wing,5);}
+ spike(top,top.clone().add(p(.12,.37,.06)),.105,gold,wing);
+ for(let [a,b] of [[elbow,notch1],[top,notch1],[notch1,notch2],[mid,notch2],[notch2,inner]]){let q=a.clone().lerp(b,.45).add(V(0,.08,.025));chain([a.clone().add(V(0,0,.025)),q,b.clone().add(V(0,0,.025))],[.015,.012,.006],hot,wing);}
+}
+const stage=mesh(new T.CylinderGeometry(3.65,3.92,.36,64),mat(0x272334,.4),V(0,-.24,0),scene);
+mesh(new T.TorusGeometry(3.52,.035,8,96),hot,V(0,-.045,0),scene).rotation.x=Math.PI/2;
+for(let i=0;i<14;i++){let a=i*Math.PI*2/14,r=3.2,o=mesh(new T.BoxGeometry(.08,.013,.24),hot,V(Math.sin(a)*r,-.045,Math.cos(a)*r),scene);o.rotation.y=a;}
+let plane=mesh(new T.PlaneGeometry(200,200),mat(0x10101b,.15),V(0,-.43,0),scene);plane.rotation.x=-Math.PI/2;
+const fx=new T.Group();scene.add(fx);
+const particleM=new T.MeshBasicMaterial({color:0xff8a1e,transparent:true,opacity:.8,depthWrite:false});let particles=[];
+for(let i=0;i<140;i++){let p=mesh(new T.IcosahedronGeometry(1,0),particleM.clone(),V(0,-20,0),fx);particles.push(p);}
+const fireCore=mesh(new T.ConeGeometry(.65,4,12,1,true),new T.MeshBasicMaterial({color:0xff5f0d,transparent:true,opacity:.35,side:T.DoubleSide,depthWrite:false,blending:T.AdditiveBlending}),V(0,-20,0),fx);fireCore.rotation.x=-Math.PI/2;
+const shield=mesh(new T.SphereGeometry(2.35,24,16),new T.MeshBasicMaterial({color:0xff691b,transparent:true,opacity:.14,wireframe:true}),V(0,1.65,0),fx);shield.visible=false;
+const aura=new T.Group();fx.add(aura);for(let i=0;i<3;i++){let o=mesh(new T.TorusGeometry(1.25+i*.72,.045+i*.008,7,80),new T.MeshBasicMaterial({color:i===1?0xf13dff:0xff6028,transparent:true,opacity:.72,blending:T.AdditiveBlending}),V(0,.08+i*.17,0),aura);o.rotation.x=Math.PI/2;}aura.visible=false;
+const flash=mesh(new T.CylinderGeometry(.6,.85,4.4,16,1,true),new T.MeshBasicMaterial({color:0xc84dff,transparent:true,opacity:.45,side:T.DoubleSide,blending:T.AdditiveBlending}),V(0,2,0),fx);flash.visible=false;
+let mode='idle',start=performance.now(),clock=new T.Clock();
+const labels={idle:'REPOSO',walk:'CAMINAR',fly:'VUELO',fire:'ALIENTO ÍGNEO',aura:'AURA SOMBRA',shield:'ESCUDO ELEMENTAL',teleport:'TELETRANSPORTE'};
+document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>{mode=b.dataset.mode;start=performance.now();document.querySelectorAll('[data-mode]').forEach(x=>x.classList.toggle('active',x===b));});
+document.querySelector('#spin').onclick=()=>{controls.autoRotate=!controls.autoRotate;document.querySelector('#spin').classList.toggle('active',controls.autoRotate)};
+document.querySelector('#spin').classList.add('active');
+const mouth=V(0,0,0);
+function tick(){requestAnimationFrame(tick);let t=clock.getElapsedTime(),u=(performance.now()-start)/1000,fly=mode==='fly',walk=mode==='walk',fire=mode==='fire',tp=mode==='teleport';
+ body.position.y=fly?.88+.25*Math.sin(t*3):.035*Math.sin(t*2.6);dragon.position.x=tp?1.1*Math.sin(u*2):0;dragon.rotation.y=walk?.16*Math.sin(t*1.8):0;
+ head.rotation.x=fire?-.13+.055*Math.sin(t*8):.06*Math.sin(t*2);head.rotation.y=.09*Math.sin(t*1.4);jaw.rotation.x=fire?.37+.08*Math.sin(t*10):.025+.02*Math.sin(t*2);
+ for(const {wing,s} of wings){wing.rotation.z=s*(fly?.52*Math.sin(t*5.3):.11*Math.sin(t*2.5));wing.rotation.y=s*(fly?.17*Math.cos(t*5.3):.13+.06*Math.sin(t*2));}
+ for(const {leg,s,rear} of legs){leg.rotation.x=walk?.44*Math.sin(t*7+(s===1?0:Math.PI)+(rear?Math.PI:0)):fly?(rear?.25:-.38)+.09*Math.sin(t*5):0;}
+ for(let i=0;i<tailSeg.length;i++){tailSeg[i].rotation.y=.12*Math.sin(t*2.6-i*.55);tailSeg[i].rotation.x=.075+.07*Math.sin(t*2-i*.4);}
+ dragon.updateMatrixWorld(true);head.localToWorld(mouth.set(0,-.12,1.18));fireCore.visible=fire;fireCore.position.copy(mouth).add(V(0,-.06,2.05));fireCore.scale.setScalar(.86+.1*Math.sin(t*13));
+ shield.visible=mode==='shield';shield.position.x=dragon.position.x;shield.rotation.y=t*.7;shield.scale.setScalar(1+.045*Math.sin(t*5));aura.visible=mode==='aura'||tp;aura.position.x=dragon.position.x;aura.rotation.y=t;flash.visible=tp;flash.position.x=dragon.position.x;flash.material.opacity=.2+.45*Math.pow(Math.sin(u*3),8);dragon.scale.setScalar(tp?.88+.12*Math.abs(Math.cos(u*3)):1);
+ particles.forEach((p,i)=>{let v=(t*.6+i*.6180339)%1,a=i*2.399963+t*2,rr=.35+1.25*v;p.visible=true;if(fire){let d=v*4.8;p.position.copy(mouth).add(V(Math.cos(a)*(.07+d*.15)*Math.sin(i),Math.sin(a)*(.07+d*.14)+d*.09,d));p.material.color.setHex(i%3===0?0xfff68b:0xff4411);p.scale.setScalar(.045+.12*Math.sin(Math.PI*v));p.material.opacity=(1-v)*.95;}else if(mode==='aura'||tp||mode==='shield'){p.position.set(dragon.position.x+Math.cos(a)*rr,.12+v*3.2,Math.sin(a)*rr);p.material.color.setHex(mode==='shield'?0xffba39:0xd43cff);p.scale.setScalar(.035+.06*(1-v));p.material.opacity=1-v;}else{p.position.set(Math.cos(a)*rr*2.2,.02+v*1.9,Math.sin(a)*rr*2.2);p.material.color.setHex(0xff681c);p.scale.setScalar(.025+.035*Math.sin(v*Math.PI));p.material.opacity=.34*(1-v);}});
+ red.intensity=fire?40+Math.sin(t*15)*8:15;document.querySelector('#status').textContent=labels[mode]+' · 3D interactivo';controls.update();renderer.render(scene,camera);}
+addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});tick();
+</script></body></html>
