@@ -1,6 +1,10 @@
 <!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"><title>Camino de la Serpiente — Planeta de Kaio-sama</title><style>*{box-sizing:border-box}body{margin:0;background:#b96cb7;color:white;font-family:system-ui;overflow:hidden}canvas{display:block}#ui{position:fixed;top:12px;left:12px;right:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;z-index:2}button,select{background:#17243cbf;border:1px solid #d7e4ff;color:white;padding:10px 13px;border-radius:10px;font-size:14px}#status{margin-left:auto;background:#17243caa;border-radius:10px;padding:10px}#note{position:fixed;bottom:12px;left:12px;background:#17243caa;padding:8px;border-radius:8px;font-size:12px}#error{position:fixed;inset:0;display:none;place-items:center;background:#19233d;padding:30px;text-align:center;z-index:10}@keyframes showPrize{0%{opacity:0;transform:scale(.5)}12%{opacity:1;transform:scale(1.08)}20%{transform:scale(1)}82%{opacity:1}100%{opacity:0;transform:scale(1.15)}}#prize{display:none;position:fixed;inset:0;z-index:5;pointer-events:none;align-items:center;justify-content:center;background:#140927a8;text-align:center}#prize.active{display:flex;animation:showPrize 5s ease-in-out forwards}.prizeText{font-weight:1000;color:#ffcf27;text-shadow:3px 4px #7c230c,-2px -2px #fff;font-size:clamp(30px,6vw,72px)}.ball{margin:12px auto;width:110px;height:110px;border-radius:50%;background:radial-gradient(circle at 30% 25%,#fff4aa,#ffab00 48%,#df5400 90%);border:4px solid #ffdf78;box-shadow:0 0 45px #ffd22c;display:grid;place-items:center;color:#d62715;font-size:65px;text-shadow:0 1px #7e140b}.subPrize{font-size:clamp(18px,3vw,32px);font-weight:800;color:white;text-shadow:2px 2px #252525}#mission{position:fixed;bottom:65px;left:50%;transform:translateX(-50%);max-width:94vw;min-width:min(88vw,420px);z-index:4;background:#192340e6;color:#ffeda1;border:1px solid #ffe27a;border-radius:15px;padding:10px 14px;text-align:center;font-weight:900;font-size:clamp(12px,2.2vw,20px);pointer-events:none;box-shadow:0 6px 22px #0008}
 @media(max-width:550px){#mission{bottom:70px;font-size:13px;padding:8px 11px}}
-</style></head><body><div id="ui"><button id="pause">Pausar</button><button id="view">Vista: corredor</button><label>Velocidad <select id="speed"><option value="2.8" selected>Corredor · 10 km/h</option><option value="4.2">Rápido · 15 km/h</option><option value="7">Turbo · 25 km/h</option></select></label><button id="test">Probar premio 1 km</button><label style="cursor:pointer;background:#17243cbf;border:1px solid #d7e4ff;border-radius:10px;padding:10px">♫ Cargar mi MP3<input id="musicFile" type="file" accept="audio/mpeg,audio/mp3,audio/*" style="display:none"></label><button id="musicToggle" disabled>♫ Pausar música</button><audio id="music" loop preload="none"></audio><span id="status">0 m / 1 km</span></div><div id="note">Camino de la Serpiente · ¡Llegá hasta Kaio-sama!</div><div id="mission" role="status">¡Kaio-sama te espera! · Faltan 1.000 m</div><div id="prize"><div><div class="prizeText">¡LLEGASTE AL PLANETA DE KAIO-SAMA!</div><div class="ball">★</div><div class="subPrize">¡CONSEGUISTE LA PRIMERA ESFERA DEL DRAGÓN!</div></div></div><div id="error">No se pudo cargar el motor 3D. Abrí el enlace con conexión a Internet y un navegador actualizado.</div><script type="module">
+#travel{position:fixed;bottom:126px;left:50%;transform:translateX(-50%);z-index:4;display:flex;justify-content:center;gap:7px;width:calc(100% - 20px);max-width:690px}
+#travel button{flex:1;min-width:0;background:#11345edc;border:1px solid #fff1ab;color:#fff4c8;padding:10px 7px;font-size:clamp(11px,2vw,16px);font-weight:800;box-shadow:0 3px 13px #0007}
+#travel button:active{background:#e0a629;color:#14142a}
+@media(max-width:550px){#travel{bottom:119px;gap:4px}#travel button{font-size:12px;padding:10px 5px}}
+</style></head><body><div id="ui"><button id="pause">Pausar</button><button id="view">Vista: corredor</button><label>Velocidad <select id="speed"><option value="2.8" selected>Corredor · 10 km/h</option><option value="4.2">Rápido · 15 km/h</option><option value="7">Turbo · 25 km/h</option></select></label><button id="test">Probar premio 1 km</button><label style="cursor:pointer;background:#17243cbf;border:1px solid #d7e4ff;border-radius:10px;padding:10px">♫ Cargar mi MP3<input id="musicFile" type="file" accept="audio/mpeg,audio/mp3,audio/*" style="display:none"></label><button id="musicToggle" disabled>♫ Pausar música</button><audio id="music" loop preload="none"></audio><span id="status">0 m / 1 km</span></div><div id="travel"><button id="forward" type="button">Avanzar +100 m</button><button id="nearEnd" type="button">Últimos 70 m</button><button id="reachEnd" type="button">Llegar al final</button></div><div id="note">Camino de la Serpiente · ¡Llegá hasta Kaio-sama!</div><div id="mission" role="status">¡Kaio-sama te espera! · Faltan 1.000 m</div><div id="prize"><div><div class="prizeText">¡LLEGASTE AL PLANETA DE KAIO-SAMA!</div><div class="ball">★</div><div class="subPrize">¡CONSEGUISTE LA PRIMERA ESFERA DEL DRAGÓN!</div></div></div><div id="error">No se pudo cargar el motor 3D. Abrí el enlace con conexión a Internet y un navegador actualizado.</div><script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js';
 import {createKaioGoal} from './planeta-kaio.js';
 const scene=new THREE.Scene();scene.background=new THREE.Color('#d28ac5');scene.fog=new THREE.FogExp2('#dca5b1',.0015);
@@ -38,29 +42,54 @@ function updateMission(m){
 const music=document.querySelector('#music'),musicToggle=document.querySelector('#musicToggle');let musicURL=null;
 document.querySelector('#musicFile').addEventListener('change',async e=>{const f=e.target.files&&e.target.files[0];if(!f)return;if(musicURL)URL.revokeObjectURL(musicURL);musicURL=URL.createObjectURL(f);music.src=musicURL;musicToggle.disabled=false;musicToggle.textContent='♫ Pausar música';try{await music.play()}catch(err){musicToggle.textContent='♫ Reproducir música'}});
 musicToggle.onclick=async()=>{if(music.paused){try{await music.play();musicToggle.textContent='♫ Pausar música'}catch(err){musicToggle.textContent='♫ Reproducir música'}}else{music.pause();musicToggle.textContent='♫ Reproducir música'}};
-let t=9,distance=0,paused=false,high=false,last=performance.now(),rewarded=false,prizeUntil=0,arrived=false;
+let t=9,distance=0,paused=false,viewMode="corredor",last=performance.now(),rewarded=false,prizeUntil=0,arrived=false;
 const status=document.querySelector('#status'),prize=document.querySelector('#prize');
 function showPrize(now){prize.classList.remove('active');void prize.offsetWidth;prize.classList.add('active');prizeUntil=now+5000}
 document.querySelector('#test').onclick=()=>showPrize(performance.now());
 document.querySelector('#pause').onclick=e=>{paused=!paused;e.target.textContent=paused?'Continuar':'Pausar'};
-document.querySelector('#view').onclick=e=>{high=!high;e.target.textContent='Vista: '+(high?'elevada':'corredor')};
+// Tres ángulos: corredor, elevada y seguimiento directo del planeta.
+const views=['corredor','elevada','planeta'];
+document.querySelector('#view').onclick=e=>{
+ viewMode=views[(views.indexOf(viewMode)+1)%views.length];
+ e.target.textContent='Vista: '+viewMode;
+};
+function avanzarHasta(m){
+ // Accesos de prueba: no alteran la velocidad configurada ni la música.
+ if(arrived)return;
+ distance=THREE.MathUtils.clamp(Math.floor(m),0,1000);
+ t=Math.min(goal.goalT,9+distance);
+ // Reposicionamiento inmediato de cámara para no atravesar toda la escena.
+ if(distance<1000){
+  const p=frame(t).p;
+  camera.position.copy(p).add(new THREE.Vector3(0,viewMode==='elevada'?30:2.8,viewMode==='elevada'?22:7));
+ }
+ updateMission(distance);
+}
+document.querySelector('#forward').onclick=()=>avanzarHasta(distance+100);
+document.querySelector('#nearEnd').onclick=()=>avanzarHasta(930);
+document.querySelector('#reachEnd').onclick=()=>avanzarHasta(1000);
 function loop(now){requestAnimationFrame(loop);const dt=Math.min((now-last)/1000,.05);last=now;
 if(!paused&&!arrived){const meters=dt*Number(document.querySelector('#speed').value);distance=Math.min(1000,distance+meters);t=9+distance}
 if(t>goal.goalT)t=goal.goalT;
 updateMission(distance);
 if(distance>=1000&&!rewarded){rewarded=true;arrived=true;showPrize(now)}
 if(prizeUntil&&now>prizeUntil){prize.classList.remove('active');prizeUntil=0}
+const high=viewMode==='elevada',focusPlanet=viewMode==='planeta';
 const f=frame(t),look=frame(t+(high?70:24));
 const bob=high||paused?0:Math.sin(now*.016)*.09;
 if(arrived){
- const departure=Math.max(70,40/camera.aspect);
+ const departure=Math.max(64,43/camera.aspect);
  const desired=goal.center.clone().add(new THREE.Vector3(0,14,departure));
  camera.position.lerp(desired,Math.min(1,dt*.9));
  camera.lookAt(goal.center.clone().add(new THREE.Vector3(0,8,0)));
 }else{
- const desired=f.p.clone().add(new THREE.Vector3(0,high?30:1.7+bob,high?22:1.8));
+ const desired=f.p.clone().add(new THREE.Vector3(0,high?30:(focusPlanet?3.6:1.7+bob),high?22:(focusPlanet?5:1.8)));
  camera.position.lerp(desired,Math.min(1,dt*5));
- const target=look.p.clone().add(new THREE.Vector3(0,high?0:1.65,0));camera.lookAt(target);
+ const target=look.p.clone().add(new THREE.Vector3(0,high?0:1.65,0));
+ // Al aproximarse, la cámara deja de mirar una ruta infinita y enfoca el destino.
+ const planetFocus=goal.center.clone().add(new THREE.Vector3(0,7,0));
+ target.lerp(planetFocus,focusPlanet?1:THREE.MathUtils.smoothstep(distance,790,970));
+ camera.lookAt(target);
 }
 status.textContent=Math.floor(distance)+' m / 1 km';
 renderer.render(scene,camera)}
