@@ -1,0 +1,66 @@
+name: Auditoria aislada de mallas Goku y Vegeta (Blender)
+
+on:
+  push:
+    paths:
+      - '.github/workflows/auditar-goku-vegeta-carrera-20261122.yml'
+      - 'serpiente-cardio-tv/prueba-carrera-3d-20261122/auditar_y_limpiar.py'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: auditar-goku-vegeta-carrera-20261122
+  cancel-in-progress: false
+
+jobs:
+  diagnosticar-y-generar-candidatos:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Instalar Blender gratis
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y blender python3-numpy
+      - name: Auditar mallas y reexportar candidatos no destructivos
+        run: |
+          blender -b -t 2 --python-exit-code 1 --python \
+            serpiente-cardio-tv/prueba-carrera-3d-20261122/auditar_y_limpiar.py
+      - name: Verificar que ambos candidatos conservan mallas y animación
+        run: |
+          python3 - <<'PY'
+          import json,struct
+          from pathlib import Path
+          root=Path('serpiente-cardio-tv/prueba-carrera-3d-20261122/candidatos-limpios')
+          assert (root/'auditoria.json').exists()
+          for name in ('goku','vegeta'):
+              raw=(root/f'{name}.glb').read_bytes()
+              assert raw[:4]==b'glTF',f'{name}: no GLB'
+              assert len(raw)==struct.unpack_from('<I',raw,8)[0], f'{name}: tamano incorrecto'
+              length=struct.unpack_from('<I',raw,12)[0]
+              data=json.loads(raw[20:20+length])
+              assert data.get('skins'),f'{name}: rig perdido'
+              assert data.get('animations'),f'{name}: animacion perdida'
+              print(f'{name}: OK skins={len(data["skins"])} clips={len(data["animations"])}')
+          PY
+      - name: Publicar unicamente candidatos y auditoria
+        run: |
+          set -euo pipefail
+          git add -- serpiente-cardio-tv/prueba-carrera-3d-20261122/candidatos-limpios/
+          if git diff --cached --quiet; then echo 'Sin cambios'; exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Auditoria: candidatos Goku Vegeta con normales y geometria libre reparadas'
+          git pull --rebase origin main
+          git push origin HEAD:main
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: auditoria-carrera-3d
+          path: serpiente-cardio-tv/prueba-carrera-3d-20261122/candidatos-limpios/
+          retention-days: 7
+          if-no-files-found: warn
