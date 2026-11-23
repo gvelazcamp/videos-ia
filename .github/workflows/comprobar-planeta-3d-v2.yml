@@ -1,0 +1,88 @@
+name: Probar visualmente Planeta Kaio 3D V2
+
+on:
+  push:
+    paths:
+      - 'serpiente-cardio-tv/modo-corredor-planeta-3d.html'
+      - 'serpiente-cardio-tv/planeta-kaio-3d-v2.js'
+      - '.github/workflows/comprobar-planeta-3d-v2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: kaio-3d-v2-mobile-smoke-test
+  cancel-in-progress: true
+
+jobs:
+  prueba-visual-movil:
+    runs-on: ubuntu-latest
+    timeout-minutes: 17
+    steps:
+      - uses: actions/checkout@v4
+      - name: Instalar navegador de prueba
+        run: |
+          python -m pip install --quiet playwright pillow
+          python -m playwright install --with-deps chromium
+      - name: Capturas y validación en móvil
+        run: |
+          python -m http.server 8765 >/tmp/kaio-server.log 2>&1 &
+          sleep 2
+          python - <<'PY'
+          import os,json,time
+          from pathlib import Path
+          from playwright.sync_api import sync_playwright
+          root=Path("serpiente-cardio-tv/pruebas-kaio-v2")
+          root.mkdir(parents=True,exist_ok=True)
+          url="http://127.0.0.1:8765/serpiente-cardio-tv/modo-corredor-planeta-3d.html"
+          with sync_playwright() as p:
+              browser=p.chromium.launch(headless=True,args=["--enable-webgl","--use-gl=angle","--use-angle=swiftshader","--disable-web-security"])
+              page=browser.new_page(viewport={"width":430,"height":915},device_scale_factor=1,is_mobile=True,has_touch=True)
+              errors=[]
+              page.on("pageerror",lambda e:errors.append(str(e)))
+              page.on("console",lambda m:errors.append("console: "+m.text) if m.type=="error" else None)
+              page.goto(url,wait_until="domcontentloaded",timeout=60000)
+              page.wait_for_timeout(7000)
+              page.screenshot(path=str(root/"01-inicio.jpg"),type="jpeg",quality=68)
+              page.locator("#nearEnd").click()
+              page.wait_for_timeout(4500)
+              page.screenshot(path=str(root/"02-a-70-metros.jpg"),type="jpeg",quality=68)
+              page.locator("#view").click()
+              page.wait_for_timeout(1400)
+              page.screenshot(path=str(root/"03-vista-elevada.jpg"),type="jpeg",quality=68)
+              page.locator("#reachEnd").click()
+              page.wait_for_timeout(1800)
+              dialog=page.locator("#kaioMeet").evaluate("(e)=>getComputedStyle(e).display")
+              page.locator("#kaioClose").click()
+              page.wait_for_timeout(3300)
+              page.screenshot(path=str(root/"04-final-3d.jpg"),type="jpeg",quality=68)
+              status=page.locator("#status").inner_text()
+              report={"status":status,"dialog_display_while_arrived":dialog,
+                      "errors":errors,"test_url":url,
+                      "samples":[p.name for p in root.glob("*.jpg")]}
+              (root/"reporte.json").write_text(json.dumps(report,ensure_ascii=False,indent=2))
+              print("KAIO_SMOKE_TEST",json.dumps(report,ensure_ascii=False))
+              browser.close()
+              assert "1000 m" in status,report
+              assert dialog=="flex",report
+              assert not errors,report
+          PY
+      - name: Publicar únicamente capturas de validación
+        if: always()
+        run: |
+          set -euo pipefail
+          git add -- serpiente-cardio-tv/pruebas-kaio-v2/
+          if git diff --cached --quiet; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Pruebas visuales de planeta Kaio 3D V2 en movil'
+          git pull --rebase origin main
+          git push origin HEAD:main
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: capturas-kaio-3d-v2
+          path: serpiente-cardio-tv/pruebas-kaio-v2/
+          retention-days: 5
+          if-no-files-found: warn
