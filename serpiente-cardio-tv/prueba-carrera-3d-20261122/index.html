@@ -63,12 +63,12 @@ function reset(){
  const halfTan=Math.tan(THREE.MathUtils.degToRad(camera.fov)*.5);
  const isDuo=active==="both";
  const modelHeight=2.75;
- const modelWidth=isDuo?5.05:2.65;
+ const modelWidth=isDuo ? 5.5 : 3.1;
  const distanceY=modelHeight/(2*halfTan*safeFraction*.88);
  const distanceX=modelWidth/(2*halfTan*camera.aspect*.84);
  const distance=Math.max(7.3,distanceY,distanceX);
  // El punto de mira ligeramente bajo sitúa las caras en la zona visible y no bajo el panel.
- const targetY=isDuo?.94:.92;
+ const targetY=isDuo ? 0.94 : 0.92;
  ctl.minDistance=distance*.88;
  ctl.maxDistance=Math.max(distance*3.5,25);
  camera.position.set(distance*.10,targetY+distance*.10,distance);
