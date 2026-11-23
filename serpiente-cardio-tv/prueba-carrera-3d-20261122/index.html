@@ -32,7 +32,7 @@ input[type=range]{width:100px;accent-color:#72bbff}
  <label><input id="bones" type="checkbox"> Ver huesos</label>
  <button id="reset" type="button">Centrar cámara</button>
  </div>
- <p class="help">Deslizá para girar 360°. Separá o juntá dos dedos para hacer zoom. Prueba aislada: no modifica el juego.</p>
+ <p class="help">Giralo 360° con un dedo y hacé zoom con dos. La cámara evita atravesar los personajes. Esta prueba no modifica el juego.</p>
  <div id="failure"></div>
 </section>
 <script type="module">
@@ -51,9 +51,33 @@ renderer.outputColorSpace=THREE.SRGBColorSpace;
 document.getElementById("scene").appendChild(renderer.domElement);
 const ctl=new OrbitControls(camera,renderer.domElement);
 ctl.enableDamping=true;ctl.dampingFactor=.07;ctl.enablePan=false;
-ctl.minDistance=2;ctl.maxDistance=13;ctl.maxPolarAngle=Math.PI*.88;
-function reset(){camera.position.set(3.3,2.15,6.3);ctl.target.set(0,1.15,0);ctl.update();}
-reset();
+ctl.maxPolarAngle=Math.PI*.88;
+// Cámara protegida: no permite acercarse hasta atravesar la piel, el pelo ni los huesos.
+// Ajuste sensible al formato del teléfono y al espacio libre encima de los controles.
+function reset(){
+ const panel=document.querySelector(".panel").getBoundingClientRect();
+ const head=document.querySelector("header").getBoundingClientRect();
+ const safeTop=Math.max(66,head.bottom-18);
+ const safeHeight=Math.max(innerHeight*.42,panel.top-safeTop-12);
+ const safeFraction=Math.min(.82,safeHeight/innerHeight);
+ const halfTan=Math.tan(THREE.MathUtils.degToRad(camera.fov)*.5);
+ const isDuo=active==="both";
+ const modelHeight=2.75;
+ const modelWidth=isDuo?5.05:2.65;
+ const distanceY=modelHeight/(2*halfTan*safeFraction*.88);
+ const distanceX=modelWidth/(2*halfTan*camera.aspect*.84);
+ const distance=Math.max(7.3,distanceY,distanceX);
+ // El punto de mira ligeramente bajo sitúa las caras en la zona visible y no bajo el panel.
+ const targetY=isDuo?.94:.92;
+ ctl.minDistance=distance*.88;
+ ctl.maxDistance=Math.max(distance*3.5,25);
+ camera.position.set(distance*.10,targetY+distance*.10,distance);
+ ctl.target.set(0,targetY,0);
+ camera.near=Math.max(.025,distance/500);
+ camera.far=Math.max(120,distance*15);
+ camera.updateProjectionMatrix();
+ ctl.update();
+}
 scene.add(new THREE.HemisphereLight(0xc5dbff,0x293348,2.2));
 const light=new THREE.DirectionalLight(0xffffff,2.8);light.position.set(2,6,5);scene.add(light);
 const fill=new THREE.DirectionalLight(0x80baff,1.1);fill.position.set(-4,2,-3);scene.add(fill);
@@ -62,6 +86,7 @@ ground.rotation.x=-Math.PI/2;ground.position.y=-.035;scene.add(ground);
 const grid=new THREE.GridHelper(14,28,0x416181,0x233a52);grid.position.y=-.02;scene.add(grid);
 const models={},loader=new GLTFLoader(),clock=new THREE.Clock();
 let active="both",playing=true;
+reset();
 const files={
 goku:"./goku.glb",
 vegeta:"./vegeta.glb"
@@ -94,7 +119,7 @@ function load(name,url){
   const skeleton=new THREE.SkeletonHelper(gltf.scene);
   skeleton.visible=false;wrap.add(skeleton);
   models[name]={root:wrap,mixer,skeleton,clip:gltf.animations[0].name};
-  place();resolve(name);
+  place();reset();resolve(name);
  },undefined,e=>reject(e)));
 }
 Promise.allSettled(Object.entries(files).map(([name,url])=>load(name,url))).then(results=>{
@@ -112,7 +137,7 @@ document.getElementById("play").addEventListener("click",e=>{playing=!playing;e.
 document.getElementById("speed").addEventListener("input",e=>{document.getElementById("speedVal").textContent=Number(e.target.value).toFixed(1)+"×"});
 document.getElementById("bones").addEventListener("change",e=>Object.values(models).forEach(m=>m.skeleton.visible=e.target.checked));
 document.getElementById("reset").addEventListener("click",reset);
-addEventListener("resize",()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+addEventListener("resize",()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);reset()});
 renderer.setAnimationLoop(()=>{let dt=Math.min(clock.getDelta(),.08),speed=Number(document.getElementById("speed").value);
  if(playing)Object.values(models).forEach(m=>m.mixer.update(dt*speed));
  ctl.update();renderer.render(scene,camera);
