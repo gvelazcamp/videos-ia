@@ -78,7 +78,7 @@ const cloudMats=[new THREE.MeshLambertMaterial({color:0xffc400,transparent:true,
 
 const goal=createKaioGoal(THREE,scene,path);
 goal.planet.visible=false;goal.kaio.visible=false;
-// Una sola malla ligera de destino: se activa en los últimos metros.
+// Una sola imagen de destino: se activa en los últimos 450 m para acercarse sin saltos.
 const destCanvas=document.createElement('canvas');destCanvas.width=480;destCanvas.height=360;
 const dc=destCanvas.getContext('2d');
 const destTex=new THREE.CanvasTexture(destCanvas);destTex.colorSpace=THREE.SRGBColorSpace;
@@ -98,7 +98,7 @@ packImage.onload=()=>{
   const c=document.createElement('canvas');c.width=240;c.height=180;
   const cx=c.getContext('2d');
   // Pack físico con tres imágenes separadas, izquierda Bulma, centro Kame, derecha Goku.
-  cx.drawImage(packImage,st.frame*240,0,240,180,0,0,240,180);
+  cx.drawImage(packImage,st.frame*100,0,100,75,0,0,240,180);
   artByStage[km]=c;
  }
  if(selectedStage)refreshDestination();
@@ -274,13 +274,13 @@ function avanzarHasta(m){
  // Accesos de prueba: no alteran la velocidad configurada ni la música.
  if(!selectedStage)return;
  distance=THREE.MathUtils.clamp(Math.floor(m),0,targetMeters);
- if(distance<1000){
+ if(distance<targetMeters){
   // Permite volver a probar la aproximación después de haber llegado.
   arrived=false;rewarded=false;prizeUntil=0;prize.classList.remove('active');stopKaioVoice();kaioMeet.classList.remove('visible');
  }
  t=routeT(distance);
  // Reposicionamiento inmediato de cámara para no atravesar toda la escena.
- if(distance<1000){
+ if(distance<targetMeters){
   const p=frame(t).p;
   if(viewMode==='desde arriba'){
    // Rumbo real: z decrece, por lo que con cámara.up en +z avanzamos
@@ -344,7 +344,7 @@ if(arrived && viewMode==='desde arriba'){
  const target=look.p.clone().add(new THREE.Vector3(0,high?0:1.65,0));
  // Al aproximarse, la cámara deja de mirar una ruta infinita y enfoca el destino.
  const planetFocus=finishCenter.clone().add(new THREE.Vector3(0,4,0));
- target.lerp(planetFocus,focusPlanet?1:THREE.MathUtils.smoothstep(remain,360,45)*(-.92)+.92);
+ target.lerp(planetFocus,focusPlanet?1:THREE.MathUtils.smoothstep(360-remain,0,315)*.92);
  camera.lookAt(target);
 }
 status.textContent=Math.floor(distance).toLocaleString('es-UY')+' m / '+(selectedStage?selectedStage.km:5)+' km';
