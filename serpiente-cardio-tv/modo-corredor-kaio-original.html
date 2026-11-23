@@ -21,7 +21,7 @@
 .kaioButtons button{font-weight:900;background:#355ba2;color:white;border-color:#a8d3ff;flex:1 1 130px;min-height:44px}
 .kaioButtons button.primary{background:#efd16b;color:#152248;border-color:#fff4b9}
 @media(max-width:500px){#kaioMeet{padding:8px}.kaioSheet{padding:10px 12px 13px}#kaioImg{max-height:40dvh}#kaioLine{min-height:52px}.kaioButtons button{padding:9px 8px;font-size:13px}}
-</style></head><body><div id="ui"><button id="pause">Pausar</button><button id="view">Vista: corredor</button><label>Velocidad <select id="speed"><option value="2.8" selected>Corredor · 10 km/h</option><option value="4.2">Rápido · 15 km/h</option><option value="7">Turbo · 25 km/h</option></select></label><button id="test">Probar premio 1 km</button><label style="cursor:pointer;background:#17243cbf;border:1px solid #d7e4ff;border-radius:10px;padding:10px">♫ Cargar mi MP3<input id="musicFile" type="file" accept="audio/mpeg,audio/mp3,audio/*" style="display:none"></label><button id="musicToggle" disabled>♫ Pausar música</button><audio id="music" loop preload="none"></audio><span id="status">0 m / 1 km</span></div><div id="travel"><button id="forward" type="button">Avanzar +100 m</button><button id="nearEnd" type="button">Últimos 70 m</button><button id="reachEnd" type="button">Llegar al final</button><button id="meetKaio" type="button">Ver a Kaio</button></div><div id="note">Planeta en 3D y Kaio-sama original · girá con un dedo al llegar</div><div id="mission" role="status">¡Kaio-sama te espera! · Faltan 1.000 m</div><div id="prize"><div><div class="prizeText">¡LLEGASTE AL PLANETA DE KAIO-SAMA!</div><div class="ball">★</div><div class="subPrize">¡CONSEGUISTE LA PRIMERA ESFERA DEL DRAGÓN!</div></div></div><div id="kaioMeet" role="dialog" aria-modal="true" aria-labelledby="kaioHeading">
+</style></head><body><div id="ui"><button id="pause">Pausar</button><button id="view">Vista: desde arriba</button><label>Velocidad <select id="speed"><option value="2.8" selected>Corredor · 10 km/h</option><option value="4.2">Rápido · 15 km/h</option><option value="7">Turbo · 25 km/h</option></select></label><button id="test">Probar premio 1 km</button><label style="cursor:pointer;background:#17243cbf;border:1px solid #d7e4ff;border-radius:10px;padding:10px">♫ Cargar mi MP3<input id="musicFile" type="file" accept="audio/mpeg,audio/mp3,audio/*" style="display:none"></label><button id="musicToggle" disabled>♫ Pausar música</button><audio id="music" loop preload="none"></audio><span id="status">0 m / 1 km</span></div><div id="travel"><button id="forward" type="button">Avanzar +100 m</button><button id="nearEnd" type="button">Últimos 70 m</button><button id="reachEnd" type="button">Llegar al final</button><button id="meetKaio" type="button">Ver a Kaio</button></div><div id="note">Vista desde arriba hacia abajo · Kaio en su planeta · girá con un dedo al llegar</div><div id="mission" role="status">¡Kaio-sama te espera! · Faltan 1.000 m</div><div id="prize"><div><div class="prizeText">¡LLEGASTE AL PLANETA DE KAIO-SAMA!</div><div class="ball">★</div><div class="subPrize">¡CONSEGUISTE LA PRIMERA ESFERA DEL DRAGÓN!</div></div></div><div id="kaioMeet" role="dialog" aria-modal="true" aria-labelledby="kaioHeading">
  <div class="kaioSheet">
   <h2 id="kaioHeading">¡Llegaste al planeta de Kaio-sama!</h2>
   <img id="kaioImg" src="./assets-kaio/kaio-real.webp" onerror="this.onerror=null;this.src='./kaio-saludando.webp'" alt="Kaio-sama de Dragon Ball Z, recortado y con fondo transparente">
@@ -69,8 +69,9 @@ realKaioTexture.load('./assets-kaio/kaio-real.webp',texture=>{
  }));
  const pos=new THREE.Vector3();goal.kaio.getWorldPosition(pos);
  // Apoyado en la superficie visible del planeta, delante del árbol.
- kaioSprite.position.copy(pos).add(new THREE.Vector3(0,10.7,4));
- kaioSprite.scale.set(24*aspect,24,1);
+ // Kaio cabe en la superficie del planeta, sin sobresalir como figura gigante.
+ kaioSprite.position.copy(pos).add(new THREE.Vector3(0,5.1,-1.2));
+ kaioSprite.scale.set(11*aspect,11,1);
  scene.add(kaioSprite);
  goal.kaio.visible=false;
 },undefined,error=>{
@@ -91,7 +92,7 @@ function updateMission(m){
 const music=document.querySelector('#music'),musicToggle=document.querySelector('#musicToggle');let musicURL=null;
 document.querySelector('#musicFile').addEventListener('change',async e=>{const f=e.target.files&&e.target.files[0];if(!f)return;if(musicURL)URL.revokeObjectURL(musicURL);musicURL=URL.createObjectURL(f);music.src=musicURL;musicToggle.disabled=false;musicToggle.textContent='♫ Pausar música';try{await music.play()}catch(err){musicToggle.textContent='♫ Reproducir música'}});
 musicToggle.onclick=async()=>{if(music.paused){try{await music.play();musicToggle.textContent='♫ Pausar música'}catch(err){musicToggle.textContent='♫ Reproducir música'}}else{music.pause();musicToggle.textContent='♫ Reproducir música'}};
-let t=9,distance=0,paused=false,viewMode="corredor",last=performance.now(),rewarded=false,prizeUntil=0,arrived=false;
+let t=9,distance=0,paused=false,viewMode="desde arriba",last=performance.now(),rewarded=false,prizeUntil=0,arrived=false;
 const status=document.querySelector('#status'),prize=document.querySelector('#prize');
 let orbitYaw=0,orbitPitch=0,orbitZoom=1,dragPoint=null;
 renderer.domElement.style.touchAction='none';
@@ -172,7 +173,7 @@ function showPrize(now){prize.classList.remove('active');void prize.offsetWidth;
 document.querySelector('#test').onclick=()=>showPrize(performance.now());
 document.querySelector('#pause').onclick=e=>{paused=!paused;e.target.textContent=paused?'Continuar':'Pausar'};
 // Tres ángulos: corredor, elevada y seguimiento directo del planeta.
-const views=['corredor','elevada','planeta'];
+const views=['desde arriba','corredor','elevada','planeta'];
 document.querySelector('#view').onclick=e=>{
  viewMode=views[(views.indexOf(viewMode)+1)%views.length];
  e.target.textContent='Vista: '+viewMode;
@@ -188,7 +189,16 @@ function avanzarHasta(m){
  // Reposicionamiento inmediato de cámara para no atravesar toda la escena.
  if(distance<1000){
   const p=frame(t).p;
-  camera.position.copy(p).add(new THREE.Vector3(0,viewMode==='elevada'?30:2.8,viewMode==='elevada'?22:7));
+  if(viewMode==='desde arriba'){
+   // Rumbo real: z decrece, por lo que con cámara.up en +z avanzamos
+   // visualmente desde ARRIBA hacia ABAJO de la pantalla.
+   const ahead=frame(Math.min(goal.goalT,t+45)).p;
+   camera.position.copy(ahead).add(new THREE.Vector3(0,136,0));
+   camera.up.set(0,0,1);
+  }else{
+   camera.position.copy(p).add(new THREE.Vector3(0,viewMode==='elevada'?30:2.8,viewMode==='elevada'?22:7));
+   camera.up.set(0,1,0);
+  }
  }
  updateMission(distance);
 }
@@ -204,7 +214,18 @@ if(prizeUntil&&now>prizeUntil){prize.classList.remove('active');prizeUntil=0}
 const high=viewMode==='elevada',focusPlanet=viewMode==='planeta';
 const f=frame(t),look=frame(t+(high?70:24));
 const bob=high||paused?0:Math.sin(now*.016)*.09;
-if(arrived){
+if(arrived && viewMode==='desde arriba'){
+ // Llegada vista cenital, sin invertir el camino.
+ camera.up.set(0,0,1);
+ const target=goal.center.clone().add(new THREE.Vector3(0,3,0));
+ const desired=target.clone().add(new THREE.Vector3(
+  Math.sin(orbitYaw)*12,Math.max(95,78/camera.aspect)*orbitZoom,
+  12+orbitPitch*28
+ ));
+ camera.position.lerp(desired,Math.min(1,dt*2));
+ camera.lookAt(target);
+}else if(arrived){
+ camera.up.set(0,1,0);
  const departure=Math.max(68,35/camera.aspect)*orbitZoom;
  const desired=goal.center.clone().add(new THREE.Vector3(
    Math.sin(orbitYaw)*departure + (viewMode==='elevada'?8:0),
@@ -213,7 +234,16 @@ if(arrived){
  ));
  camera.position.lerp(desired,Math.min(1,dt*1.7));
  camera.lookAt(goal.center.clone().add(new THREE.Vector3(0,6,0)));
+ }else if(viewMode==='desde arriba'){
+ // Vista de pájaro: el avance se proyecta de arriba hacia abajo.
+ camera.up.set(0,0,1);
+ const visibleAhead=frame(Math.min(goal.goalT,t+46)).p;
+ const desired=visibleAhead.clone().add(new THREE.Vector3(0,137,0));
+ camera.position.lerp(desired,Math.min(1,dt*4));
+ const target=visibleAhead.clone().add(new THREE.Vector3(0,0,0));
+ camera.lookAt(target);
 }else{
+ camera.up.set(0,1,0);
  const desired=f.p.clone().add(new THREE.Vector3(0,high?30:(focusPlanet?3.6:1.7+bob),high?22:(focusPlanet?5:1.8)));
  camera.position.lerp(desired,Math.min(1,dt*5));
  const target=look.p.clone().add(new THREE.Vector3(0,high?0:1.65,0));
