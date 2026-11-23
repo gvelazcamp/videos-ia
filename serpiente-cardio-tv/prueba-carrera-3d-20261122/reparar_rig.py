@@ -103,12 +103,18 @@ for name in ("goku","vegeta"):
         if not action.users:continue
         changed=0
         samples=[]
-        if hasattr(action,'fcurves'):
-            # GLTF import convierte las rotaciones a quaterniones. Antes se
-            # buscaban rotation_euler y nunca se corregian los movimientos.
+        # Blender nuevo usa Layered Actions y guarda las curvas en Channelbags.
+        # Los fcurves directos de una Action antigua aparecen vacios en Blender 4.4/5.
+        all_curves=list(action.fcurves) if hasattr(action,'fcurves') else []
+        if not all_curves and hasattr(action,'layers'):
+            for layer in action.layers:
+                for strip in layer.strips:
+                    for bag in getattr(strip,'channelbags',[]):
+                        all_curves.extend(list(bag.fcurves))
+        if all_curves:
             from collections import defaultdict
             groups=defaultdict(dict)
-            for fc in action.fcurves:
+            for fc in all_curves:
                 if "rotation_quaternion" in fc.data_path:
                     groups[fc.data_path][fc.array_index]=fc
                 elif "rotation_euler" in fc.data_path and fc.array_index==0:
@@ -158,6 +164,8 @@ for name in ("goku","vegeta"):
                 changed+=4
         animations.append({"name":action.name,"adjusted_curves":changed,
                            "sample_paths":samples})
+    if sum(a["adjusted_curves"] for a in animations)==0:
+        raise RuntimeError(name+": el clip no tiene curvas editables; no publicar reparacion ficticia")
     # Ocultar auxiliares no skinned y que no pertenecen al GLB de personaje.
     # Algunos son esferas de depuracion; solo se retiran si carecen de materiales/texturas
     # y no tienen modificador ARMATURE.
