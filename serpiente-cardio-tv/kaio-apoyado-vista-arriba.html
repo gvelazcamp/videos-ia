@@ -1,0 +1,264 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"><title>Camino de la Serpiente — Kaio apoyado y vista desde arriba</title><style>*{box-sizing:border-box}body{margin:0;background:#b96cb7;color:white;font-family:system-ui;overflow:hidden}canvas{display:block;touch-action:none}#ui{position:fixed;top:12px;left:12px;right:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;z-index:2}button,select{background:#17243cbf;border:1px solid #d7e4ff;color:white;padding:10px 13px;border-radius:10px;font-size:14px}#status{margin-left:auto;background:#17243caa;border-radius:10px;padding:10px}#note{position:fixed;bottom:12px;left:12px;background:#17243caa;padding:8px;border-radius:8px;font-size:12px}#error{position:fixed;inset:0;display:none;place-items:center;background:#19233d;padding:30px;text-align:center;z-index:10}@keyframes showPrize{0%{opacity:0;transform:scale(.5)}12%{opacity:1;transform:scale(1.08)}20%{transform:scale(1)}82%{opacity:1}100%{opacity:0;transform:scale(1.15)}}#prize{display:none;position:fixed;inset:0;z-index:5;pointer-events:none;align-items:center;justify-content:center;background:#140927a8;text-align:center}#prize.active{display:flex;animation:showPrize 5s ease-in-out forwards}.prizeText{font-weight:1000;color:#ffcf27;text-shadow:3px 4px #7c230c,-2px -2px #fff;font-size:clamp(30px,6vw,72px)}.ball{margin:12px auto;width:110px;height:110px;border-radius:50%;background:radial-gradient(circle at 30% 25%,#fff4aa,#ffab00 48%,#df5400 90%);border:4px solid #ffdf78;box-shadow:0 0 45px #ffd22c;display:grid;place-items:center;color:#d62715;font-size:65px;text-shadow:0 1px #7e140b}.subPrize{font-size:clamp(18px,3vw,32px);font-weight:800;color:white;text-shadow:2px 2px #252525}#mission{position:fixed;bottom:65px;left:50%;transform:translateX(-50%);max-width:94vw;min-width:min(88vw,420px);z-index:4;background:#192340e6;color:#ffeda1;border:1px solid #ffe27a;border-radius:15px;padding:10px 14px;text-align:center;font-weight:900;font-size:clamp(12px,2.2vw,20px);pointer-events:none;box-shadow:0 6px 22px #0008}
+@media(max-width:550px){#mission{bottom:70px;font-size:13px;padding:8px 11px}}
+#travel{position:fixed;bottom:126px;left:50%;transform:translateX(-50%);z-index:4;display:flex;justify-content:center;gap:7px;width:calc(100% - 20px);max-width:690px}
+#travel button{flex:1;min-width:0;background:#11345edc;border:1px solid #fff1ab;color:#fff4c8;padding:10px 7px;font-size:clamp(11px,2vw,16px);font-weight:800;box-shadow:0 3px 13px #0007}
+#travel button:active{background:#e0a629;color:#14142a}
+#travel #meetKaio{background:#e8b947;color:#152238;border:2px solid #ffec99;font-weight:900}
+@media(max-width:550px){#travel{bottom:119px;gap:4px}#travel button{font-size:12px;padding:10px 5px}}
+
+/* Encuentro interactivo con Kaio-sama: imagen transparente auténtica y diálogo. */
+#kaioMeet{position:fixed;inset:0;z-index:12;display:none;align-items:center;justify-content:center;padding:16px;background:linear-gradient(160deg,#071329ef,#31245bdc);overflow-y:auto}
+#kaioMeet.visible{display:flex}
+.kaioSheet{width:min(96vw,520px);max-height:calc(100dvh - 25px);overflow:auto;text-align:center;background:linear-gradient(145deg,#101b3d,#202b5e);border:2px solid #ffe68c;border-radius:22px;padding:13px 15px 17px;box-shadow:0 15px 55px #0009}
+ .kaioSheet h2{color:#ffdf67;font-size:clamp(20px,4.7vw,32px);line-height:1.16;margin:3px auto 8px;text-shadow:0 3px 2px #2b182a}
+#kaioImg{width:min(73vw,315px);height:auto;max-height:49dvh;object-fit:contain;filter:drop-shadow(0 7px 10px #0009);animation:kaioBreathe 2.8s ease-in-out infinite;display:block;margin:0 auto}
+#kaioImg.speaking{animation:kaioTalk .38s ease-in-out infinite alternate}
+@keyframes kaioBreathe{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes kaioTalk{0%{transform:translateY(1px) rotate(-1.4deg)}100%{transform:translateY(-4px) rotate(1.4deg)}}
+#kaioLine{background:#fff6d8;color:#13224d;border-radius:13px;padding:10px 13px;font-size:clamp(14px,3vw,19px);font-weight:700;line-height:1.3;min-height:62px;margin:8px 0}
+#kaioReward{font-size:clamp(14px,2.8vw,20px);color:#ffe991;font-weight:900;margin:8px auto}
+.kaioButtons{display:flex;flex-wrap:wrap;justify-content:center;gap:7px;margin-top:10px}
+.kaioButtons button{font-weight:900;background:#355ba2;color:white;border-color:#a8d3ff;flex:1 1 130px;min-height:44px}
+.kaioButtons button.primary{background:#efd16b;color:#152248;border-color:#fff4b9}
+@media(max-width:500px){#kaioMeet{padding:8px}.kaioSheet{padding:10px 12px 13px}#kaioImg{max-height:40dvh}#kaioLine{min-height:52px}.kaioButtons button{padding:9px 8px;font-size:13px}}
+</style></head><body><div id="ui"><button id="pause">Pausar</button><button id="view">Vista: desde arriba</button><label>Velocidad <select id="speed"><option value="2.8" selected>Corredor · 10 km/h</option><option value="4.2">Rápido · 15 km/h</option><option value="7">Turbo · 25 km/h</option></select></label><button id="test">Probar premio 1 km</button><label style="cursor:pointer;background:#17243cbf;border:1px solid #d7e4ff;border-radius:10px;padding:10px">♫ Cargar mi MP3<input id="musicFile" type="file" accept="audio/mpeg,audio/mp3,audio/*" style="display:none"></label><button id="musicToggle" disabled>♫ Pausar música</button><audio id="music" loop preload="none"></audio><span id="status">0 m / 1 km</span></div><div id="travel"><button id="forward" type="button">Avanzar +100 m</button><button id="nearEnd" type="button">Últimos 70 m</button><button id="reachEnd" type="button">Llegar al final</button><button id="meetKaio" type="button">Ver a Kaio</button></div><div id="note">Vista desde arriba hacia abajo · Kaio en su planeta · girá con un dedo al llegar</div><div id="mission" role="status">¡Kaio-sama te espera! · Faltan 1.000 m</div><div id="prize"><div><div class="prizeText">¡LLEGASTE AL PLANETA DE KAIO-SAMA!</div><div class="ball">★</div><div class="subPrize">¡CONSEGUISTE LA PRIMERA ESFERA DEL DRAGÓN!</div></div></div><div id="kaioMeet" role="dialog" aria-modal="true" aria-labelledby="kaioHeading">
+ <div class="kaioSheet">
+  <h2 id="kaioHeading">¡Llegaste al planeta de Kaio-sama!</h2>
+  <img id="kaioImg" src="./assets-kaio/kaio-real.webp" onerror="this.onerror=null;this.src='./kaio-saludando.webp'" alt="Kaio-sama de Dragon Ball Z, recortado y con fondo transparente">
+  <p id="kaioLine" aria-live="polite">¡Llegaste! ¡Te estaba esperando al final del Camino de la Serpiente!</p>
+  <div id="kaioReward">★ ¡Conseguiste la primera esfera del dragón!</div>
+  <div class="kaioButtons">
+   <button id="kaioListen" type="button" class="primary">Escuchar a Kaio</button>
+   <button id="kaioNext" type="button">Seguir hablando</button>
+   <button id="kaioClose" type="button">Ver el planeta</button>
+  </div>
+ </div>
+</div><div id="error">No se pudo cargar el motor 3D. Abrí el enlace con conexión a Internet y un navegador actualizado.</div><script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js';
+import {createKaioGoal} from './planeta-kaio-3d-v2.js';
+const scene=new THREE.Scene();scene.background=new THREE.Color('#d28ac5');scene.fog=new THREE.FogExp2('#dca5b1',.0006);
+const camera=new THREE.PerspectiveCamera(75,innerWidth/innerHeight,.1,1600);const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,1.7));renderer.setSize(innerWidth,innerHeight);renderer.outputColorSpace=THREE.SRGBColorSpace;document.body.appendChild(renderer.domElement);
+scene.add(new THREE.HemisphereLight(0xfff6d2,0x8798bb,2.1));const sun=new THREE.DirectionalLight(0xffedb4,2.5);sun.position.set(-50,90,-80);scene.add(sun);
+// The snake road follows a single continuous 3D centerline. Both the road and the camera use this exact function.
+const roadY=29, width=10, maxT=1018, step=1.7;
+function path(t){return new THREE.Vector3(29*Math.sin(t*.012)+14*Math.sin(t*.026),roadY+2.6*Math.sin(t*.015),-t)}
+function frame(t){const a=path(t-.08),b=path(t+.08),tan=b.sub(a).normalize();const right=new THREE.Vector3(-tan.z,0,tan.x).normalize();return {p:path(t),tan,right}}
+const top=[],uv=[],indices=[],sides=[],sideIndices=[],edgeVerts=[],edgeIdx=[];let n=0;
+for(let t=0;t<=maxT;t+=step){const {p,right}=frame(t);for(const s of [-1,1]){const v=p.clone().addScaledVector(right,s*width/2);top.push(v.x,v.y,v.z);uv.push(s===-1?0:1,t*.1)}if(n>0){let k=2*(n-1);indices.push(k,k+1,k+2,k+1,k+3,k+2)}n++}
+function mesh(pos,ind,material,uvs){const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));if(uvs)g.setAttribute('uv',new THREE.Float32BufferAttribute(uvs,2));g.setIndex(ind);g.computeVertexNormals();return new THREE.Mesh(g,material)}
+// Canvas-generated original tile texture: light blue-grey surface and thin stone seams.
+const cv=document.createElement('canvas');cv.width=256;cv.height=256;const cx=cv.getContext('2d');cx.fillStyle='#c4d0d9';cx.fillRect(0,0,256,256);cx.strokeStyle='#8a9ead';cx.lineWidth=3;for(let y=0;y<256;y+=64){cx.beginPath();cx.moveTo(0,y);cx.lineTo(256,y);cx.stroke()}for(let y=0;y<256;y+=128){cx.beginPath();cx.moveTo(128,y);cx.lineTo(128,y+64);cx.stroke()}const tex=new THREE.CanvasTexture(cv);tex.wrapS=tex.wrapT=THREE.RepeatWrapping;tex.repeat.set(1,2);
+const road=mesh(top,indices,new THREE.MeshStandardMaterial({map:tex,color:0xf5f8ff,roughness:.94,side:THREE.DoubleSide}),uv);scene.add(road);
+// Deep blue scaled underside, so this is an elevated serpentine body rather than a flat floating ribbon.
+const under=[],underIdx=[];let u=0;for(let t=0;t<=maxT;t+=step*2){const {p,right}=frame(t);for(let j=0;j<9;j++){const theta=Math.PI*j/8;const v=p.clone().addScaledVector(right,Math.cos(theta)*width/2);v.y-=Math.sin(theta)*5+.35;under.push(v.x,v.y,v.z)}if(u>0){for(let j=0;j<8;j++){const k=(u-1)*9+j;underIdx.push(k,k+1,k+9,k+1,k+10,k+9)}}u++}scene.add(mesh(under,underIdx,new THREE.MeshStandardMaterial({color:0x8399b0,roughness:.9,side:THREE.DoubleSide})));
+// Distinctive triangular spines on BOTH edges, not a conventional green highway railing.
+const spikeMaterial=new THREE.MeshStandardMaterial({color:0x24b5e8,side:THREE.DoubleSide,roughness:.8});const spikeGeo=new THREE.BufferGeometry();const spikePos=[],spikeInd=[];let si=0;for(let t=0;t<maxT-2;t+=2.6){for(const side of [-1,1]){const f=frame(t),f2=frame(t+2.4);const a=f.p.clone().addScaledVector(f.right,side*(width/2+.1));const b=f2.p.clone().addScaledVector(f2.right,side*(width/2+.1));const peak=a.clone().lerp(b,.48);peak.y+=0.85;for(const v of [a,b,peak])spikePos.push(v.x,v.y,v.z);spikeInd.push(si,si+1,si+2);si+=3}}spikeGeo.setAttribute('position',new THREE.Float32BufferAttribute(spikePos,3));spikeGeo.setIndex(spikeInd);spikeGeo.computeVertexNormals();scene.add(new THREE.Mesh(spikeGeo,spikeMaterial));
+// Vast golden cloud sea: layered, overlapping soft cloud forms, never blue water or green land.
+const cloudMats=[new THREE.MeshLambertMaterial({color:0xffc400,transparent:true,opacity:.98}),new THREE.MeshLambertMaterial({color:0xffdf3d,transparent:true,opacity:.98}),new THREE.MeshLambertMaterial({color:0xf6a800,transparent:true,opacity:.97})];const sphere=new THREE.SphereGeometry(1,9,6);const rng=(i)=>{let x=Math.sin(i*127.1+4.71)*43758.5453;return x-Math.floor(x)};for(let i=0;i<2800;i++){const z=-rng(i*3+1)*1900,x=(rng(i*3+2)-.5)*550,y=14+rng(i*3+3)*4;const m=new THREE.Mesh(sphere,cloudMats[i%3]);m.position.set(x,y,z);m.scale.set(15+rng(i+5)*27,6+rng(i+6)*5,16+rng(i+7)*25);scene.add(m)}
+// Mundo tridimensional completo; sin imágenes planas gigantes delante de la ruta.
+const goal=createKaioGoal(THREE,scene,path);
+// El planeta sigue siendo tridimensional. Solo Kaio es un recorte real de anime.
+// El personaje 3D simplificado queda como respaldo si falla la textura.
+const realKaioTexture=new THREE.TextureLoader();
+realKaioTexture.load('./assets-kaio/kaio-real.webp',texture=>{
+ texture.colorSpace=THREE.SRGBColorSpace;
+ const img=texture.image;
+ const aspect=(img.width||740)/(img.height||1020);
+ const kaioSprite=new THREE.Sprite(new THREE.SpriteMaterial({
+  map:texture,transparent:true,alphaTest:.02,depthTest:true,depthWrite:false,fog:false
+ }));
+ // Ubicación geométrica exacta en el hemisferio frontal de la esfera.
+ // Antes la parte inferior de la ilustración quedaba oculta por el planeta.
+ const kaioHeight=9.5;
+ const footX=8.0, footZ=17.0;
+ const radius=goal.radius||22;
+ const footY=Math.sqrt(Math.max(0,radius*radius-footX*footX-footZ*footZ));
+ kaioSprite.position.copy(goal.center).add(new THREE.Vector3(
+  footX,footY+kaioHeight*.50,footZ+.08
+ ));
+ kaioSprite.scale.set(kaioHeight*aspect,kaioHeight,1);
+ scene.add(kaioSprite);
+ goal.kaio.visible=false;
+},undefined,error=>{
+ console.warn('Kaio original no pudo cargar: se conserva Kaio 3D simplificado',error);
+});
+const mission=document.querySelector('#mission');
+function updateMission(m){
+ const remain=Math.max(0,Math.ceil(1000-m));
+ let label;
+ if(remain===0)label="¡Llegaste! ¡Kaio-sama te está esperando!";
+ else if(m<150)label="¡Corré hasta el planeta de Kaio-sama! · "+remain+" m";
+ else if(m<450)label="¡Ya se ve el planeta! · "+remain+" m";
+ else if(m<700)label="¡Estás cada vez más cerca! · "+remain+" m";
+ else if(m<900)label="¡Último tramo del Camino de la Serpiente! · "+remain+" m";
+ else label="¡Ahí está Kaio-sama! ¡No aflojes! · "+remain+" m";
+ if(mission.textContent!==label)mission.textContent=label;
+}
+const music=document.querySelector('#music'),musicToggle=document.querySelector('#musicToggle');let musicURL=null;
+document.querySelector('#musicFile').addEventListener('change',async e=>{const f=e.target.files&&e.target.files[0];if(!f)return;if(musicURL)URL.revokeObjectURL(musicURL);musicURL=URL.createObjectURL(f);music.src=musicURL;musicToggle.disabled=false;musicToggle.textContent='♫ Pausar música';try{await music.play()}catch(err){musicToggle.textContent='♫ Reproducir música'}});
+musicToggle.onclick=async()=>{if(music.paused){try{await music.play();musicToggle.textContent='♫ Pausar música'}catch(err){musicToggle.textContent='♫ Reproducir música'}}else{music.pause();musicToggle.textContent='♫ Reproducir música'}};
+let t=9,distance=0,paused=false,viewMode="desde arriba",last=performance.now(),rewarded=false,prizeUntil=0,arrived=false;
+const status=document.querySelector('#status'),prize=document.querySelector('#prize');
+let orbitYaw=0,orbitPitch=0,orbitZoom=1,dragPoint=null;
+renderer.domElement.style.touchAction='none';
+// Después de llegar, 1 dedo gira alrededor del planeta; 2 dedos cambian el zoom.
+const pointers=new Map();
+renderer.domElement.addEventListener('pointerdown',e=>{
+ if(!arrived)return;
+ renderer.domElement.setPointerCapture(e.pointerId);
+ pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+ dragPoint={x:e.clientX,y:e.clientY};
+});
+renderer.domElement.addEventListener('pointermove',e=>{
+ if(!arrived||!pointers.has(e.pointerId))return;
+ const old=pointers.get(e.pointerId);
+ if(pointers.size===1){
+  orbitYaw-=(e.clientX-old.x)*.009;
+  orbitPitch=THREE.MathUtils.clamp(orbitPitch+(e.clientY-old.y)*.004,-.7,.7);
+ }else{
+  const other=[...pointers.entries()].find(([id])=>id!==e.pointerId);
+  if(other){
+   const before=Math.hypot(old.x-other[1].x,old.y-other[1].y);
+   const after=Math.hypot(e.clientX-other[1].x,e.clientY-other[1].y);
+   if(before>20&&after>20)orbitZoom=THREE.MathUtils.clamp(orbitZoom*before/after,.65,2.0);
+  }
+ }
+ pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+});
+function dropPointer(e){pointers.delete(e.pointerId);}
+renderer.domElement.addEventListener('pointerup',dropPointer);
+renderer.domElement.addEventListener('pointercancel',dropPointer);
+
+const kaioMeet=document.querySelector('#kaioMeet');
+const kaioImg=document.querySelector('#kaioImg');
+const kaioLine=document.querySelector('#kaioLine');
+const kaioDialog=[
+ "¡Llegaste! ¡Te estaba esperando al final del Camino de la Serpiente!",
+ "¡Increíble! Recorriste mil metros. ¡Tenés el espíritu de un auténtico guerrero!",
+ "Te ganaste la primera esfera del dragón. ¡Pero todavía te quedan muchos entrenamientos!",
+ "¿Estás listo para entrenar con Kaio-sama? ¡Descansá un momento y seguí adelante!"
+];
+let kaioIndex=0;
+function stopKaioVoice(){
+ if('speechSynthesis' in window)window.speechSynthesis.cancel();
+ kaioImg.classList.remove('speaking');
+}
+function kaioSpeak(){
+ if(!('speechSynthesis' in window)){
+  document.querySelector('#kaioListen').textContent='Audio no disponible';
+  return;
+ }
+ stopKaioVoice();
+ const text=kaioDialog[kaioIndex];
+ const speech=new SpeechSynthesisUtterance(text);
+ speech.lang='es-AR';speech.rate=.90;speech.pitch=.83;speech.volume=1;
+ const voices=window.speechSynthesis.getVoices();
+ const voice=voices.find(v=>/^es(-|_)/i.test(v.lang) && /AR|UY/i.test(v.lang))
+   ||voices.find(v=>/^es(-|_)/i.test(v.lang));
+ if(voice)speech.voice=voice;
+ speech.onstart=()=>kaioImg.classList.add('speaking');
+ speech.onend=()=>kaioImg.classList.remove('speaking');
+ speech.onerror=()=>kaioImg.classList.remove('speaking');
+ window.speechSynthesis.speak(speech);
+}
+function openKaio(){
+ kaioIndex=0;kaioLine.textContent=kaioDialog[0];
+ kaioMeet.classList.add('visible');
+}
+document.querySelector('#kaioListen').onclick=kaioSpeak;
+document.querySelector('#meetKaio').onclick=()=>openKaio();
+document.querySelector('#kaioNext').onclick=()=>{
+ stopKaioVoice();kaioIndex=(kaioIndex+1)%kaioDialog.length;
+ kaioLine.textContent=kaioDialog[kaioIndex];
+};
+document.querySelector('#kaioClose').onclick=()=>{
+ stopKaioVoice();kaioMeet.classList.remove('visible');
+};
+function showPrize(now){prize.classList.remove('active');void prize.offsetWidth;prize.classList.add('active');prizeUntil=now+5000}
+document.querySelector('#test').onclick=()=>showPrize(performance.now());
+document.querySelector('#pause').onclick=e=>{paused=!paused;e.target.textContent=paused?'Continuar':'Pausar'};
+// Tres ángulos: corredor, elevada y seguimiento directo del planeta.
+// El juego comienza en vista superior, corredor es la siguiente vista.
+const views=['desde arriba','corredor','elevada','planeta'];
+document.querySelector('#view').onclick=e=>{
+ viewMode=views[(views.indexOf(viewMode)+1)%views.length];
+ e.target.textContent='Vista: '+viewMode;
+};
+function avanzarHasta(m){
+ // Accesos de prueba: no alteran la velocidad configurada ni la música.
+ distance=THREE.MathUtils.clamp(Math.floor(m),0,1000);
+ if(distance<1000){
+  // Permite volver a probar la aproximación después de haber llegado.
+  arrived=false;rewarded=false;prizeUntil=0;prize.classList.remove('active');stopKaioVoice();kaioMeet.classList.remove('visible');
+ }
+ t=Math.min(goal.goalT,9+distance);
+ // Reposicionamiento inmediato de cámara para no atravesar toda la escena.
+ if(distance<1000){
+  const p=frame(t).p;
+  if(viewMode==='desde arriba'){
+   // Rumbo real: z decrece, por lo que con cámara.up en +z avanzamos
+   // visualmente desde ARRIBA hacia ABAJO de la pantalla.
+   const ahead=frame(Math.min(goal.goalT,t+45)).p;
+   camera.position.copy(ahead).add(new THREE.Vector3(0,136,0));
+   camera.up.set(0,0,1);
+  }else{
+   camera.position.copy(p).add(new THREE.Vector3(0,viewMode==='elevada'?30:2.8,viewMode==='elevada'?22:7));
+   camera.up.set(0,1,0);
+  }
+ }
+ updateMission(distance);
+}
+document.querySelector('#forward').onclick=()=>avanzarHasta(distance+100);
+document.querySelector('#nearEnd').onclick=()=>avanzarHasta(930);
+document.querySelector('#reachEnd').onclick=()=>avanzarHasta(1000);
+function loop(now){requestAnimationFrame(loop);const dt=Math.min((now-last)/1000,.05);last=now;
+if(!paused&&!arrived){const meters=dt*Number(document.querySelector('#speed').value);distance=Math.min(1000,distance+meters);t=9+distance}
+if(t>goal.goalT)t=goal.goalT;
+updateMission(distance);
+if(distance>=1000&&!rewarded){rewarded=true;arrived=true;openKaio()}
+if(prizeUntil&&now>prizeUntil){prize.classList.remove('active');prizeUntil=0}
+const high=viewMode==='elevada',focusPlanet=viewMode==='planeta';
+const f=frame(t),look=frame(t+(high?70:24));
+const bob=high||paused?0:Math.sin(now*.016)*.09;
+if(arrived && viewMode==='desde arriba'){
+ // Llegada vista cenital, sin invertir el camino.
+ camera.up.set(0,0,1);
+ const target=goal.center.clone().add(new THREE.Vector3(0,3,0));
+ const desired=target.clone().add(new THREE.Vector3(
+  Math.sin(orbitYaw)*12,Math.max(95,78/camera.aspect)*orbitZoom,
+  12+orbitPitch*28
+ ));
+ camera.position.lerp(desired,Math.min(1,dt*2));
+ camera.lookAt(target);
+}else if(arrived){
+ camera.up.set(0,1,0);
+ const departure=Math.max(68,35/camera.aspect)*orbitZoom;
+ const desired=goal.center.clone().add(new THREE.Vector3(
+   Math.sin(orbitYaw)*departure + (viewMode==='elevada'?8:0),
+   (viewMode==='elevada'?25:13)+orbitPitch*departure*.4,
+   Math.cos(orbitYaw)*departure
+ ));
+ camera.position.lerp(desired,Math.min(1,dt*1.7));
+ camera.lookAt(goal.center.clone().add(new THREE.Vector3(0,6,0)));
+ }else if(viewMode==='desde arriba'){
+ // Vista de pájaro: el avance se proyecta de arriba hacia abajo.
+ camera.up.set(0,0,1);
+ const visibleAhead=frame(Math.min(goal.goalT,t+46)).p;
+ const desired=visibleAhead.clone().add(new THREE.Vector3(0,137,0));
+ camera.position.lerp(desired,Math.min(1,dt*4));
+ const target=visibleAhead.clone().add(new THREE.Vector3(0,0,0));
+ camera.lookAt(target);
+}else{
+ camera.up.set(0,1,0);
+ const desired=f.p.clone().add(new THREE.Vector3(0,high?30:(focusPlanet?3.6:1.7+bob),high?22:(focusPlanet?5:1.8)));
+ camera.position.lerp(desired,Math.min(1,dt*5));
+ const target=look.p.clone().add(new THREE.Vector3(0,high?0:1.65,0));
+ // Al aproximarse, la cámara deja de mirar una ruta infinita y enfoca el destino.
+ const planetFocus=goal.center.clone().add(new THREE.Vector3(0,7,0));
+ target.lerp(planetFocus,focusPlanet?1:THREE.MathUtils.smoothstep(distance,550,980)*.92);
+ camera.lookAt(target);
+}
+status.textContent=Math.floor(distance)+' m / 1 km';
+renderer.render(scene,camera)}
+requestAnimationFrame(loop);window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+</script></body></html>
