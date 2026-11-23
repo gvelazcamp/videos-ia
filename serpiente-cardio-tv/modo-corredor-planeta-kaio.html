@@ -23,7 +23,7 @@
 </style></head><body><div id="ui"><button id="pause">Pausar</button><button id="view">Vista: corredor</button><label>Velocidad <select id="speed"><option value="2.8" selected>Corredor · 10 km/h</option><option value="4.2">Rápido · 15 km/h</option><option value="7">Turbo · 25 km/h</option></select></label><button id="test">Probar premio 1 km</button><label style="cursor:pointer;background:#17243cbf;border:1px solid #d7e4ff;border-radius:10px;padding:10px">♫ Cargar mi MP3<input id="musicFile" type="file" accept="audio/mpeg,audio/mp3,audio/*" style="display:none"></label><button id="musicToggle" disabled>♫ Pausar música</button><audio id="music" loop preload="none"></audio><span id="status">0 m / 1 km</span></div><div id="travel"><button id="forward" type="button">Avanzar +100 m</button><button id="nearEnd" type="button">Últimos 70 m</button><button id="reachEnd" type="button">Llegar al final</button></div><div id="note">Camino de la Serpiente · ¡Llegá hasta Kaio-sama!</div><div id="mission" role="status">¡Kaio-sama te espera! · Faltan 1.000 m</div><div id="prize"><div><div class="prizeText">¡LLEGASTE AL PLANETA DE KAIO-SAMA!</div><div class="ball">★</div><div class="subPrize">¡CONSEGUISTE LA PRIMERA ESFERA DEL DRAGÓN!</div></div></div><div id="kaioMeet" role="dialog" aria-modal="true" aria-labelledby="kaioHeading">
  <div class="kaioSheet">
   <h2 id="kaioHeading">¡Llegaste al planeta de Kaio-sama!</h2>
-  <img id="kaioImg" src="./kaio-saludando.webp" alt="Kaio-sama saludándote, recortado y con fondo transparente">
+  <img id="kaioImg" src="./assets-kaio/kaio-real.webp" onerror="this.onerror=null;this.src='./kaio-saludando.webp'" alt="Kaio-sama de Dragon Ball Z, recortado y con fondo transparente">
   <p id="kaioLine" aria-live="polite">¡Llegaste! ¡Te estaba esperando al final del Camino de la Serpiente!</p>
   <div id="kaioReward">★ ¡Conseguiste la primera esfera del dragón!</div>
   <div class="kaioButtons">
@@ -55,18 +55,48 @@ const spikeMaterial=new THREE.MeshStandardMaterial({color:0x24b5e8,side:THREE.Do
 // Vast golden cloud sea: layered, overlapping soft cloud forms, never blue water or green land.
 const cloudMats=[new THREE.MeshLambertMaterial({color:0xffc400,transparent:true,opacity:.98}),new THREE.MeshLambertMaterial({color:0xffdf3d,transparent:true,opacity:.98}),new THREE.MeshLambertMaterial({color:0xf6a800,transparent:true,opacity:.97})];const sphere=new THREE.SphereGeometry(1,9,6);const rng=(i)=>{let x=Math.sin(i*127.1+4.71)*43758.5453;return x-Math.floor(x)};for(let i=0;i<2800;i++){const z=-rng(i*3+1)*1900,x=(rng(i*3+2)-.5)*550,y=14+rng(i*3+3)*4;const m=new THREE.Mesh(sphere,cloudMats[i%3]);m.position.set(x,y,z);m.scale.set(15+rng(i+5)*27,6+rng(i+6)*5,16+rng(i+7)*25);scene.add(m)}
 const goal=createKaioGoal(THREE,scene,path);
-// La figura de la llegada se reemplaza por el Kaio-sama ilustrado sin fondo,
-// pero si el recurso no carga se conserva el Kaio 3D original como respaldo.
-new THREE.TextureLoader().load('./kaio-saludando.webp',texture=>{
+// Referencias del planeta y Kaio reales recortadas con transparencia desde Google.
+// Cargan como sprites en la META: se acercan en perspectiva con cada metro.
+// Si falla la descarga, la escena 3D que funcionaba sigue siendo el respaldo.
+const imgLoader=new THREE.TextureLoader();
+imgLoader.load('./assets-kaio/planeta-real.webp',texture=>{
  texture.colorSpace=THREE.SRGBColorSpace;
- const mat=new THREE.SpriteMaterial({map:texture,transparent:true,depthWrite:false,fog:false});
+ const image=texture.image;
+ const aspect=(image.width||447)/(image.height||460);
+ const realPlanet=new THREE.Sprite(new THREE.SpriteMaterial({
+  map:texture,transparent:true,alphaTest:.03,depthWrite:false,
+  depthTest:false,fog:false
+ }));
+ realPlanet.position.copy(goal.center);
+ realPlanet.scale.set(65*aspect,65,1);
+ realPlanet.renderOrder=90;
+ scene.add(realPlanet);
+ goal.planet.visible=false;
+},undefined,()=>{
+ console.warn('Referencia del planeta no disponible; sigue el planeta 3D anterior');
+});
+function showRealKaio(texture){
+ texture.colorSpace=THREE.SRGBColorSpace;
+ const im=texture.image;
+ const aspect=(im.width||740)/(im.height||1020);
+ const mat=new THREE.SpriteMaterial({
+  map:texture,transparent:true,alphaTest:.02,depthWrite:false,
+  depthTest:false,fog:false
+ });
  const kaio2d=new THREE.Sprite(mat);
- const center=new THREE.Vector3();goal.kaio.getWorldPosition(center);
- kaio2d.position.copy(center).add(new THREE.Vector3(0,7.5,0));
- kaio2d.scale.set(15,20,1);
+ // Personaje esperando frente a la esfera, visible durante la aproximación.
+ const pos=new THREE.Vector3();goal.kaio.getWorldPosition(pos);
+ kaio2d.position.copy(pos).add(new THREE.Vector3(0,8.5,4.4));
+ kaio2d.scale.set(22*aspect,22,1);
+ kaio2d.renderOrder=91;
  scene.add(kaio2d);
  goal.kaio.visible=false;
-},undefined,()=>{console.warn('Kaio 2D no cargó; se mantiene el modelo 3D de respaldo')});
+}
+imgLoader.load('./assets-kaio/kaio-real.webp',showRealKaio,undefined,()=>{
+ imgLoader.load('./kaio-saludando.webp',showRealKaio,undefined,()=>{
+  console.warn('Referencia de Kaio no disponible; se mantiene personaje 3D');
+ });
+});
 const mission=document.querySelector('#mission');
 function updateMission(m){
  const remain=Math.max(0,Math.ceil(1000-m));
