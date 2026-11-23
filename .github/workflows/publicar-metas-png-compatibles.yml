@@ -1,0 +1,44 @@
+name: Publicar cuatro imágenes PNG compatibles para llegadas
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/publicar-metas-png-compatibles.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  convertir:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Convertir imágenes originales AVIF a cuatro PNG con transparencia
+        run: |
+          python -m pip install --quiet pillow pillow-avif-plugin
+          python - <<'PY'
+          import pillow_avif
+          from PIL import Image
+          from pathlib import Path
+          p=Path('serpiente-cardio-tv/assets-metas')
+          sheet=Image.open(p/'imagenes-originales-4.avif').convert('RGBA')
+          assert sheet.size==(720,135), f'Dimensiones inesperadas: {sheet.size}'
+          for i,name in enumerate(('bulma','kaio','kame','goku')):
+              img=sheet.crop((i*180,0,(i+1)*180,135))
+              assert img.getbbox(), f'Imagen {name} vacía'
+              img.resize((540,405),Image.Resampling.LANCZOS).save(
+                 p/f'meta-{name}.png', optimize=True)
+              print(name, 'alpha',img.getchannel('A').getextrema(), 'bytes',(p/f'meta-{name}.png').stat().st_size)
+          PY
+      - name: Publicar únicamente recursos de metas
+        run: |
+          set -euo pipefail
+          git add -- serpiente-cardio-tv/assets-metas/meta-bulma.png serpiente-cardio-tv/assets-metas/meta-kaio.png serpiente-cardio-tv/assets-metas/meta-kame.png serpiente-cardio-tv/assets-metas/meta-goku.png
+          if git diff --cached --quiet; then exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Exportar cuatro imágenes reales PNG compatibles con navegadores móviles"
+          git pull --rebase origin main
+          git push origin HEAD:main
