@@ -1,0 +1,850 @@
+{
+  "goku": {
+    "mallas": [
+      {
+        "objeto": "geometry_0",
+        "vertices": 24074,
+        "caras": 8026,
+        "islas": {
+          "total": 8024,
+          "mas_grandes": [
+            4,
+            4,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3
+          ],
+          "grupos_pequenos_ejemplo": [
+            {
+              "vertices": 3,
+              "centro_local": [
+                -0.107,
+                -0.01,
+                0.132
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                -0.007,
+                0.012,
+                0.282
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                0.033,
+                -0.014,
+                0.366
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                -0.128,
+                0.024,
+                0.445
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                -0.027,
+                -0.041,
+                -0.198
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                0.015,
+                0.044,
+                -0.249
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                0.104,
+                0.019,
+                -0.5
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                0.128,
+                -0.003,
+                -0.5
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                0.131,
+                -0.037,
+                -0.5
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                0.114,
+                -0.038,
+                -0.5
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                0.096,
+                -0.027,
+                -0.5
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                0.101,
+                0.052,
+                -0.5
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                0.097,
+                0.031,
+                -0.5
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                0.123,
+                0.061,
+                -0.5
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                0.149,
+                -0.0,
+                -0.5
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                0.158,
+                -0.024,
+                -0.5
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                0.131,
+                -0.068,
+                -0.5
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                0.123,
+                -0.061,
+                -0.5
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                0.081,
+                0.063,
+                -0.5
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                0.072,
+                0.055,
+                -0.5
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                0.117,
+                0.072,
+                -0.5
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                0.16,
+                -0.012,
+                -0.5
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                0.124,
+                -0.073,
+                -0.5
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                -0.124,
+                0.021,
+                -0.5
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                -0.111,
+                -0.005,
+                -0.5
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                -0.104,
+                0.018,
+                -0.5
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                -0.131,
+                -0.052,
+                -0.5
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                -0.132,
+                -0.02,
+                -0.5
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                -0.112,
+                -0.054,
+                -0.5
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                -0.152,
+                -0.006,
+                -0.5
+              ]
+            }
+          ]
+        },
+        "bounds_world": [
+          [
+            -0.2368,
+            -0.3549,
+            -0.4284
+          ],
+          [
+            -0.2368,
+            -0.3549,
+            0.4834
+          ],
+          [
+            -0.2368,
+            0.4154,
+            0.4834
+          ],
+          [
+            -0.2368,
+            0.4154,
+            -0.4284
+          ],
+          [
+            0.1747,
+            -0.3549,
+            -0.4284
+          ],
+          [
+            0.1747,
+            -0.3549,
+            0.4834
+          ],
+          [
+            0.1747,
+            0.4154,
+            0.4834
+          ],
+          [
+            0.1747,
+            0.4154,
+            -0.4284
+          ]
+        ],
+        "armature": "Corredor_Trellis_Armature"
+      },
+      {
+        "objeto": "Icosphere",
+        "vertices": 42,
+        "caras": 80,
+        "islas": {
+          "total": 1,
+          "mas_grandes": [
+            42
+          ],
+          "grupos_pequenos_ejemplo": []
+        },
+        "bounds_world": [
+          [
+            -0.9511,
+            -1.0,
+            -1.0
+          ],
+          [
+            -0.9511,
+            -1.0,
+            1.0
+          ],
+          [
+            -0.9511,
+            1.0,
+            1.0
+          ],
+          [
+            -0.9511,
+            1.0,
+            -1.0
+          ],
+          [
+            0.9511,
+            -1.0,
+            -1.0
+          ],
+          [
+            0.9511,
+            -1.0,
+            1.0
+          ],
+          [
+            0.9511,
+            1.0,
+            1.0
+          ],
+          [
+            0.9511,
+            1.0,
+            -1.0
+          ]
+        ],
+        "armature": null
+      }
+    ],
+    "huesos": {
+      "Corredor_Trellis_Armature": 17
+    },
+    "animaciones": [
+      {
+        "nombre": "Correr_Ciclo_32f",
+        "frames": [
+          1.0,
+          33.0
+        ]
+      }
+    ],
+    "correcciones": {
+      "geometry_0": {
+        "verts": 24074,
+        "faces": 8026,
+        "vertices_sin_caras_eliminados": 0
+      },
+      "Icosphere": {
+        "verts": 42,
+        "faces": 80,
+        "vertices_sin_caras_eliminados": 0
+      }
+    },
+    "candidato_bytes": 2616580
+  },
+  "vegeta": {
+    "mallas": [
+      {
+        "objeto": "geometry_0",
+        "vertices": 18734,
+        "caras": 6246,
+        "islas": {
+          "total": 6244,
+          "mas_grandes": [
+            4,
+            4,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3,
+            3
+          ],
+          "grupos_pequenos_ejemplo": [
+            {
+              "vertices": 3,
+              "centro_local": [
+                0.143,
+                0.02,
+                -0.022
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                0.102,
+                -0.022,
+                -0.498
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                0.084,
+                -0.036,
+                -0.498
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                0.103,
+                -0.002,
+                -0.497
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                0.102,
+                0.005,
+                -0.497
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                0.117,
+                0.008,
+                -0.496
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                0.121,
+                -0.022,
+                -0.498
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                0.095,
+                -0.068,
+                -0.497
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                0.124,
+                -0.031,
+                -0.498
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                0.115,
+                -0.063,
+                -0.497
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                0.127,
+                -0.046,
+                -0.497
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                0.134,
+                -0.071,
+                -0.497
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                0.124,
+                -0.083,
+                -0.496
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                0.11,
+                -0.087,
+                -0.496
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                0.1,
+                -0.079,
+                -0.497
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                0.13,
+                -0.085,
+                -0.496
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                0.115,
+                0.015,
+                -0.496
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                0.099,
+                0.014,
+                -0.497
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                0.094,
+                0.024,
+                -0.498
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                0.106,
+                0.045,
+                -0.498
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                0.092,
+                0.038,
+                -0.498
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                0.124,
+                0.041,
+                -0.498
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                0.075,
+                0.025,
+                -0.498
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                0.093,
+                0.059,
+                -0.498
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                -0.066,
+                -0.046,
+                0.042
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                -0.062,
+                -0.053,
+                0.04
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                -0.062,
+                -0.052,
+                0.032
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                -0.067,
+                -0.044,
+                0.03
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                -0.054,
+                -0.064,
+                0.042
+              ]
+            },
+            {
+              "vertices": 3,
+              "centro_local": [
+                -0.048,
+                -0.067,
+                0.038
+              ]
+            }
+          ]
+        },
+        "bounds_world": [
+          [
+            -0.2312,
+            -0.3722,
+            -0.4305
+          ],
+          [
+            -0.2312,
+            -0.3722,
+            0.5064
+          ],
+          [
+            -0.2312,
+            0.396,
+            0.5064
+          ],
+          [
+            -0.2312,
+            0.396,
+            -0.4305
+          ],
+          [
+            0.1817,
+            -0.3722,
+            -0.4305
+          ],
+          [
+            0.1817,
+            -0.3722,
+            0.5064
+          ],
+          [
+            0.1817,
+            0.396,
+            0.5064
+          ],
+          [
+            0.1817,
+            0.396,
+            -0.4305
+          ]
+        ],
+        "armature": "Corredor_Trellis_Armature"
+      },
+      {
+        "objeto": "Icosphere",
+        "vertices": 42,
+        "caras": 80,
+        "islas": {
+          "total": 1,
+          "mas_grandes": [
+            42
+          ],
+          "grupos_pequenos_ejemplo": []
+        },
+        "bounds_world": [
+          [
+            -0.9511,
+            -1.0,
+            -1.0
+          ],
+          [
+            -0.9511,
+            -1.0,
+            1.0
+          ],
+          [
+            -0.9511,
+            1.0,
+            1.0
+          ],
+          [
+            -0.9511,
+            1.0,
+            -1.0
+          ],
+          [
+            0.9511,
+            -1.0,
+            -1.0
+          ],
+          [
+            0.9511,
+            -1.0,
+            1.0
+          ],
+          [
+            0.9511,
+            1.0,
+            1.0
+          ],
+          [
+            0.9511,
+            1.0,
+            -1.0
+          ]
+        ],
+        "armature": null
+      },
+      {
+        "objeto": "Icosphere.001",
+        "vertices": 42,
+        "caras": 80,
+        "islas": {
+          "total": 1,
+          "mas_grandes": [
+            42
+          ],
+          "grupos_pequenos_ejemplo": []
+        },
+        "bounds_world": [
+          [
+            -0.9511,
+            -1.0,
+            -1.0
+          ],
+          [
+            -0.9511,
+            -1.0,
+            1.0
+          ],
+          [
+            -0.9511,
+            1.0,
+            1.0
+          ],
+          [
+            -0.9511,
+            1.0,
+            -1.0
+          ],
+          [
+            0.9511,
+            -1.0,
+            -1.0
+          ],
+          [
+            0.9511,
+            -1.0,
+            1.0
+          ],
+          [
+            0.9511,
+            1.0,
+            1.0
+          ],
+          [
+            0.9511,
+            1.0,
+            -1.0
+          ]
+        ],
+        "armature": null
+      }
+    ],
+    "huesos": {
+      "Corredor_Trellis_Armature": 17
+    },
+    "animaciones": [
+      {
+        "nombre": "Correr_Ciclo_32f.001",
+        "frames": [
+          1.0,
+          33.0
+        ]
+      }
+    ],
+    "correcciones": {
+      "geometry_0": {
+        "verts": 18734,
+        "faces": 6246,
+        "vertices_sin_caras_eliminados": 0
+      },
+      "Icosphere": {
+        "verts": 42,
+        "faces": 80,
+        "vertices_sin_caras_eliminados": 0
+      },
+      "Icosphere.001": {
+        "verts": 42,
+        "faces": 80,
+        "vertices_sin_caras_eliminados": 0
+      }
+    },
+    "candidato_bytes": 2339376
+  }
+}
