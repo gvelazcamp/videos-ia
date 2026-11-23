@@ -391,7 +391,16 @@
         "vertices_sin_caras_eliminados": 0
       }
     },
-    "candidato_bytes": 2616580
+    "candidato_bytes": 2616580,
+    "soldadura": {
+      "geometry_0": {
+        "vertices_antes": 24074,
+        "vertices_despues": 3994,
+        "soldados": 20080,
+        "islas_despues": 1
+      }
+    },
+    "soldado_bytes": 1698300
   },
   "vegeta": {
     "mallas": [
@@ -845,6 +854,15 @@
         "vertices_sin_caras_eliminados": 0
       }
     },
-    "candidato_bytes": 2339376
+    "candidato_bytes": 2339376,
+    "soldadura": {
+      "geometry_0": {
+        "vertices_antes": 18734,
+        "vertices_despues": 3118,
+        "soldados": 15616,
+        "islas_despues": 1
+      }
+    },
+    "soldado_bytes": 1625924
   }
 }
