@@ -1,0 +1,120 @@
+name: Comprobar que las cuatro metas se VEN en móvil
+
+on:
+  push:
+    paths:
+      - 'serpiente-cardio-tv/menu-rutas-destinos-visibles.html'
+      - 'serpiente-cardio-tv/assets-metas/meta-*.png'
+      - '.github/workflows/comprobar-destinos-visibles-movil.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: comprobar-destinos-visibles-movil
+  cancel-in-progress: true
+
+jobs:
+  pruebas:
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+      - name: Instalar navegador de prueba
+        run: |
+          python -m pip install --quiet playwright pillow
+          python -m playwright install --with-deps chromium
+      - name: Validar imágenes y captura real durante la carrera
+        run: |
+          python -m http.server 8765 >/tmp/serpiente.log 2>&1 &
+          sleep 2
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          from playwright.sync_api import sync_playwright
+          import traceback,json
+          root=Path("serpiente-cardio-tv/pruebas-destinos-visibles")
+          root.mkdir(parents=True,exist_ok=True)
+          assets=Path("serpiente-cardio-tv/assets-metas")
+          for name in ["bulma","kaio","kame","goku"]:
+              img=Image.open(assets/f"meta-{name}.png").convert("RGBA")
+              assert img.width>=180 and img.height>=135
+              assert img.getchannel("A").getextrema()[1]==255
+          report={"checks":[],"errors":[]}
+          with sync_playwright() as p:
+              browser=p.chromium.launch(headless=True,args=[
+                "--enable-webgl","--use-gl=angle","--use-angle=swiftshader",
+                "--disable-web-security"])
+              page=browser.new_page(viewport={"width":430,"height":915},
+                  device_scale_factor=1,is_mobile=True,has_touch=True)
+              page.on("pageerror",lambda e: report["errors"].append(str(e)))
+              try:
+                  page.goto("http://127.0.0.1:8765/serpiente-cardio-tv/menu-rutas-destinos-visibles.html",
+                            wait_until="domcontentloaded",timeout=60000)
+                  page.wait_for_timeout(5500)
+                  assert page.locator("#routeMenu").is_visible()
+                  page.screenshot(path=str(root/"01-menu.jpg"),type="jpeg",quality=82)
+                  for km in [5,10,15,20]:
+                      page.locator(f'[data-km="{km}"]').click()
+                      assert page.locator("#view").inner_text()=="Vista: corredor"
+                      page.locator("#nearEnd").click()
+                      page.wait_for_timeout(1500)
+                      v=page.locator("#arrivalArt").evaluate("""e=>{
+                        let r=e.getBoundingClientRect(),s=getComputedStyle(e);
+                        return {loaded:e.complete&&e.naturalWidth>0,display:s.display,
+                        width:r.width,height:r.height,left:r.left,top:r.top,
+                        viewportWidth:innerWidth,viewportHeight:innerHeight,
+                        src:e.currentSrc};
+                      }""")
+                      assert v["loaded"] and v["display"]!="none",v
+                      assert v["width"]>35 and v["height"]>25,v
+                      assert v["left"]<v["viewportWidth"] and v["left"]+v["width"]>0,v
+                      assert v["top"]<v["viewportHeight"] and v["top"]+v["height"]>0,v
+                      shot=f"02-antes-{km}km.jpg"
+                      page.screenshot(path=str(root/shot),type="jpeg",quality=82)
+                      page.locator("#reachEnd").click()
+                      page.wait_for_timeout(2200)
+                      final=page.locator("#arrivalArt").evaluate("""e=>{
+                         let s=getComputedStyle(e),r=e.getBoundingClientRect();
+                         return {loaded:e.complete&&e.naturalWidth>0,
+                            display:s.display,width:r.width,height:r.height,
+                            left:r.left,top:r.top};
+                      }""")
+                      assert final["loaded"] and final["display"]=="block",final
+                      assert final["width"]>75,final
+                      page.screenshot(path=str(root/f"03-llegada-{km}km.jpg"),type="jpeg",quality=82)
+                      report["checks"].append({"km":km,"near":v,"finish":final,"result":"VISIBLE"})
+                      page.locator("#menuAgain").click()
+                      assert page.locator("#routeMenu").is_visible()
+                  assert not report["errors"],report["errors"]
+                  report["result"]="success"
+              except Exception as exc:
+                  report["result"]="failure"
+                  report["error"]=str(exc)
+                  report["traceback"]=traceback.format_exc()[-2500:]
+                  page.screenshot(path=str(root/"error.jpg"),type="jpeg",quality=82)
+                  raise
+              finally:
+                  (root/"reporte.json").write_text(json.dumps(report,ensure_ascii=False,indent=2))
+                  print("CHECK_VISIBILITY",json.dumps(report,ensure_ascii=False))
+                  browser.close()
+          PY
+      - name: Guardar capturas y reporte
+        if: always()
+        run: |
+          set -euo pipefail
+          git add -- serpiente-cardio-tv/pruebas-destinos-visibles/
+          if git diff --cached --quiet; then exit 0; fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'Guardar pruebas de visibilidad real de las cuatro metas'
+          git pull --rebase origin main
+          git push origin HEAD:main
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: capturas-destinos-visibles
+          path: serpiente-cardio-tv/pruebas-destinos-visibles/
+          retention-days: 6
+          if-no-files-found: warn
