@@ -54,7 +54,7 @@
 <p class="routeNotice">El juego de Kaio-sama a 1 km sigue disponible en la versión anterior.</p></div></div>
 <div id="error">No se pudo cargar el motor 3D. Abrí el enlace con conexión a Internet y un navegador actualizado.</div><script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js';
-import {createKaioGoal} from './planeta-kaio-3d-v2.js';
+import {createKaioGoal} from './planeta-kaio-multiruta.js';
 const scene=new THREE.Scene();scene.background=new THREE.Color('#d28ac5');scene.fog=new THREE.FogExp2('#dca5b1',.0006);
 const camera=new THREE.PerspectiveCamera(75,innerWidth/innerHeight,.1,2500);const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,1.7));renderer.setSize(innerWidth,innerHeight);renderer.outputColorSpace=THREE.SRGBColorSpace;document.body.appendChild(renderer.domElement);
 scene.add(new THREE.HemisphereLight(0xfff6d2,0x8798bb,2.1));const sun=new THREE.DirectionalLight(0xffedb4,2.5);sun.position.set(-50,90,-80);scene.add(sun);
@@ -77,7 +77,7 @@ const cloudMats=[new THREE.MeshLambertMaterial({color:0xffc400,transparent:true,
 // Mundo tridimensional completo; sin imágenes planas gigantes delante de la ruta.
 
 const goal=createKaioGoal(THREE,scene,path);
-goal.planet.visible=false;goal.kaio.visible=false;
+goal.planet.visible=false;goal.kaio.visible=false;goal.finish.visible=false;
 // Una sola imagen de destino: se activa en los últimos 450 m para acercarse sin saltos.
 const destCanvas=document.createElement('canvas');destCanvas.width=480;destCanvas.height=360;
 const dc=destCanvas.getContext('2d');
@@ -98,7 +98,7 @@ packImage.onload=()=>{
   const c=document.createElement('canvas');c.width=240;c.height=180;
   const cx=c.getContext('2d');
   // Pack físico con tres imágenes separadas, izquierda Bulma, centro Kame, derecha Goku.
-  cx.drawImage(packImage,st.frame*100,0,100,75,0,0,240,180);
+  cx.drawImage(packImage,st.frame*70,0,70,52,0,0,240,180);
   artByStage[km]=c;
  }
  if(selectedStage)refreshDestination();
