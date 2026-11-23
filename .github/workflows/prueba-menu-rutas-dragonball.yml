@@ -5,7 +5,7 @@ on:
     paths:
       - 'serpiente-cardio-tv/menu-rutas-dragonball.html'
       - 'serpiente-cardio-tv/planeta-kaio-multiruta.js'
-      - 'serpiente-cardio-tv/assets-metas/casas-dragonball.webp'
+      - 'serpiente-cardio-tv/assets-metas/casas-dragonball.avif'
       - '.github/workflows/prueba-menu-rutas-dragonball.yml'
   workflow_dispatch:
 
@@ -48,10 +48,10 @@ jobs:
               page.on("pageerror",lambda e:report["console_errors"].append(str(e)))
               url="http://127.0.0.1:8765/serpiente-cardio-tv/menu-rutas-dragonball.html"
               try:
-                  asset=page.request.get("http://127.0.0.1:8765/serpiente-cardio-tv/assets-metas/casas-dragonball.webp")
+                  asset=page.request.get("http://127.0.0.1:8765/serpiente-cardio-tv/assets-metas/casas-dragonball.avif")
                   assert asset.status==200,"Falta pack de ilustraciones"
-                  im=Image.open("serpiente-cardio-tv/assets-metas/casas-dragonball.webp")
-                  assert im.width==210 and im.height==52
+                  im=Image.open("serpiente-cardio-tv/assets-metas/casas-dragonball.avif")
+                  assert im.width==480 and im.height==120
                   page.goto(url,wait_until="domcontentloaded",timeout=60000)
                   page.wait_for_timeout(5500)
                   assert page.locator("#routeMenu").is_visible()
