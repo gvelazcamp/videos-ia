@@ -81,9 +81,13 @@ function reset(){
 scene.add(new THREE.HemisphereLight(0xc5dbff,0x293348,2.2));
 const light=new THREE.DirectionalLight(0xffffff,2.8);light.position.set(2,6,5);scene.add(light);
 const fill=new THREE.DirectionalLight(0x80baff,1.1);fill.position.set(-4,2,-3);scene.add(fill);
+const facial=new THREE.DirectionalLight(0xffffff,1.2);facial.position.set(0,4,8);scene.add(facial);
 const ground=new THREE.Mesh(new THREE.PlaneGeometry(50,50),new THREE.MeshStandardMaterial({color:0x14243a,roughness:1}));
-ground.rotation.x=-Math.PI/2;ground.position.y=-.035;scene.add(ground);
-const grid=new THREE.GridHelper(14,28,0x416181,0x233a52);grid.position.y=-.02;scene.add(grid);
+ground.rotation.x=-Math.PI/2;ground.position.y=-.035;ground.renderOrder=-100;
+// El piso debe dibujarse DETRÁS, nunca cortar los modelos articulados.
+ground.material.depthTest=false;ground.material.depthWrite=false;scene.add(ground);
+const grid=new THREE.GridHelper(14,28,0x416181,0x233a52);grid.position.y=-.02;grid.renderOrder=-99;
+grid.material.depthTest=false;grid.material.depthWrite=false;scene.add(grid);
 const models={},loader=new GLTFLoader(),clock=new THREE.Clock();
 let active="both",playing=true;
 reset();
