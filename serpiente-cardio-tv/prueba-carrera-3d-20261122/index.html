@@ -112,12 +112,8 @@ function load(name,url){
   gltf.scene.traverse(obj=>{
     if(!obj.isMesh) return;
     obj.frustumCulled=false;
-    // Mostrar las dos caras de superficies abiertas: las mallas reconstruidas
-    // pueden contener triángulos con orientación invertida.
-    for(const mat of (Array.isArray(obj.material)?obj.material:[obj.material])){
-      if(!mat)continue;
-      if(mat.side!==THREE.DoubleSide){mat.side=THREE.DoubleSide;mat.needsUpdate=true;}
-    }
+    // Respetar orientación de materiales exportada por Blender.
+    // Forzar DoubleSide dejaba ver las caras invertidas y aumentaba artefactos negros.
   });
   const wrap=new THREE.Group();wrap.add(gltf.scene);
   // Normalizar tamaño y apoyar el modelo sin modificar la malla ni la animación.
