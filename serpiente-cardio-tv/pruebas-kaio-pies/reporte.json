@@ -1,0 +1,14 @@
+{
+  "status": "1000 m / 1 km",
+  "dialog_display_while_arrived": "flex",
+  "errors": [],
+  "kaio_original_loaded": true,
+  "test_url": "http://127.0.0.1:8765/serpiente-cardio-tv/kaio-apoyado-vista-arriba.html",
+  "samples": [
+    "04-final-3d.jpg",
+    "03b-kaio-de-cerca.jpg",
+    "03-vista-elevada.jpg",
+    "01-inicio.jpg",
+    "02-a-70-metros.jpg"
+  ]
+}
