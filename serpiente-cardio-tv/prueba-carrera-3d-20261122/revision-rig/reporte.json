@@ -16,7 +16,8 @@
     "animacion": [
       {
         "name": "Correr_Ciclo_32f",
-        "adjusted_curves": 0
+        "adjusted_curves": 0,
+        "sample_paths": []
       }
     ],
     "estado": "candidato_pendiente_verificacion_visual"
@@ -38,7 +39,8 @@
     "animacion": [
       {
         "name": "Correr_Ciclo_32f.001",
-        "adjusted_curves": 0
+        "adjusted_curves": 0,
+        "sample_paths": []
       }
     ],
     "estado": "candidato_pendiente_verificacion_visual"
