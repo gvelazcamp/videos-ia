@@ -1,0 +1,46 @@
+{
+  "goku": {
+    "archivo": "revision-rig/goku.glb",
+    "bytes": 2616580,
+    "huesos": 17,
+    "clips": 1,
+    "mallas": {
+      "geometry_0": {
+        "vertices_repesados": 24074,
+        "caras_preservadas": 8026
+      }
+    },
+    "auxiliares_eliminados": [
+      "Icosphere"
+    ],
+    "animacion": [
+      {
+        "name": "Correr_Ciclo_32f",
+        "adjusted_curves": 0
+      }
+    ],
+    "estado": "candidato_pendiente_verificacion_visual"
+  },
+  "vegeta": {
+    "archivo": "revision-rig/vegeta.glb",
+    "bytes": 2339376,
+    "huesos": 17,
+    "clips": 2,
+    "mallas": {
+      "geometry_0": {
+        "vertices_repesados": 18734,
+        "caras_preservadas": 6246
+      }
+    },
+    "auxiliares_eliminados": [
+      "Icosphere"
+    ],
+    "animacion": [
+      {
+        "name": "Correr_Ciclo_32f.001",
+        "adjusted_curves": 0
+      }
+    ],
+    "estado": "candidato_pendiente_verificacion_visual"
+  }
+}
