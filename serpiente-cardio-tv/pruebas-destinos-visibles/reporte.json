@@ -1,0 +1,98 @@
+{
+  "checks": [
+    {
+      "km": 5,
+      "near": {
+        "loaded": true,
+        "display": "block",
+        "width": 245.6875,
+        "height": 184.265625,
+        "left": 94.046875,
+        "top": 335.921875,
+        "viewportWidth": 430,
+        "viewportHeight": 915,
+        "src": "http://127.0.0.1:8765/serpiente-cardio-tv/assets-metas/meta-bulma.png"
+      },
+      "finish": {
+        "loaded": true,
+        "display": "block",
+        "width": 298.59375,
+        "height": 223.9375,
+        "left": 74.890625,
+        "top": 319.15625
+      },
+      "result": "VISIBLE"
+    },
+    {
+      "km": 10,
+      "near": {
+        "loaded": true,
+        "display": "block",
+        "width": 267.6875,
+        "height": 200.765625,
+        "left": 76.25,
+        "top": 325.125,
+        "viewportWidth": 430,
+        "viewportHeight": 915,
+        "src": "http://127.0.0.1:8765/serpiente-cardio-tv/assets-metas/meta-kaio.png"
+      },
+      "finish": {
+        "loaded": true,
+        "display": "block",
+        "width": 302.796875,
+        "height": 227.09375,
+        "left": 60.8984375,
+        "top": 316.59375
+      },
+      "result": "VISIBLE"
+    },
+    {
+      "km": 15,
+      "near": {
+        "loaded": true,
+        "display": "block",
+        "width": 270.390625,
+        "height": 202.78125,
+        "left": 81.8984375,
+        "top": 323.71875,
+        "viewportWidth": 430,
+        "viewportHeight": 915,
+        "src": "http://127.0.0.1:8765/serpiente-cardio-tv/assets-metas/meta-kame.png"
+      },
+      "finish": {
+        "loaded": true,
+        "display": "block",
+        "width": 304.1875,
+        "height": 228.140625,
+        "left": 62.203125,
+        "top": 315.046875
+      },
+      "result": "VISIBLE"
+    },
+    {
+      "km": 20,
+      "near": {
+        "loaded": true,
+        "display": "block",
+        "width": 271.09375,
+        "height": 203.3125,
+        "left": 81.84375,
+        "top": 323.875,
+        "viewportWidth": 430,
+        "viewportHeight": 915,
+        "src": "http://127.0.0.1:8765/serpiente-cardio-tv/assets-metas/meta-goku.png"
+      },
+      "finish": {
+        "loaded": true,
+        "display": "block",
+        "width": 293,
+        "height": 219.75,
+        "left": 65.59375,
+        "top": 324.75
+      },
+      "result": "VISIBLE"
+    }
+  ],
+  "errors": [],
+  "result": "success"
+}
