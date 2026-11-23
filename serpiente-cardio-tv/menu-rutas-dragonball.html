@@ -31,6 +31,13 @@
 .routeChoice span:first-child{color:#ffe49c;font-weight:950;min-width:68px;font-size:18px}
 .routeChoice small{display:block;color:#d2e2fa;font-size:12px;font-weight:500;margin-top:4px}
 .routeChoice:hover,.routeChoice:focus{background:#405f91;outline:2px solid #efce7b}
+.routeThumb{display:block;flex:0 0 67px;width:67px;height:51px;background-image:url('./assets-metas/casas-dragonball.avif');background-size:300% 100%;background-repeat:no-repeat;border-radius:7px}
+.routeThumb.bulma{background-position:0% 50%}
+.routeThumb.kame{background-position:50% 50%}
+.routeThumb.goku{background-position:100% 50%}
+.routeThumb.generic{background:none;display:grid;place-items:center;color:#fbe6a3;border:1px solid #d8c58d;font-weight:900;font-size:11px}
+.routeChoice>div{flex:1;min-width:0}
+@media(max-width:380px){.routeThumb{flex-basis:49px;width:49px;height:38px}.routeChoice span:first-child{min-width:58px}}
 #menuAgain{background:#d6a83e;color:#172540;border-color:#fff3a2;font-weight:850}
 #routeMenu .routeNotice{font-size:12px;color:#adbfde;margin-top:13px}
 @media(max-width:540px){#ui button,#ui select{font-size:12px;padding:8px 9px}#travel button{font-size:11px}}
@@ -47,10 +54,10 @@
   </div>
  </div>
 </div><div id="routeMenu"><div class="routeBox"><h1>Camino de la Serpiente</h1><p>Elegí la distancia y empezá a correr en vista corredor.</p>
-<button class="routeChoice" data-km="5" type="button"><span>5 km</span><div>Casa de Bulma<small>Capsule Corporation · Bulma te recibe</small></div></button>
-<button class="routeChoice" data-km="10" type="button"><span>10 km</span><div>Desafío de 10 km<small>Meta libre · personaje por definir</small></div></button>
-<button class="routeChoice" data-km="15" type="button"><span>15 km</span><div>Kame House<small>La casita rosa en la isla</small></div></button>
-<button class="routeChoice" data-km="20" type="button"><span>20 km</span><div>Casa de Goku<small>La casa blanca en el bosque</small></div></button>
+<button class="routeChoice" data-km="5" type="button"><span>5 km</span><div>Casa de Bulma<small>Capsule Corporation · Bulma te recibe</small></div><i class="routeThumb bulma" aria-hidden="true"></i></button>
+<button class="routeChoice" data-km="10" type="button"><span>10 km</span><div>Desafío de 10 km<small>Meta libre · personaje por definir</small></div><i class="routeThumb generic" aria-hidden="true">META</i></button>
+<button class="routeChoice" data-km="15" type="button"><span>15 km</span><div>Kame House<small>La casita rosa en la isla</small></div><i class="routeThumb kame" aria-hidden="true"></i></button>
+<button class="routeChoice" data-km="20" type="button"><span>20 km</span><div>Casa de Goku<small>La casa blanca en el bosque</small></div><i class="routeThumb goku" aria-hidden="true"></i></button>
 <p class="routeNotice">El juego de Kaio-sama a 1 km sigue disponible en la versión anterior.</p></div></div>
 <div id="error">No se pudo cargar el motor 3D. Abrí el enlace con conexión a Internet y un navegador actualizado.</div><script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js';
