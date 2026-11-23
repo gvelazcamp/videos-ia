@@ -98,13 +98,13 @@ packImage.onload=()=>{
   const c=document.createElement('canvas');c.width=240;c.height=180;
   const cx=c.getContext('2d');
   // Pack físico con tres imágenes separadas, izquierda Bulma, centro Kame, derecha Goku.
-  cx.drawImage(packImage,st.frame*70,0,70,52,0,0,240,180);
+  cx.drawImage(packImage,st.frame*160,0,160,120,0,0,240,180);
   artByStage[km]=c;
  }
  if(selectedStage)refreshDestination();
 };
 packImage.onerror=()=>console.warn('Imágenes de las metas aún no disponibles; se mostrará cartel de destino');
-packImage.src='./assets-metas/casas-dragonball.webp';
+packImage.src='./assets-metas/casas-dragonball.avif';
 let selectedStage=null,targetMeters=5000,started=false,finishCenter=goal.center.clone();
 function refreshDestination(){
  const st=selectedStage;
