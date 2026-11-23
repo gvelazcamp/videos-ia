@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Goku y Vegeta — prueba Blender de mallas limpias</title>
+<style>
+:root{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#ecf2fa;background:#0b1120}
+*{box-sizing:border-box}body{margin:0;overflow:hidden}#scene{position:fixed;inset:0;touch-action:none}
+header{position:fixed;top:0;left:0;right:0;background:linear-gradient(#0b1120eb,#0b112000);padding:13px 16px 32px;pointer-events:none}
+h1{font-size:18px;margin:0 0 4px;font-weight:800}#status{font-size:12px;color:#bad0e5}
+.panel{position:fixed;left:10px;right:10px;bottom:max(12px,env(safe-area-inset-bottom));background:#101c31ed;border:1px solid #31435f;border-radius:16px;padding:12px;box-shadow:0 8px 28px #0007}
+.line{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.buttons{display:flex;gap:6px;flex-wrap:wrap}
+button{border:1px solid #4a5c77;background:#1b2b44;color:#fff;border-radius:10px;padding:9px 12px;font-weight:650;cursor:pointer}
+button[aria-pressed="true"]{background:#285d98;border-color:#6dabf5}
+label{display:flex;gap:8px;align-items:center;font-size:12px;color:#cfdeee}
+input[type=range]{width:100px;accent-color:#72bbff}
+.help{font-size:11px;color:#91a7bf;margin:8px 0 0}
+#failure{white-space:pre-wrap;color:#ffd5a5}
+</style>
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.1/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.1/examples/jsm/"}}
+</script></head><body>
+<div id="scene"></div>
+<header><h1>Goku y Vegeta · revisión Blender</h1><div id="status" role="status">Cargando los modelos articulados…</div></header>
+<section class="panel">
+ <div class="line"><div class="buttons">
+ <button type="button" data-view="both" aria-pressed="true">Ambos</button>
+ <button type="button" data-view="goku" aria-pressed="false">Goku</button>
+ <button type="button" data-view="vegeta" aria-pressed="false">Vegeta</button>
+ </div><button id="play" type="button">Pausar</button></div>
+ <div class="line" style="margin-top:10px">
+ <label>Velocidad <input id="speed" aria-label="Velocidad de carrera" type="range" min="0" max="2.5" step=".1" value="1"><span id="speedVal">1×</span></label>
+ <label><input id="bones" type="checkbox"> Ver huesos</label>
+ <button id="reset" type="button">Centrar cámara</button>
+ </div>
+ <p class="help">Giralo 360° con un dedo y hacé zoom con dos. La cámara evita atravesar los personajes. Candidatos revisados en Blender; originales intactos.</p>
+ <div id="failure"></div>
+</section>
+<script type="module">
+import * as THREE from "three";
+import {OrbitControls} from "three/addons/controls/OrbitControls.js";
+import {GLTFLoader} from "three/addons/loaders/GLTFLoader.js";
+
+const status=document.getElementById("status"), fail=document.getElementById("failure");
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x0b1120);
+scene.fog=new THREE.Fog(0x0b1120,9,18);
+const camera=new THREE.PerspectiveCamera(45,innerWidth/innerHeight,.03,100);
+const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:"high-performance"});
+renderer.setPixelRatio(Math.min(devicePixelRatio||1,2));
+renderer.setSize(innerWidth,innerHeight);
+renderer.outputColorSpace=THREE.SRGBColorSpace;
+document.getElementById("scene").appendChild(renderer.domElement);
+const ctl=new OrbitControls(camera,renderer.domElement);
+ctl.enableDamping=true;ctl.dampingFactor=.07;ctl.enablePan=false;
+ctl.maxPolarAngle=Math.PI*.88;
+// Cámara protegida: no permite acercarse hasta atravesar la piel, el pelo ni los huesos.
+// Ajuste sensible al formato del teléfono y al espacio libre encima de los controles.
+function reset(){
+ const panel=document.querySelector(".panel").getBoundingClientRect();
+ const head=document.querySelector("header").getBoundingClientRect();
+ const safeTop=Math.max(66,head.bottom-18);
+ const safeHeight=Math.max(innerHeight*.42,panel.top-safeTop-12);
+ const safeFraction=Math.min(.82,safeHeight/innerHeight);
+ const halfTan=Math.tan(THREE.MathUtils.degToRad(camera.fov)*.5);
+ const isDuo=active==="both";
+ const modelHeight=2.75;
+ const modelWidth=isDuo ? 5.5 : 3.1;
+ const distanceY=modelHeight/(2*halfTan*safeFraction*.88);
+ const distanceX=modelWidth/(2*halfTan*camera.aspect*.84);
+ const distance=Math.max(7.3,distanceY,distanceX);
+ // El punto de mira ligeramente bajo sitúa las caras en la zona visible y no bajo el panel.
+ const targetY=isDuo ? 0.94 : 0.92;
+ ctl.minDistance=distance*.88;
+ ctl.maxDistance=Math.max(distance*3.5,25);
+ camera.position.set(distance*.10,targetY+distance*.10,distance);
+ ctl.target.set(0,targetY,0);
+ camera.near=Math.max(.025,distance/500);
+ camera.far=Math.max(120,distance*15);
+ camera.updateProjectionMatrix();
+ ctl.update();
+}
+scene.add(new THREE.HemisphereLight(0xc5dbff,0x293348,2.2));
+const light=new THREE.DirectionalLight(0xffffff,2.8);light.position.set(2,6,5);scene.add(light);
+const fill=new THREE.DirectionalLight(0x80baff,1.1);fill.position.set(-4,2,-3);scene.add(fill);
+const facial=new THREE.DirectionalLight(0xffffff,1.2);facial.position.set(0,4,8);scene.add(facial);
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(50,50),new THREE.MeshStandardMaterial({color:0x14243a,roughness:1}));
+ground.rotation.x=-Math.PI/2;ground.position.y=-.035;ground.renderOrder=-100;
+// El piso debe dibujarse DETRÁS, nunca cortar los modelos articulados.
+ground.material.depthTest=false;ground.material.depthWrite=false;scene.add(ground);
+const grid=new THREE.GridHelper(14,28,0x416181,0x233a52);grid.position.y=-.02;grid.renderOrder=-99;
+grid.material.depthTest=false;grid.material.depthWrite=false;scene.add(grid);
+const models={},loader=new GLTFLoader(),clock=new THREE.Clock();
+let active="both",playing=true;
+reset();
+const files={
+goku:"./candidatos-limpios/goku.glb",
+vegeta:"./candidatos-limpios/vegeta.glb"
+};
+function place(){
+ for(const name of ["goku","vegeta"]){
+  const item=models[name];if(!item)continue;
+  const visible=active==="both"||active===name;
+  item.root.visible=visible;
+  item.root.position.x=active==="both"?(name==="goku"?-1.15:1.15):0;
+ }
+}
+function load(name,url){
+ return new Promise((resolve,reject)=>loader.load(url,gltf=>{
+  if(!gltf.scene) return reject(new Error(name+": sin escena 3D"));
+  if(!gltf.animations.length) return reject(new Error(name+": sin animación"));
+  // Los GLB articulados pueden desplazar partes fuera de su caja de reposo:
+  // evitar el recorte por frustum en brazos, pelo y piernas durante la carrera.
+  gltf.scene.traverse(obj=>{
+    if(!obj.isMesh) return;
+    obj.frustumCulled=false;
+    // Respetar orientación de materiales exportada por Blender.
+    // Forzar DoubleSide dejaba ver las caras invertidas y aumentaba artefactos negros.
+  });
+  const wrap=new THREE.Group();wrap.add(gltf.scene);
+  // Normalizar tamaño y apoyar el modelo sin modificar la malla ni la animación.
+  let box=new THREE.Box3().setFromObject(gltf.scene);
+  let size=box.getSize(new THREE.Vector3());
+  if(!Number.isFinite(size.y)||size.y<.0001)return reject(new Error(name+": tamaño inválido"));
+  let scale=2.55/size.y;gltf.scene.scale.setScalar(scale);
+  box=new THREE.Box3().setFromObject(gltf.scene);
+  const center=box.getCenter(new THREE.Vector3());
+  gltf.scene.position.set(-center.x,-box.min.y,-center.z);
+  wrap.userData.name=name;
+  scene.add(wrap);
+  const mixer=new THREE.AnimationMixer(gltf.scene);
+  mixer.clipAction(gltf.animations[0]).reset().play();
+  const skeleton=new THREE.SkeletonHelper(gltf.scene);
+  skeleton.visible=false;wrap.add(skeleton);
+  models[name]={root:wrap,mixer,skeleton,clip:gltf.animations[0].name};
+  place();reset();resolve(name);
+ },undefined,e=>reject(e)));
+}
+Promise.allSettled(Object.entries(files).map(([name,url])=>load(name,url))).then(results=>{
+ const ok=results.filter(r=>r.status==="fulfilled").length;
+ const errors=results.filter(r=>r.status==="rejected").map(r=>String(r.reason?.message||r.reason));
+ status.textContent=ok===2?"Dos GLB cargados · animación Correr disponible":ok===1?"Solo cargó 1 de 2 modelos":"No se cargaron los modelos";
+ fail.textContent=errors.join("\n");
+});
+document.querySelectorAll("[data-view]").forEach(btn=>btn.addEventListener("click",()=>{
+ active=btn.dataset.view;
+ document.querySelectorAll("[data-view]").forEach(b=>b.setAttribute("aria-pressed",String(b===btn)));
+ place();reset();
+}));
+document.getElementById("play").addEventListener("click",e=>{playing=!playing;e.currentTarget.textContent=playing?"Pausar":"Reanudar"});
+document.getElementById("speed").addEventListener("input",e=>{document.getElementById("speedVal").textContent=Number(e.target.value).toFixed(1)+"×"});
+document.getElementById("bones").addEventListener("change",e=>Object.values(models).forEach(m=>m.skeleton.visible=e.target.checked));
+document.getElementById("reset").addEventListener("click",reset);
+addEventListener("resize",()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);reset()});
+renderer.setAnimationLoop(()=>{let dt=Math.min(clock.getDelta(),.08),speed=Number(document.getElementById("speed").value);
+ if(playing)Object.values(models).forEach(m=>m.mixer.update(dt*speed));
+ ctl.update();renderer.render(scene,camera);
+});
+</script></body></html>
