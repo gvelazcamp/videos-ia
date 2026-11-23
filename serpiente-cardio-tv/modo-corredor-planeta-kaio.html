@@ -55,8 +55,11 @@ document.querySelector('#view').onclick=e=>{
 };
 function avanzarHasta(m){
  // Accesos de prueba: no alteran la velocidad configurada ni la música.
- if(arrived)return;
  distance=THREE.MathUtils.clamp(Math.floor(m),0,1000);
+ if(distance<1000){
+  // Permite volver a probar la aproximación después de haber llegado.
+  arrived=false;rewarded=false;prizeUntil=0;prize.classList.remove('active');
+ }
  t=Math.min(goal.goalT,9+distance);
  // Reposicionamiento inmediato de cámara para no atravesar toda la escena.
  if(distance<1000){
@@ -79,9 +82,13 @@ const f=frame(t),look=frame(t+(high?70:24));
 const bob=high||paused?0:Math.sin(now*.016)*.09;
 if(arrived){
  const departure=Math.max(64,43/camera.aspect);
- const desired=goal.center.clone().add(new THREE.Vector3(0,14,departure));
+ const desired=goal.center.clone().add(new THREE.Vector3(
+  viewMode==='elevada'?25:0,
+  viewMode==='elevada'?40:(viewMode==='planeta'?12:14),
+  viewMode==='planeta'?departure*.82:departure
+ ));
  camera.position.lerp(desired,Math.min(1,dt*.9));
- camera.lookAt(goal.center.clone().add(new THREE.Vector3(0,8,0)));
+ camera.lookAt(goal.center.clone().add(new THREE.Vector3(0,viewMode==='planeta'?10:8,0)));
 }else{
  const desired=f.p.clone().add(new THREE.Vector3(0,high?30:(focusPlanet?3.6:1.7+bob),high?22:(focusPlanet?5:1.8)));
  camera.position.lerp(desired,Math.min(1,dt*5));
