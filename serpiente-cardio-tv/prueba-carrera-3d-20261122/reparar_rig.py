@@ -101,28 +101,63 @@ for name in ("goku","vegeta"):
     animations=[]
     for action in bpy.data.actions:
         if not action.users:continue
-        revised=0
+        changed=0
+        samples=[]
         if hasattr(action,'fcurves'):
+            # GLTF import convierte las rotaciones a quaterniones. Antes se
+            # buscaban rotation_euler y nunca se corregian los movimientos.
+            from collections import defaultdict
+            groups=defaultdict(dict)
             for fc in action.fcurves:
-                if not ("rotation_euler" in fc.data_path and fc.array_index==0):
+                if "rotation_quaternion" in fc.data_path:
+                    groups[fc.data_path][fc.array_index]=fc
+                elif "rotation_euler" in fc.data_path and fc.array_index==0:
+                    path=fc.data_path
+                    factor=(.64 if "UpperArm" in path else
+                            .72 if "Thigh" in path else
+                            .70 if "Shin" in path else
+                            .78 if "Forearm" in path else
+                            .47 if "Torso" in path else 1.0)
+                    if factor!=1.0:
+                        for k in fc.keyframe_points:
+                            k.co.y*=factor
+                            k.handle_left.y*=factor
+                            k.handle_right.y*=factor
+                            k.interpolation="BEZIER"
+                            k.handle_left_type="AUTO_CLAMPED"
+                            k.handle_right_type="AUTO_CLAMPED"
+                        changed+=1
+                if len(samples)<5:
+                    samples.append(fc.data_path)
+            for path,curves in groups.items():
+                if set(curves)!={0,1,2,3}:
                     continue
-                path=fc.data_path
                 factor=(.64 if "UpperArm" in path else
                         .72 if "Thigh" in path else
                         .70 if "Shin" in path else
                         .78 if "Forearm" in path else
-                        .47 if "Torso" in path else
-                        1.0)
-                if factor!=1.0:
-                    for k in fc.keyframe_points:
-                        k.co.y*=factor
-                        k.handle_left.y*=factor
-                        k.handle_right.y*=factor
-                        k.interpolation="BEZIER"
-                        k.handle_left_type="AUTO_CLAMPED"
-                        k.handle_right_type="AUTO_CLAMPED"
-                    revised+=1
-        animations.append({"name":action.name,"adjusted_curves":revised})
+                        .47 if "Torso" in path else 1.0)
+                if factor>=1:
+                    continue
+                from mathutils import Quaternion
+                n=min(len(fc.keyframe_points) for fc in curves.values())
+                for i in range(n):
+                    keyframes=[curves[j].keyframe_points[i] for j in (0,1,2,3)]
+                    q=Quaternion(tuple(k.co.y for k in keyframes))
+                    q.normalize()
+                    corrected=Quaternion((1.,0.,0.,0.)).slerp(q,factor)
+                    for j,key in enumerate(keyframes):
+                        old=key.co.y
+                        offset=corrected[j]-old
+                        key.co.y=corrected[j]
+                        key.handle_left.y+=offset
+                        key.handle_right.y+=offset
+                        key.interpolation="BEZIER"
+                        key.handle_left_type="AUTO_CLAMPED"
+                        key.handle_right_type="AUTO_CLAMPED"
+                changed+=4
+        animations.append({"name":action.name,"adjusted_curves":changed,
+                           "sample_paths":samples})
     # Ocultar auxiliares no skinned y que no pertenecen al GLB de personaje.
     # Algunos son esferas de depuracion; solo se retiran si carecen de materiales/texturas
     # y no tienen modificador ARMATURE.
