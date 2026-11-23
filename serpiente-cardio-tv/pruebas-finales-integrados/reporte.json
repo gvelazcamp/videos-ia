@@ -1,0 +1,102 @@
+{
+  "checks": [
+    {
+      "km": 5,
+      "near": {
+        "loaded": true,
+        "display": "block",
+        "width": 246.1875,
+        "height": 184.640625,
+        "left": 93.90625,
+        "top": 335.859375,
+        "viewportWidth": 430,
+        "viewportHeight": 915,
+        "src": "http://127.0.0.1:8765/serpiente-cardio-tv/assets-metas/meta-bulma.png"
+      },
+      "finish": {
+        "loaded": true,
+        "width": 339.6875,
+        "height": 254.765625,
+        "display": "block",
+        "left": 45.15625,
+        "top": 440.640625
+      },
+      "heading": "¡Llegaste a Casa de Bulma!",
+      "result": "VISIBLE"
+    },
+    {
+      "km": 10,
+      "near": {
+        "loaded": true,
+        "display": "block",
+        "width": 268.09375,
+        "height": 201.0625,
+        "left": 75.953125,
+        "top": 324.9375,
+        "viewportWidth": 430,
+        "viewportHeight": 915,
+        "src": "http://127.0.0.1:8765/serpiente-cardio-tv/assets-metas/meta-kaio.png"
+      },
+      "finish": {
+        "loaded": true,
+        "width": 313.890625,
+        "height": 235.40625,
+        "display": "block",
+        "left": 58.0546875,
+        "top": 460
+      },
+      "heading": "¡Llegaste a Planeta de Kaio-sama!",
+      "result": "VISIBLE"
+    },
+    {
+      "km": 15,
+      "near": {
+        "loaded": true,
+        "display": "block",
+        "width": 271.390625,
+        "height": 203.53125,
+        "left": 81.3046875,
+        "top": 323.46875,
+        "viewportWidth": 430,
+        "viewportHeight": 915,
+        "src": "http://127.0.0.1:8765/serpiente-cardio-tv/assets-metas/meta-kame.png"
+      },
+      "finish": {
+        "loaded": true,
+        "width": 339.6875,
+        "height": 254.765625,
+        "display": "block",
+        "left": 45.15625,
+        "top": 440.640625
+      },
+      "heading": "¡Llegaste a Kame House!",
+      "result": "VISIBLE"
+    },
+    {
+      "km": 20,
+      "near": {
+        "loaded": true,
+        "display": "block",
+        "width": 269.59375,
+        "height": 202.1875,
+        "left": 82.59375,
+        "top": 324.40625,
+        "viewportWidth": 430,
+        "viewportHeight": 915,
+        "src": "http://127.0.0.1:8765/serpiente-cardio-tv/assets-metas/meta-goku.png"
+      },
+      "finish": {
+        "loaded": true,
+        "width": 339.6875,
+        "height": 254.765625,
+        "display": "block",
+        "left": 45.15625,
+        "top": 440.640625
+      },
+      "heading": "¡Llegaste a Casa de Goku!",
+      "result": "VISIBLE"
+    }
+  ],
+  "errors": [],
+  "result": "success"
+}
