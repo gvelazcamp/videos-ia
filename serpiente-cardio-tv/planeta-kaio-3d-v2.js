@@ -30,13 +30,16 @@ export function createKaioGoal(THREE,scene,path){
  band.add(new THREE.Mesh(bandGeometry,bandMaterial));
  // Rayas de las baldosas para reconocer la pista circular.
  const seams=mat(0xbdb5a2,{side:THREE.DoubleSide});
- for(let i=0;i<94;i++){
-  const ang=i*Math.PI*2/94;
-  const radial=R+.14,longitude=new THREE.Group();
-  const v=new THREE.Vector3(Math.cos(ang)*radial,0,Math.sin(ang)*radial);
-  const tile=cube(longitude,.13,5.9,.06,v.x,v.y,v.z,seams);
-  longitude.rotation.y=-ang;
-  band.add(longitude);
+ for(let i=0;i<80;i++){
+  const a=i*Math.PI*2/80,pts=[];
+  for(let j=0;j<=5;j++){
+   const phi=-.120+j*.048,r=R+.16;
+   pts.push(new THREE.Vector3(r*Math.cos(phi)*Math.cos(a),
+    r*Math.sin(phi),r*Math.cos(phi)*Math.sin(a)));
+  }
+  const seam=new THREE.Mesh(
+   new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts),5,.043,4,false),seams);
+  band.add(seam);
  }
  // Aro del camino visible desde el frente sin transparencias que oculten edificios.
  const rim=new THREE.Mesh(new THREE.TorusGeometry(R+.10,.13,7,100),trim);
