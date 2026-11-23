@@ -59,6 +59,24 @@ def cleanup_mesh(mesh):
     mesh.update()
     return {**antes,"vertices_sin_caras_eliminados":len(libres)}
 
+def weld_soup_mesh(mesh):
+    # Candidato alternativo: soldar vértices geométricamente coincidentes.
+    # Se usa una tolerancia diminuta para no borrar mechones/puntas legítimos.
+    bm=bmesh.new()
+    bm.from_mesh(mesh)
+    before=len(bm.verts)
+    bmesh.ops.remove_doubles(bm,verts=list(bm.verts),dist=0.00004)
+    if bm.faces:
+        bmesh.ops.recalc_face_normals(bm,faces=list(bm.faces))
+    after=len(bm.verts)
+    bm.to_mesh(mesh)
+    bm.free()
+    for poly in mesh.polygons:
+        poly.use_smooth=True
+    mesh.update()
+    return {"vertices_antes":before,"vertices_despues":after,
+            "soldados":before-after,"islas_despues":summarize_islands(mesh)["total"]}
+
 for name in ("goku","vegeta"):
     bpy.ops.object.select_all(action='SELECT')
     bpy.ops.object.delete(use_global=False)
@@ -84,6 +102,15 @@ for name in ("goku","vegeta"):
     bpy.ops.export_scene.gltf(filepath=str(OUT/(name+".glb")),
             export_format='GLB',export_animations=True,export_skins=True)
     item["candidato_bytes"]=(OUT/(name+".glb")).stat().st_size
+    item["soldadura"]={}
+    for obj in meshes:
+        if obj.name.startswith("geometry"):
+            item["soldadura"][obj.name]=weld_soup_mesh(obj.data)
+    # Una segunda opción soldada sin reemplazar ni los originales ni el candidato suave.
+    welded=OUT/(name+"-soldado.glb")
+    bpy.ops.export_scene.gltf(filepath=str(welded),
+            export_format='GLB',export_animations=True,export_skins=True)
+    item["soldado_bytes"]=welded.stat().st_size
     report[name]=item
 
 (OUT/"auditoria.json").write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding="utf-8")
